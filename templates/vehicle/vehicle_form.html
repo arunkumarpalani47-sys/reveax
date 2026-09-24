@@ -1,0 +1,326 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<style>
+/* Modern Admin Form Styling */
+.form-page-wrapper {
+  padding: 1.5rem 0;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.form-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.form-card-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 1.5rem 2rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-card-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #ffffff;
+}
+
+.form-section-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #2563eb;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-control-custom {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.form-control-custom:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  outline: none;
+}
+
+.image-preview-box {
+  width: 100%;
+  height: 160px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.image-preview-box:hover {
+  border-color: #3b82f6;
+  background: #f0f7ff;
+}
+
+.image-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-gradient-submit {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 0.85rem 2rem;
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-gradient-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  color: #ffffff;
+}
+</style>
+
+<div class="form-page-wrapper">
+  
+  <!-- Breadcrumb Header -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <a href="{% url 'vehicle_list' %}" class="text-secondary text-decoration-none small fw-semibold">
+        <i class="bi bi-arrow-left me-1"></i> Back to Fleet Catalog
+      </a>
+    </div>
+    <span class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill font-monospace" style="font-size: 0.75rem;">
+      Admin Management
+    </span>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-header">
+      <h2 class="form-card-title">
+        {% if form.instance.pk %}
+          <i class="bi bi-pencil-square text-warning me-1"></i> Edit Vehicle Details
+        {% else %}
+          <i class="bi bi-car-front-fill text-warning me-1"></i> Add New Fleet Vehicle
+        {% endif %}
+      </h2>
+      <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fw-semibold small">
+        Rovexa Fleet Portal
+      </span>
+    </div>
+
+    <div class="p-4 p-md-5">
+      
+      {% if form.errors %}
+        <div class="alert alert-danger rounded-4 mb-4 border-0 shadow-sm">
+          <strong><i class="bi bi-exclamation-octagon-fill me-1"></i> Form Submission Error:</strong>
+          <ul class="mb-0 mt-2 ps-3">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- SECTION 1: BASIC VEHICLE INFORMATION -->
+        <div class="mb-4">
+          <div class="form-section-label">
+            <i class="bi bi-info-circle-fill"></i> 1. Vehicle Identification
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Vehicle Display Name</label>
+              {{ form.vehicle_name }}
+              <div class="form-text small">e.g., Rovexa Sedan, Swift Dzire Cab</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">License Plate Number</label>
+              {{ form.vehicle_number }}
+              <div class="form-text small">e.g., TN-01-AX-4040 (Unique ID)</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Brand / Manufacturer</label>
+              {{ form.brand }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Vehicle Model Name</label>
+              {{ form.model }}
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4 text-secondary opacity-25">
+
+        <!-- SECTION 2: CATEGORY, SPECS & PRICING -->
+        <div class="mb-4">
+          <div class="form-section-label">
+            <i class="bi bi-tag-fill"></i> 2. Category, Specs & Pricing Rate
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Vehicle Type / Category</label>
+              {{ form.vehicle_type }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Fuel Type</label>
+              {{ form.fuel_type }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Seating Capacity</label>
+              {{ form.seats }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Pricing Rate per KM (₹)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-dark fw-bold border-end-0" style="border-radius: 14px 0 0 14px;">₹</span>
+                {{ form.price_per_km }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4 text-secondary opacity-25">
+
+        <!-- SECTION 3: MEDIA & AVAILABILITY -->
+        <div class="mb-4">
+          <div class="form-section-label">
+            <i class="bi bi-image-fill"></i> 3. Car Photo & Availability Status
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Vehicle Image URL (Supports Google Drive & Web Links)</label>
+              {{ form.image_url }}
+              <div class="form-text small text-primary"><i class="bi bi-google me-1"></i> Paste any Google Drive or web link (auto-converted to direct image).</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Or Upload Vehicle Photo File</label>
+              {{ form.image }}
+              <div class="form-text small">Upload clear JPG/PNG car photo.</div>
+            </div>
+
+            <div class="col-12">
+              <div class="card bg-light border-0 rounded-4 p-3 d-flex align-items-center justify-content-between flex-row">
+                <div>
+                  <div class="fw-bold text-dark small">Active Availability</div>
+                  <div class="text-secondary extra-small" style="font-size:0.75rem;">Enable for customer bookings</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.is_available }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4 text-secondary opacity-25">
+
+        <!-- SECTION 4: DRIVER DETAILS -->
+        <div class="mb-4">
+          <div class="form-section-label">
+            <i class="bi bi-person-badge-fill"></i> 4. Driver Information & Contact Details
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Driver Full Name</label>
+              {{ form.driver_name }}
+              <div class="form-text small">e.g., Ramesh Kumar</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Driver Phone Number</label>
+              {{ form.driver_phone }}
+              <div class="form-text small">e.g., +91 98452 98351</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Driver Photo URL (Supports Google Drive & Web Links)</label>
+              {{ form.driver_image_url }}
+              <div class="form-text small text-primary"><i class="bi bi-google me-1"></i> Paste any Google Drive or web link (auto-converted to direct image).</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Or Upload Driver Photo File</label>
+              {{ form.driver_image }}
+              <div class="form-text small">Upload driver profile photo file.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Driver Rating (Out of 5.0)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-warning fw-bold border-end-0" style="border-radius: 14px 0 0 14px;"><i class="bi bi-star-fill"></i></span>
+                {{ form.driver_rating }}
+              </div>
+              <div class="form-text small">Default is 4.9</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4 text-secondary opacity-25">
+
+        <!-- FORM ACTIONS -->
+        <div class="d-flex align-items-center justify-content-between pt-2">
+          <a href="{% url 'vehicle_list' %}" class="btn btn-light px-4 py-2.5 rounded-3 fw-semibold text-secondary">
+            Cancel
+          </a>
+
+          <button type="submit" class="btn-gradient-submit">
+            {% if form.instance.pk %}
+              <i class="bi bi-check-circle-fill me-2"></i> Update Vehicle
+            {% else %}
+              <i class="bi bi-plus-circle-fill me-2"></i> Save & Publish Vehicle
+            {% endif %}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

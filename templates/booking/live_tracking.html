@@ -1,0 +1,980 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+/* ==========================================
+   ULTRA-PREMIUM LIVE RIDE TRACKING DASHBOARD
+   ========================================== */
+.tracking-wrapper {
+  padding: 1.5rem 0.5rem;
+}
+
+/* Glassmorphism Dark Card Container */
+.tracking-main-card {
+  background: #0f172a;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  color: #f8fafc;
+}
+
+.tracking-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.tracking-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* Equalizer Bars Animation */
+.eq-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+  padding: 2px 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border-radius: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.eq-bar {
+  width: 3px;
+  background: #f59e0b;
+  border-radius: 3px;
+  animation: eqBounce 1.2s ease-in-out infinite alternate;
+}
+.eq-bar:nth-child(1) { height: 60%; animation-delay: 0.1s; }
+.eq-bar:nth-child(2) { height: 100%; animation-delay: 0.3s; }
+.eq-bar:nth-child(3) { height: 40%; animation-delay: 0.5s; }
+.eq-bar:nth-child(4) { height: 80%; animation-delay: 0.2s; }
+@keyframes eqBounce {
+  0% { height: 25%; }
+  100% { height: 100%; }
+}
+
+/* Action Header Badges */
+.header-action-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.4rem 0.95rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================
+   HORIZONTAL RIDE TIMELINE STEPPER
+   ========================================== */
+.stepper-timeline-bar {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(12px);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stepper-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  position: relative;
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.stepper-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2.5px solid #475569;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.stepper-step.completed .stepper-circle {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #34d399;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.stepper-step.active .stepper-circle {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: #fbbf24;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  transform: scale(1.1);
+  animation: pulseActive 2s infinite ease-in-out;
+}
+
+@keyframes pulseActive {
+  0%, 100% { transform: scale(1.08); box-shadow: 0 0 16px rgba(245, 158, 11, 0.5); }
+  50% { transform: scale(1.16); box-shadow: 0 0 28px rgba(245, 158, 11, 0.8); }
+}
+
+.stepper-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+
+.stepper-step.active .stepper-title {
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+.stepper-step.completed .stepper-title {
+  color: #34d399;
+}
+
+/* ==========================================
+   LIVE MAP & TELEMETRY
+   ========================================== */
+.map-view-box {
+  position: relative;
+  width: 100%;
+  height: 440px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: #090d16;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+@media (max-width: 768px) {
+  .map-view-box {
+    height: 320px !important;
+    border-radius: 14px;
+  }
+  .stepper-timeline-bar {
+    padding: 0.75rem 1rem !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .stepper-grid {
+    min-width: 500px;
+  }
+  .tracking-header {
+    padding: 1rem !important;
+  }
+}
+
+#live-map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.map-hud-overlay {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.hud-pill-badge {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* ==========================================
+   DRIVER PROFILE & TRIP CARDS
+   ========================================== */
+.card-dark-glass {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.driver-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.driver-large-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid #f59e0b;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+  flex-shrink: 0;
+}
+
+.driver-full-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.driver-phone-num {
+  font-size: 0.82rem;
+  color: #38bdf8;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.btn-call-driver {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #0f172a;
+  font-weight: 800;
+  padding: 0.6rem 1.1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-call-driver:hover {
+  transform: translateY(-2px);
+  color: #0f172a;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+}
+
+/* Shimmering OTP Card */
+.otp-card-gold {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 2px dashed #f59e0b;
+  border-radius: 18px;
+  padding: 1.1rem;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+  margin-bottom: 1.25rem;
+}
+
+.otp-number-display {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: #f59e0b;
+  text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+  line-height: 1.1;
+  margin: 0.3rem 0;
+}
+
+/* Route Location List */
+.route-spec-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.route-dot-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.route-dot-icon.pickup { background: #064e3b; color: #34d399; }
+.route-dot-icon.drop { background: #7f1d1d; color: #f87171; }
+
+.btn-sos-danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-sos-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+</style>
+
+<div class="tracking-wrapper">
+  <div class="tracking-main-card">
+    
+    <!-- HEADER BAR -->
+    <div class="tracking-header">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <a href="{% url 'booking_list' %}" class="btn btn-sm btn-outline-light rounded-pill px-3 me-1">
+            <i class="bi bi-arrow-left me-1"></i> Back to Rides
+          </a>
+          <h1 class="tracking-title">
+            <i class="bi bi-compass-fill text-warning"></i> Live Ride Tracking
+          </h1>
+          <div class="eq-bars ms-2">
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+          </div>
+        </div>
+        <div class="text-white-50 small mt-1 ps-1">
+          Booking ID: <code class="text-warning fw-bold">#{{ booking.id }}</code>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        {% if is_rejected_or_cancelled %}
+          <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-30 rounded-pill px-3 py-1 fw-bold small">
+            <i class="bi bi-x-circle-fill me-1"></i> Booking Rejected / Cancelled
+          </span>
+        {% else %}
+          <span class="header-action-badge">
+            <i class="bi bi-check-circle-fill"></i> Driver & Cab Confirmed
+          </span>
+        {% endif %}
+        <a id="gmaps-open-btn" href="https://www.google.com/maps/dir/?api=1&destination={{ booking.pickup_lat|default:12.9716 }},{{ booking.pickup_lng|default:77.5946 }}&travelmode=driving" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold text-decoration-none">
+          <i class="bi bi-map-fill me-1"></i> Open in Maps
+        </a>
+        <button onclick="sharePublicRideLink()" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold">
+          <i class="bi bi-share-fill me-1"></i> Share Trip
+        </button>
+      </div>
+    </div>
+
+    <!-- HORIZONTAL STEPPER TIMELINE -->
+    <div class="stepper-timeline-bar">
+      {% if is_rejected_or_cancelled %}
+        <div class="text-center py-1">
+          <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-30 rounded-pill px-4 py-2 fw-bold fs-6">
+            <i class="bi bi-x-circle-fill me-2"></i> Ride Request Rejected / Cancelled
+          </span>
+        </div>
+      {% else %}
+        <div class="stepper-grid">
+          {% for step in steps %}
+            <div class="stepper-step {% if step.active %}active{% endif %} {% if step.completed %}completed{% endif %}">
+              <div class="stepper-circle">
+                {% if step.completed %}<i class="bi bi-check-lg"></i>{% else %}{{ step.icon }}{% endif %}
+              </div>
+              <div class="stepper-title">{{ step.label }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div class="p-4">
+      <div class="row g-4">
+        
+        <!-- LEFT COLUMN: LIVE MAP & ROUTE SPECIFICATIONS -->
+        <div class="col-lg-7">
+          
+          <!-- Live Interactive Map Viewport -->
+          <div class="map-view-box mb-4">
+            <div class="map-hud-overlay">
+              <div class="hud-pill-badge">
+                <i class="bi bi-speedometer2 text-warning fs-6"></i>
+                <span>38 km/h • On-Time Route</span>
+              </div>
+              <div class="hud-pill-badge">
+                <i class="bi bi-clock-history text-info fs-6"></i>
+                <span id="hud-eta-val">{{ booking.estimated_duration|default:"15" }} mins ETA</span>
+              </div>
+            </div>
+
+            <div id="live-map"></div>
+          </div>
+
+          <!-- Trip Specifications Card -->
+          <div class="card-dark-glass mb-0">
+            <h5 class="fw-bold text-white mb-3 small text-uppercase tracking-wider">
+              <i class="bi bi-geo-alt-fill text-warning me-1"></i> Route Details
+            </h5>
+
+            <div class="d-flex flex-column gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <div class="route-spec-item">
+                <div class="route-dot-icon pickup"><i class="bi bi-circle-fill"></i></div>
+                <div>
+                  <div class="text-white-50 extra-small fw-semibold" style="font-size: 0.72rem;">PICKUP LOCATION</div>
+                  <div class="text-white fw-bold small">{{ booking.pickup_location }}</div>
+                </div>
+              </div>
+
+              <div class="route-spec-item">
+                <div class="route-dot-icon drop"><i class="bi bi-geo-alt-fill"></i></div>
+                <div>
+                  <div class="text-white-50 extra-small fw-semibold" style="font-size: 0.72rem;">DROP DESTINATION</div>
+                  <div class="text-white fw-bold small">{{ booking.drop_location }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-2 text-center">
+              <div class="col-4">
+                <div class="p-2.5 rounded-3 bg-dark bg-opacity-50">
+                  <div class="text-white-50 extra-small" style="font-size:0.7rem;">Distance</div>
+                  <div class="text-white fw-bold small mt-1">{{ booking.distance|floatformat:1 }} km</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-2.5 rounded-3 bg-dark bg-opacity-50">
+                  <div class="text-white-50 extra-small" style="font-size:0.7rem;">Est. Time</div>
+                  <div class="text-white fw-bold small mt-1">{{ booking.estimated_duration|default:"15" }} mins</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-2.5 rounded-3 bg-dark bg-opacity-50">
+                  <div class="text-white-50 extra-small" style="font-size:0.7rem;">Total Fare</div>
+                  <div class="text-success fw-bold small mt-1">₹{{ booking.total_fare|floatformat:2 }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: ASSIGNED DRIVER & RIDE SECURITY -->
+        <div class="col-lg-5">
+          
+          {% if booking.status == 'REJECTED' or booking.status == 'Rejected' or booking.status == 'CANCELLED' or booking.status == 'Cancelled' or is_rejected_or_cancelled %}
+            <!-- BOOKING REJECTED / CANCELLED NOTICE CARD -->
+            <div class="card-dark-glass text-center border border-danger border-opacity-40 bg-danger bg-opacity-10 py-4 mb-3">
+              <div class="display-3 text-danger mb-2"><i class="bi bi-x-circle-fill"></i></div>
+              <h4 class="fw-bold text-white mb-2">Booking Rejected</h4>
+              <p class="text-white-50 small mb-4 px-2">
+                We apologize, but this ride request was rejected or cancelled by the driver or administrator. No fare has been charged to your account.
+              </p>
+              <a href="{% url 'add_booking' %}" class="btn btn-warning fw-bold rounded-pill px-4 py-2.5 text-dark shadow-sm">
+                <i class="bi bi-plus-circle-fill me-2"></i> Book a New Ride
+              </a>
+            </div>
+          {% else %}
+            <!-- Assigned Driver Card -->
+            <div class="card-dark-glass">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-20 rounded-pill px-3 py-1 fw-bold small">
+                  <i class="bi bi-shield-check me-1"></i> Verified Assigned Driver
+                </span>
+                <span class="badge bg-warning bg-opacity-20 text-warning rounded-pill px-2.5 py-1 fw-bold small">
+                  <i class="bi bi-star-fill me-1"></i> 
+                  {% if booking.vehicle and booking.vehicle.driver_rating %}{{ booking.vehicle.driver_rating }}{% else %}4.9{% endif %}
+                </span>
+              </div>
+
+              <div class="driver-profile-header mb-3">
+                {% if booking.vehicle and booking.vehicle.driver_image %}
+                  <img src="{{ booking.vehicle.driver_image.url }}" alt="Driver Portrait" class="driver-large-avatar" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80';">
+                {% else %}
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="Driver Portrait" class="driver-large-avatar">
+                {% endif %}
+
+                <div class="flex-grow-1">
+                  <h4 class="driver-full-name">
+                    {% if booking.vehicle and booking.vehicle.driver_name %}
+                      {{ booking.vehicle.driver_name }}
+                    {% elif booking.driver %}
+                      {{ booking.driver.get_full_name|default:booking.driver.username }}
+                    {% else %}
+                      Ramesh Kumar
+                    {% endif %}
+                  </h4>
+                  <div class="driver-phone-num">
+                    <i class="bi bi-telephone-fill me-1"></i>
+                    {% if booking.vehicle and booking.vehicle.driver_phone %}
+                      {{ booking.vehicle.driver_phone }}
+                    {% elif booking.driver and booking.driver.phone %}
+                      {{ booking.driver.phone }}
+                    {% else %}
+                      +91 98452 98351
+                    {% endif %}
+                  </div>
+                  <div class="text-white-50 extra-small mt-1" style="font-size:0.75rem;">
+                    <i class="bi bi-car-front-fill text-warning me-1"></i>
+                    {{ booking.vehicle.vehicle_name|default:"Rovexa Premium Cab" }} ({{ booking.vehicle.vehicle_number|default:"TN-01-AX-4040" }})
+                  </div>
+                </div>
+              </div>
+
+              <a href="tel:{% if booking.vehicle and booking.vehicle.driver_phone %}{{ booking.vehicle.driver_phone }}{% else %}+919845298351{% endif %}" class="btn-call-driver w-100 justify-content-center">
+                <i class="bi bi-telephone-outbound-fill"></i> Call Driver Now
+              </a>
+            </div>
+
+            <!-- DYNAMIC STAGE ACKNOWLEDGEMENT & OTP BOX -->
+            <div id="otp-container">
+              {% if booking.status == 'TRIP_STARTED' or booking.otp_verified %}
+                <!-- STAGE 3: TRIP STARTED & IN PROGRESS -->
+                <div class="card-dark-glass text-center border border-success border-opacity-40 bg-success bg-opacity-10 py-3 mb-3">
+                  <div class="text-success fw-bold fs-5 mb-1">
+                    <i class="bi bi-shield-check-fill me-1"></i> Trip In Progress
+                  </div>
+                  <div class="text-white-50 extra-small">
+                    OTP verified successfully! Your ride is currently in transit to destination. Enjoy your ride!
+                  </div>
+                </div>
+              {% elif booking.status == 'TRIP_COMPLETED' %}
+                <!-- STAGE 4: TRIP COMPLETED & RATING -->
+                <div class="card-dark-glass text-center border border-primary border-opacity-40 bg-primary bg-opacity-10 py-3 mb-3">
+                  <div class="text-info fw-bold fs-5 mb-1">
+                    <i class="bi bi-check-circle-fill me-1"></i> Trip Completed
+                  </div>
+                  <div class="text-white-50 extra-small mb-2">
+                    Total Fare Paid: <strong class="text-warning fs-6">₹{{ booking.total_fare|floatformat:2 }}</strong>
+                  </div>
+
+                  <div id="rating-form-box" class="pt-2 border-top border-secondary border-opacity-25 text-start">
+                    {% if booking.rating %}
+                      <div class="text-center text-warning fw-bold small">
+                        <i class="bi bi-star-fill text-warning me-1"></i> You rated this trip {{ booking.rating }}/5 stars
+                      </div>
+                    {% else %}
+                      <div class="text-white extra-small fw-bold mb-2">Rate Your Driver Experience:</div>
+                      <div class="d-flex justify-content-center gap-2 mb-2" id="star-rating-select">
+                        <span class="fs-4 text-warning cursor-pointer" onclick="setRating(1)">★</span>
+                        <span class="fs-4 text-warning cursor-pointer" onclick="setRating(2)">★</span>
+                        <span class="fs-4 text-warning cursor-pointer" onclick="setRating(3)">★</span>
+                        <span class="fs-4 text-warning cursor-pointer" onclick="setRating(4)">★</span>
+                        <span class="fs-4 text-warning cursor-pointer" onclick="setRating(5)">★</span>
+                      </div>
+                      <input type="hidden" id="selected_rating_val" value="5">
+                      <textarea id="rating_comment_input" class="form-control bg-dark text-white border-secondary extra-small mb-2" rows="2" placeholder="Leave review feedback (optional)..."></textarea>
+                      <button type="button" class="btn btn-warning w-100 fw-bold btn-sm rounded-pill text-dark py-1.5" onclick="submitTripRating()">
+                        Submit Review
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              {% else %}
+                <!-- STAGE 1 & 2: START RIDE OTP CARD -->
+                <div class="otp-card-gold">
+                  <div class="text-warning extra-small fw-bold text-uppercase tracking-wider">
+                    <i class="bi bi-key-fill me-1"></i> Start Ride OTP
+                  </div>
+                  <div class="otp-number-display">{{ booking.otp|default:"632845" }}</div>
+                  <div class="text-white-50 extra-small" style="font-size:0.75rem;">
+                    Share this 6-digit OTP with driver upon arrival to start your trip
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <!-- Passenger Info & Driver Notes -->
+          <div class="card-dark-glass">
+            <div class="row g-2 text-start">
+              <div class="col-6">
+                <div class="text-white-50 extra-small" style="font-size:0.72rem;">Passenger Name</div>
+                <div class="text-white fw-bold small mt-0.5">{{ booking.passenger_name|default:request.user.get_full_name|default:request.user.username }}</div>
+              </div>
+              <div class="col-6">
+                <div class="text-white-50 extra-small" style="font-size:0.72rem;">Passenger Phone</div>
+                <div class="text-white fw-bold small mt-0.5">{{ booking.passenger_phone|default:request.user.phone|default:"Not specified" }}</div>
+              </div>
+              {% if booking.driver_notes %}
+                <div class="col-12 mt-2 pt-2 border-top border-secondary border-opacity-25">
+                  <div class="text-white-50 extra-small" style="font-size:0.72rem;">Driver Notes</div>
+                  <div class="text-warning small fw-medium mt-0.5"><i class="bi bi-chat-left-text me-1"></i> {{ booking.driver_notes }}</div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Live Chat Presets & Emergency Action -->
+          <div class="card-dark-glass mb-0">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-white small fw-bold"><i class="bi bi-chat-dots-fill text-warning me-1.5"></i> Live Chat with Driver</span>
+              <span class="badge bg-success bg-opacity-20 text-success rounded-pill extra-small" style="font-size:0.7rem;">Online</span>
+            </div>
+
+            <div id="chat-messages-log" class="mb-2 p-2 rounded-3 bg-dark bg-opacity-50 overflow-y-auto" style="max-height: 140px;"></div>
+
+            <div class="d-flex gap-1 flex-wrap mb-3">
+              <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5 rounded-pill text-white" style="font-size:0.75rem;" onclick="sendPresetChat('I am at pickup location')">📍 At pickup</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5 rounded-pill text-white" style="font-size:0.75rem;" onclick="sendPresetChat('Waiting near main entrance')">🚪 Near entrance</button>
+            </div>
+
+            <div class="input-group input-group-sm mb-3">
+              <input type="text" id="chat_msg_input" class="form-control bg-dark text-white border-secondary" placeholder="Type message to driver..." onkeypress="if(event.key==='Enter') sendCustomChat()">
+              <button class="btn btn-warning fw-bold text-dark px-3" onclick="sendCustomChat()"><i class="bi bi-send-fill"></i></button>
+            </div>
+
+            <button type="button" class="btn-sos-danger" onclick="triggerEmergencySOS()">
+              <i class="bi bi-exclamation-triangle-fill me-1.5"></i> Emergency SOS Assistance
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const bookingId = "{{ booking.id }}";
+const pLat = {{ booking.pickup_lat|default:12.9716 }};
+const pLng = {{ booking.pickup_lng|default:77.5946 }};
+const dLat = {{ booking.drop_lat|default:12.9352 }};
+const dLng = {{ booking.drop_lng|default:77.6245 }};
+let currentBookingStatus = "{{ booking.status|default:'ACCEPTED' }}";
+
+// CREATE LIVE LEAFLET MAP
+var map = L.map("live-map", { zoomControl: false }).setView([pLat, pLng], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+// OpenStreetMap Tile Layer (Free, Watermark-Free)
+L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Pickup Marker
+const pickupIcon = L.divIcon({
+  className: 'custom-pin-pickup',
+  html: `<div style="width:20px; height:20px; border-radius:50%; background:#10b981; border:2px solid #ffffff; box-shadow:0 0 15px rgba(16,185,129,0.8);"></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10]
+});
+L.marker([pLat, pLng], { icon: pickupIcon }).addTo(map).bindPopup("<b>Pickup:</b> {{ booking.pickup_location|escapejs }}");
+
+// Drop Marker
+const dropIcon = L.divIcon({
+  className: 'custom-pin-drop',
+  html: `<div style="width:22px; height:22px; border-radius:50%; background:#ef4444; border:2px solid #ffffff; box-shadow:0 0 15px rgba(239,68,68,0.8); display:flex; align-items:center; justify-content:center; font-size:10px;">🏁</div>`,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11]
+});
+L.marker([dLat, dLng], { icon: dropIcon }).addTo(map).bindPopup("<b>Drop:</b> {{ booking.drop_location|escapejs }}");
+
+// Driver Cab Marker
+let driverMarker = null;
+const driverCabIcon = L.divIcon({
+  className: 'custom-car-pin',
+  html: `<div style="width:26px; height:26px; border-radius:50%; background:#f59e0b; border:2px solid #ffffff; box-shadow:0 0 18px rgba(245,158,11,0.9); display:flex; align-items:center; justify-content:center; font-size:13px;">🚖</div>`,
+  iconSize: [26, 26],
+  iconAnchor: [13, 13]
+});
+
+// Fetch OSRM Route Line
+let routePolyline = null;
+function drawRoute() {
+  fetch(`https://router.project-osrm.org/route/v1/driving/${pLng},${pLat};${dLng},${dLat}?overview=full&geometries=geojson`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.routes && data.routes.length > 0) {
+        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+
+        if (routePolyline) map.removeLayer(routePolyline);
+
+        routePolyline = L.polyline(coords, {
+          color: '#f59e0b',
+          weight: 5,
+          opacity: 0.9,
+          lineCap: 'round',
+          lineJoin: 'round'
+        }).addTo(map);
+
+        map.fitBounds(L.polyline(coords).getBounds(), { padding: [40, 40] });
+      }
+    })
+    .catch(err => {
+      L.polyline([[pLat, pLng], [dLat, dLng]], { color: '#f59e0b', weight: 4, dashArray: '8, 8' }).addTo(map);
+      map.fitBounds([[pLat, pLng], [dLat, dLng]], { padding: [40, 40] });
+    });
+}
+drawRoute();
+
+// LIVE STATUS AUTO-POLLING & DRIVER LOCATION TRACKING
+function pollBookingStatus() {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+  fetch(`/booking/api/status/${bookingId}/`)
+    .then(res => {
+      if (!res.ok) return null;
+      return res.json();
+    })
+    .then(data => {
+      if (data && data.success) {
+        if (data.driver && data.driver.lat && data.driver.lng) {
+          updateDriverCabMarker(data.driver.lat, data.driver.lng, data.driver.name);
+        }
+        if (data.status && data.status !== currentBookingStatus) {
+          currentBookingStatus = data.status;
+          handleStatusChange(data.status, data);
+        }
+      }
+    })
+    .catch(e => {
+      // Quietly ignore offline errors
+    });
+}
+setInterval(pollBookingStatus, 3000);
+pollBookingStatus();
+
+function updateDriverCabMarker(dLatVal, dLngVal, dName) {
+  if (!driverMarker) {
+    driverMarker = L.marker([dLatVal, dLngVal], { icon: driverCabIcon }).addTo(map).bindPopup("<b>Driver Cab:</b> " + (dName || "Rovexa Cab"));
+  } else {
+    driverMarker.setLatLng([dLatVal, dLngVal]);
+  }
+}
+
+function handleStatusChange(status, data) {
+  const otpContainer = document.getElementById("otp-container");
+  const hudTitle = document.querySelector(".hud-pill-badge span");
+
+  updateGmapsLink(status);
+
+  if (status === "REJECTED" || status === "CANCELLED" || status === "Rejected" || status === "Cancelled") {
+    window.location.reload();
+    return;
+  }
+
+  if (status === "ACCEPTED" || status === "DRIVER_ASSIGNED" || status === "CONFIRMED") {
+
+    if (hudTitle) hudTitle.innerText = "Driver En Route to Pickup";
+    updateStepper(1); // Step 2: Driver En Route
+  } else if (status === "TRIP_STARTED") {
+
+    if (hudTitle) hudTitle.innerText = "In Transit to Destination";
+    if (otpContainer) {
+      otpContainer.innerHTML = `
+        <div class="card-dark-glass text-center border border-success border-opacity-40 bg-success bg-opacity-10 py-3 mb-3">
+          <div class="text-success fw-bold fs-5 mb-1"><i class="bi bi-shield-check-fill me-1"></i> Trip In Progress</div>
+          <div class="text-white-50 extra-small">OTP verified successfully! Your ride is currently in transit to destination. Enjoy your ride!</div>
+        </div>`;
+    }
+    updateStepper(2); // Step 3: Trip Started
+  } else if (status === "TRIP_COMPLETED") {
+    if (hudTitle) hudTitle.innerText = "Trip Completed";
+    if (otpContainer) {
+      const fareVal = data.fare || {{ booking.total_fare|default:0 }};
+      otpContainer.innerHTML = `
+        <div class="card-dark-glass text-center border border-primary border-opacity-40 bg-primary bg-opacity-10 py-3 mb-3">
+          <div class="text-info fw-bold fs-5 mb-1"><i class="bi bi-check-circle-fill me-1"></i> Trip Completed</div>
+          <div class="text-white-50 extra-small mb-2">Total Fare Paid: <strong class="text-warning fs-6">₹${fareVal.toFixed(2)}</strong></div>
+          <div id="rating-box-inner">
+            <div class="text-white extra-small fw-bold mb-2">Rate Your Driver Experience:</div>
+            <div class="d-flex justify-content-center gap-2 mb-2" id="star-rating-select">
+              <span class="fs-4 text-warning cursor-pointer" onclick="setRating(1)">★</span>
+              <span class="fs-4 text-warning cursor-pointer" onclick="setRating(2)">★</span>
+              <span class="fs-4 text-warning cursor-pointer" onclick="setRating(3)">★</span>
+              <span class="fs-4 text-warning cursor-pointer" onclick="setRating(4)">★</span>
+              <span class="fs-4 text-warning cursor-pointer" onclick="setRating(5)">★</span>
+            </div>
+            <input type="hidden" id="selected_rating_val" value="5">
+            <textarea id="rating_comment_input" class="form-control bg-dark text-white border-secondary extra-small mb-2" rows="2" placeholder="Leave review feedback (optional)..."></textarea>
+            <button type="button" class="btn btn-warning w-100 fw-bold btn-sm rounded-pill text-dark py-1.5" onclick="submitTripRating()">Submit Review</button>
+          </div>
+        </div>`;
+    }
+    updateStepper(3); // Step 4: Completed
+  }
+}
+
+function updateGmapsLink(status) {
+  const gmapsBtn = document.getElementById("gmaps-open-btn");
+  if (!gmapsBtn) return;
+
+  const pLat = {{ booking.pickup_lat|default:12.9716 }};
+  const pLng = {{ booking.pickup_lng|default:77.5946 }};
+  const dLat = {{ booking.drop_lat|default:12.9352 }};
+  const dLng = {{ booking.drop_lng|default:77.6245 }};
+
+  if (status === "TRIP_STARTED") {
+    gmapsBtn.href = `https://www.google.com/maps/dir/?api=1&origin=${pLat},${pLng}&destination=${dLat},${dLng}&travelmode=driving`;
+    gmapsBtn.innerHTML = `<i class="bi bi-compass-fill me-1"></i> Open Drop Route`;
+  } else if (status === "TRIP_COMPLETED") {
+    gmapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${dLat},${dLng}`;
+    gmapsBtn.innerHTML = `<i class="bi bi-geo-alt-fill me-1"></i> Drop Destination`;
+  } else {
+    gmapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${pLat},${pLng}&travelmode=driving`;
+    gmapsBtn.innerHTML = `<i class="bi bi-map-fill me-1"></i> Open Pickup Route`;
+  }
+}
+
+function updateStepper(activeIdx) {
+  const steps = document.querySelectorAll(".stepper-step");
+  steps.forEach((step, idx) => {
+    step.classList.remove("active", "completed");
+    if (idx < activeIdx) {
+      step.classList.add("completed");
+    } else if (idx === activeIdx) {
+      step.classList.add("active");
+    }
+  });
+}
+
+function setRating(val) {
+  document.getElementById("selected_rating_val").value = val;
+  const stars = document.querySelectorAll("#star-rating-select span");
+  stars.forEach((star, idx) => {
+    star.style.opacity = (idx < val) ? "1.0" : "0.3";
+  });
+}
+
+function submitTripRating() {
+  const rating = document.getElementById("selected_rating_val").value;
+  const comment = document.getElementById("rating_comment_input").value;
+
+  fetch("/booking/api/rate-driver/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+    body: JSON.stringify({ booking_id: bookingId, rating: rating, comment: comment })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      const box = document.getElementById("rating-box-inner");
+      if (box) {
+        box.innerHTML = `
+          <div class="p-3 rounded-3 bg-success bg-opacity-20 border border-success border-opacity-30 text-success text-center fw-bold small">
+            <i class="bi bi-check-circle-fill me-1"></i> Thank you! You rated this trip ${rating}/5 stars.
+          </div>`;
+      } else {
+        alert("⭐ Thank you for rating your ride!");
+      }
+    } else {
+      alert(data.message || "Failed to submit rating.");
+    }
+  });
+}
+
+function sendPresetChat(msgText) {
+  sendChatMessageAPI(msgText);
+}
+
+function sendCustomChat() {
+  const input = document.getElementById("chat_msg_input");
+  if (input && input.value.trim()) {
+    sendChatMessageAPI(input.value.trim());
+    input.value = "";
+  }
+}
+
+function sendChatMessageAPI(msgText) {
+  fetch("/booking/api/chat/send/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+    body: JSON.stringify({ booking_id: bookingId, message: msgText, sender: "CUSTOMER" })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      pollChatMessages();
+    }
+  })
+  .catch(err => console.log("Chat send error", err));
+}
+
+function pollChatMessages() {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+  fetch(`/booking/api/chat/get/${bookingId}/`)
+    .then(res => {
+      if (!res.ok) return null;
+      return res.json();
+    })
+    .then(data => {
+      if (data && data.success && data.messages && data.messages.length > 0) {
+        const chatBox = document.getElementById("chat-messages-log");
+        if (chatBox) {
+          let html = "";
+          data.messages.forEach(m => {
+            const isMe = (m.sender === "CUSTOMER");
+            html += `<div class="p-2 mb-1 rounded-3 ${isMe ? 'bg-primary bg-opacity-20 text-white text-end ms-auto' : 'bg-secondary bg-opacity-20 text-white me-auto'}" style="max-width:85%; font-size:0.78rem;">
+              <strong>${m.sender_name}:</strong> ${m.message} <span class="text-white-50 extra-small">(${m.time})</span>
+            </div>`;
+          });
+          chatBox.innerHTML = html;
+        }
+      }
+    })
+    .catch(err => {
+      // Quietly ignore offline errors
+    });
+}
+setInterval(pollChatMessages, 4000);
+
+function sharePublicRideLink() {
+  if (navigator.share) {
+    navigator.share({ title: 'Live Ride Tracking', url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(window.location.href);
+    alert("Live tracking link copied to clipboard!");
+  }
+}
+
+function triggerEmergencySOS() {
+  if (confirm("Trigger Emergency SOS for Booking #{{ booking.id }}? Our safety team will be notified immediately.")) {
+    fetch("/booking/api/sos/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+      body: JSON.stringify({ booking_id: bookingId, address: "{{ booking.pickup_location|escapejs }}" })
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert("🚨 " + (data.message || "Emergency SOS Alert Triggered! Safety team notified."));
+    })
+    .catch(err => alert("🚨 SOS Alert Triggered! Safety team notified."));
+  }
+}
+</script>
+{% endblock %}

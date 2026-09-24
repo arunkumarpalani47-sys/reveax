@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Live Ride Tracking — Rovexa</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+    }
+    .track-card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 850px;
+      margin: 30px auto;
+      border: 1px solid #334155;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    #public-map {
+      height: 380px;
+      border-radius: 20px;
+      width: 100%;
+      background: #0f172a;
+    }
+    .badge-live {
+      background: #10b981;
+      color: white;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container py-4">
+    <div class="track-card">
+
+      <!-- Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4 border-bottom border-secondary pb-3">
+        <div>
+          <h4 class="fw-bold text-white mb-1"><i class="bi bi-taxi-front-fill text-warning me-2"></i>Rovexa Live Tracking</h4>
+          <span class="text-muted small">Public Shared Trip • Booking #{{ booking.id }}</span>
+        </div>
+        <span class="badge-live"><i class="bi bi-broadcast me-1"></i> LIVE RIDE STREAM</span>
+      </div>
+
+      {% if error %}
+        <div class="alert alert-danger border-0 rounded-4 text-center py-5">
+          <i class="bi bi-exclamation-triangle-fill fs-1 d-block mb-2"></i>
+          <h5>Invalid or Expired Tracking Link</h5>
+          <p class="text-muted small mb-0">Please request an updated tracking link from the passenger.</p>
+        </div>
+      {% else %}
+
+      <!-- Map Container -->
+      <div id="public-map" class="mb-4"></div>
+
+      <!-- Passenger & Driver Info -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="p-3 rounded-4" style="background:#0f172a; border:1px solid #334155;">
+            <span class="text-muted x-small d-block text-uppercase fw-bold mb-1">PASSENGER</span>
+            <strong class="text-white fs-5">{{ booking.customer.get_full_name|default:booking.customer.username }}</strong>
+            <div class="text-muted small mt-1">Vehicle: <span class="badge bg-warning text-dark">{{ booking.vehicle_type }}</span></div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 rounded-4" style="background:#0f172a; border:1px solid #334155;">
+            <span class="text-muted x-small d-block text-uppercase fw-bold mb-1">ASSIGNED DRIVER & CAB</span>
+            <strong class="text-warning fs-5">{{ booking.driver.full_name|default:"Driver Assigned" }}</strong>
+            <div class="text-muted small mt-1">Reg No: <strong>{{ booking.vehicle.registration_number|default:"Rovexa Cab" }}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Route Overview -->
+      <div class="p-3 rounded-4 mb-4" style="background:#0f172a; border:1px solid #334155;">
+        <h6 class="fw-bold text-white mb-3"><i class="bi bi-geo-alt-fill text-warning me-2"></i>Trip Route</h6>
+        <div class="row g-2">
+          <div class="col-md-6">
+            <span class="text-muted x-small d-block">PICKUP LOCATION</span>
+            <strong class="text-white small">{{ booking.pickup_location }}</strong>
+          </div>
+          <div class="col-md-6">
+            <span class="text-muted x-small d-block">DROP DESTINATION</span>
+            <strong class="text-white small">{{ booking.drop_location }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <span class="text-muted small">Powered by <strong>Rovexa Real-Time Navigation System</strong></span>
+      </div>
+
+      {% endif %}
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% if not error and GOOGLE_MAPS_API_KEY %}
+  <script>
+    function initPublicMap() {
+      const pickup = { lat: {{ booking.pickup_lat|default:12.9716 }}, lng: {{ booking.pickup_lng|default:77.5946 }} };
+      const drop   = { lat: {{ booking.drop_lat|default:12.9352 }},   lng: {{ booking.drop_lng|default:77.6245 }} };
+
+      const map = new google.maps.Map(document.getElementById("public-map"), {
+        center: pickup,
+        zoom: 13,
+        disableDefaultUI: true,
+        styles: [
+          { elementType: "geometry", stylers: [{ color: "#0f172a" }] },
+          { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
+          { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+          { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
+          { featureType: "water", elementType: "geometry", stylers: [{ color: "#0c1a2e" }] }
+        ]
+      });
+
+      new google.maps.Marker({ position: pickup, map, title: "Pickup", icon: "https://maps.google.com/mapfiles/ms/icons/green-dot.png" });
+      new google.maps.Marker({ position: drop, map, title: "Drop", icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" });
+
+      const ds = new google.maps.DirectionsService();
+      const dr = new google.maps.DirectionsRenderer({ map, suppressMarkers: true, polylineOptions: { strokeColor: "#f59e0b", strokeWeight: 4 } });
+      ds.route({ origin: pickup, destination: drop, travelMode: google.maps.TravelMode.DRIVING }, (res, status) => {
+        if (status === "OK") dr.setDirections(res);
+      });
+    }
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initPublicMap"></script>
+  {% endif %}
+</body>
+</html>

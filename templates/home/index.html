@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="hero-section">
+
+    <div class="hero-overlay"></div>
+
+    <div class="container-fluid h-100">
+
+        <div class="container h-100">
+
+            <div class="row align-items-center h-100">
+
+                <!-- LEFT -->
+
+                <div class="col-lg-6 text-white">
+
+                    
+                    <h1 class="hero-title">
+
+                        Ride Anywhere,
+                        <br>
+
+                        Anytime with
+                        <br>
+
+                        <span>ROVEXA</span>
+
+                    </h1>
+
+                    <p class="hero-text">
+
+                        Fast, Safe & Affordable Taxi Service
+                        <br>
+
+                        at Your Fingertips
+
+                    </p>
+
+                    <a href="{% url 'add_booking' %}"
+                       class="btn btn-warning btn-lg px-4 me-3">
+
+                        Book Now
+
+                    </a>
+
+                    <a href="#"
+                       class="btn btn-light btn-lg px-4">
+
+                        Learn More
+
+                    </a>
+
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-lg-6 text-center text-lg-end mt-4 mt-lg-0">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= SEARCH CARD ================= -->
+
+<div class="container">
+
+<form method="GET" action="{% url 'search_vehicle' %}">
+
+<div class="search-box shadow-lg">
+
+<div class="row g-3 align-items-end">
+
+<!-- Pickup -->
+
+<div class="col-md-3">
+
+<label class="form-label fw-bold">
+<i class="bi bi-geo-alt-fill text-warning me-2"></i>
+Pickup Location
+</label>
+
+<div class="input-group position-relative">
+
+<span class="input-group-text">
+<i class="bi bi-geo-fill text-danger"></i>
+</span>
+
+<input
+type="text"
+id="home_pickup"
+name="pickup"
+class="form-control"
+placeholder="Enter Pickup"
+autocomplete="off"
+required>
+
+<div class="autocomplete-suggestions" id="home_pickup_suggestions" style="display: none;"></div>
+
+</div>
+
+</div>
+
+<!-- Drop -->
+
+<div class="col-md-3">
+
+<label class="form-label fw-bold">
+<i class="bi bi-pin-map-fill text-success me-2"></i>
+Drop Location
+</label>
+
+<div class="input-group position-relative">
+
+<span class="input-group-text">
+<i class="bi bi-flag-fill text-success"></i>
+</span>
+
+<input
+type="text"
+id="home_drop"
+name="drop"
+class="form-control"
+placeholder="Enter Destination"
+autocomplete="off"
+required>
+
+<div class="autocomplete-suggestions" id="home_drop_suggestions" style="display: none;"></div>
+
+</div>
+
+</div>
+
+<!-- Date -->
+
+<div class="col-md-2">
+
+<label class="form-label fw-bold">
+<i class="bi bi-calendar-event-fill text-primary me-2"></i>
+Pickup Date
+</label>
+
+<input
+type="date"
+name="date"
+class="form-control"
+required>
+
+</div>
+
+<!-- Time -->
+
+<div class="col-md-2">
+
+<label class="form-label fw-bold">
+<i class="bi bi-clock-fill text-info me-2"></i>
+Pickup Time
+</label>
+
+<input
+type="time"
+name="time"
+class="form-control"
+required>
+
+</div>
+
+<!-- Button -->
+
+<div class="col-md-2 d-grid">
+
+<button
+type="submit"
+class="btn btn-warning btn-lg">
+
+<i class="bi bi-search me-2"></i>
+
+Search Taxi
+
+</button>
+
+</div>
+
+</div>
+
+<hr>
+
+<!-- Popular Locations -->
+
+<div>
+
+<span class="fw-bold me-2">
+
+<i class="bi bi-star-fill text-warning"></i>
+
+Popular Locations
+
+</span>
+
+<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Kempegowda International Airport (BLR)';">
+Airport
+</button>
+
+<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='KSR Bengaluru Railway Station';">
+Railway Station
+</button>
+
+<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Tiruvannamalai, Tamil Nadu';">
+Tiruvannamalai
+</button>
+
+<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Chengam, Tamil Nadu';">
+Chengam
+</button>
+
+<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Vellore, Tamil Nadu';">
+Vellore
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<style>
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 1050;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    margin-top: 5px;
+}
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f1f1f1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+.suggestion-item:hover {
+    background-color: #ffc107;
+    color: #000;
+    font-weight: 500;
+}
+</style>
+
+<script>
+function initAutocomplete(inputId, suggestionsId) {
+    const input = document.getElementById(inputId);
+    const suggestionsContainer = document.getElementById(suggestionsId);
+    let debounceTimer;
+
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        
+        if (query.length < 3) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`)
+                .then(res => res.json())
+                .then(data => {
+                    suggestionsContainer.innerHTML = '';
+                    if (data.length > 0) {
+                        suggestionsContainer.style.display = 'block';
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.innerText = item.display_name;
+                            div.addEventListener('click', () => {
+                                input.value = item.display_name;
+                                suggestionsContainer.innerHTML = '';
+                                suggestionsContainer.style.display = 'none';
+                            });
+                            suggestionsContainer.appendChild(div);
+                        });
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                })
+                .catch(err => console.error(err));
+        }, 400);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target !== input && e.target !== suggestionsContainer) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initAutocomplete('home_pickup', 'home_pickup_suggestions');
+    initAutocomplete('home_drop', 'home_drop_suggestions');
+});
+</script>
+{% endblock %}

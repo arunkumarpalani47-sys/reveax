@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ride Receipt #{{ booking.id }} — Rovexa</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+      .invoice-card { box-shadow: none !important; border: none !important; }
+    }
+
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #334155;
+    }
+
+    .invoice-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 800px;
+      margin: 40px auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .brand-header {
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .badge-paid {
+      background: #10b981;
+      color: white;
+      font-size: 14px;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-weight: 700;
+    }
+
+    .fare-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: #64748b; }
+  </style>
+</head>
+<body>
+
+  <!-- Printable Action Bar -->
+  <div class="container text-center pt-4 no-print" style="max-width: 800px;">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="/booking/" class="btn btn-outline-light rounded-pill px-4">
+        <i class="bi bi-arrow-left me-1"></i> Back to Bookings
+      </a>
+      <button onclick="window.print()" class="btn btn-warning rounded-pill px-4 fw-bold shadow">
+        <i class="bi bi-printer-fill me-2"></i> Print / Save PDF Invoice
+      </button>
+    </div>
+  </div>
+
+  <div class="invoice-card">
+
+    <!-- Header -->
+    <div class="brand-header d-flex justify-content-between align-items-start">
+      <div>
+        <div class="brand-logo"><i class="bi bi-taxi-front-fill text-warning me-2"></i>ROVEXA</div>
+        <div class="text-muted small">Official Ride Receipt</div>
+      </div>
+      <div class="text-end">
+        <span class="badge-paid mb-2 d-inline-block">PAID</span>
+        <div class="fw-bold text-dark">Invoice #{{ booking.id }}</div>
+        <div class="text-muted small">Date: {{ booking.created_at|date:"d M Y, h:i A" }}</div>
+      </div>
+    </div>
+
+    <!-- User & Driver Info -->
+    <div class="row g-3 mb-4 p-3 rounded-3" style="background:#f8fafc;">
+      <div class="col-sm-6">
+        <span class="text-muted small d-block">CUSTOMER</span>
+        <strong class="text-dark">{{ booking.customer.get_full_name|default:booking.customer.username }}</strong>
+        <div class="text-muted small">{{ booking.customer.email|default:"" }}</div>
+      </div>
+      <div class="col-sm-6 text-sm-end">
+        <span class="text-muted small d-block">DRIVER & VEHICLE</span>
+        <strong class="text-dark">{{ booking.driver.full_name|default:"Assigned Driver" }}</strong>
+        <div class="text-muted small">{{ booking.vehicle_type }} • {{ booking.vehicle.registration_number|default:"Rovexa Cab" }}</div>
+      </div>
+    </div>
+
+    <!-- Route Overview -->
+    <div class="mb-4">
+      <h6 class="fw-bold text-dark mb-3"><i class="bi bi-geo-alt-fill text-warning me-2"></i>Trip Route</h6>
+      <div class="p-3 border rounded-3">
+        <div class="mb-2">
+          <span class="text-muted small d-block">PICKUP</span>
+          <strong class="text-dark">{{ booking.pickup_location }}</strong>
+        </div>
+        <hr class="my-2">
+        <div>
+          <span class="text-muted small d-block">DROP DESTINATION</span>
+          <strong class="text-dark">{{ booking.drop_location }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Itemized Fare Breakdown -->
+    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-receipt-cutoff text-warning me-2"></i>Itemized Fare Breakdown</h6>
+    <div class="table-responsive mb-4">
+      <table class="table fare-table border align-middle">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="text-end">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Base Fare Component</td>
+            <td class="text-end">₹{{ booking.base_fare_component|default:booking.total_fare|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td>Distance Fare ({{ booking.distance|floatformat:1 }} km)</td>
+            <td class="text-end">₹{{ booking.distance_fare_component|default:"0.00"|floatformat:2 }}</td>
+          </tr>
+          {% if booking.time_fare_component and booking.time_fare_component > 0 %}
+          <tr>
+            <td>Time Fare ({{ booking.estimated_duration|default:15 }} mins)</td>
+            <td class="text-end">₹{{ booking.time_fare_component|floatformat:2 }}</td>
+          </tr>
+          {% endif %}
+          {% if booking.surge_multiplier and booking.surge_multiplier > 1.0 %}
+          <tr>
+            <td>Peak Surge Multiplier ({{ booking.surge_multiplier }}x)</td>
+            <td class="text-end text-warning fw-bold">Applied</td>
+          </tr>
+          {% endif %}
+          {% if booking.night_charge and booking.night_charge > 0 %}
+          <tr>
+            <td>Night Surcharge (+20%)</td>
+            <td class="text-end">₹{{ booking.night_charge|floatformat:2 }}</td>
+          </tr>
+          {% endif %}
+          {% if booking.airport_charge and booking.airport_charge > 0 %}
+          <tr>
+            <td>Airport Surcharge</td>
+            <td class="text-end">₹{{ booking.airport_charge|floatformat:2 }}</td>
+          </tr>
+          {% endif %}
+          {% if booking.discount_amount and booking.discount_amount > 0 %}
+          <tr class="table-success">
+            <td>Coupon Discount ({{ booking.coupon_code }})</td>
+            <td class="text-end text-success fw-bold">-₹{{ booking.discount_amount|floatformat:2 }}</td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot class="table-group-divider">
+          <tr>
+            <th class="fs-5 text-dark">Total Amount Paid</th>
+            <th class="text-end fs-4 text-warning">₹{{ booking.total_fare|floatformat:2 }}</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+      <div class="text-muted small">
+        Payment Method: <strong class="text-dark">{{ booking.payment_method|default:"CASH" }}</strong>
+      </div>
+      <div class="text-muted small">
+        Thank you for riding with <strong>Rovexa</strong>!
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+
+    <div class="container">
+
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+
+            <img src="{% static 'images/Brand.jpg' %}"
+                 width="55"
+                 height="55"
+                 class="me-2 rounded-circle">
+
+            <div>
+
+                <h2 class="m-0 fw-bold">
+                    Rove<span class="text-warning">xa</span>
+                </h2>
+
+                <small class="text-muted">
+                    Safe Rides, Anytime
+                </small>
+
+            </div>
+
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- Center Menu -->
+            <ul class="navbar-nav mx-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %} fw-semibold"
+                       href="{% url 'home' %}">
+                        Home
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/about/' %}active{% endif %} fw-semibold"
+                       href="{% url 'about' %}">
+                        About Us
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/services/' %}active{% endif %} fw-semibold"
+                       href="{% url 'services' %}">
+                        Services
+                    </a>
+                </li>
+
+                {% if request.user.is_authenticated and request.user.role == 'ADMIN' or request.user.role == 'PARTNER' %}
+                <li class="nav-item">
+                    <a class="nav-link {% if '/vehicle/' in request.path %}active{% endif %} fw-semibold"
+                       href="{% url 'vehicle_list' %}">
+                        Vehicles
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/contact/' %}active{% endif %} fw-semibold"
+                       href="{% url 'contact' %}">
+                        Contact
+                    </a>
+                </li>
+
+            </ul>
+
+            <!-- Right Side -->
+            <div class="d-flex align-items-center">
+
+                
+                <a href="tel:+919876543210"
+   class="btn btn-outline-dark rounded-pill me-3">
+
+    <i class="bi bi-telephone-fill me-2"></i>
+
+    +91 94873 51101
+
+</a>
+
+                {% if request.user.is_authenticated %}
+
+                    <div class="dropdown ms-2">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle profile-dropdown-toggle" id="navbarProfileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="navbar-avatar d-flex align-items-center justify-content-center fw-bold shadow-sm 
+                                {% if request.user.role == 'ADMIN' %}bg-admin{% elif request.user.role == 'PARTNER' %}bg-partner{% elif request.user.role == 'DRIVER' %}bg-driver{% else %}bg-customer{% endif %}">
+                                {{ request.user.display_name|slice:":1"|upper }}
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2 mt-2" aria-labelledby="navbarProfileDropdown" style="border-radius: 16px; min-width: 250px; background: #ffffff;">
+                            <li class="px-3 py-2 border-bottom border-light">
+                                <div class="fw-bold text-dark fs-6">{{ request.user.display_name }}</div>
+                                <div class="text-muted small d-flex align-items-center gap-1 mt-1">
+                                    <span class="badge text-capitalize px-2 py-1 
+                                        {% if request.user.role == 'ADMIN' %}bg-warning text-dark{% elif request.user.role == 'PARTNER' %}bg-primary text-white{% elif request.user.role == 'DRIVER' %}bg-secondary text-white{% else %}bg-success text-white{% endif %}" style="font-size: 10px;">{{ request.user.role|lower }}</span>
+                                    {% if request.user.email %}
+                                        <span class="text-truncate text-muted" style="max-width: 140px; font-size: 11px;">{{ request.user.email }}</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-dark mt-1" href="{% url 'profile' %}">
+                                    <i class="bi bi-person-circle text-muted fs-5"></i> My Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-dark" href="{% if request.user.role == 'ADMIN' %}{% url 'admin_dashboard' %}{% elif request.user.role == 'DRIVER' or request.user.role == 'PARTNER' %}{% url 'booking_list' %}{% else %}{% url 'customer_dashboard' %}{% endif %}">
+                                    <i class="bi bi-speedometer2 text-muted fs-5"></i> My Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-dark" href="{% url 'booking_list' %}">
+                                    <i class="bi bi-calendar-event text-muted fs-5"></i> My Bookings / Requests
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-dark" href="{% url 'settings' %}">
+                                    <i class="bi bi-gear-fill text-muted fs-5"></i> Account Settings
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-2 border-light"></li>
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger fw-semibold" href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right fs-5"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                {% else %}
+
+                    <a href="{% url 'login' %}"
+   class="btn btn-warning rounded-pill px-4">
+
+    <i class="bi bi-person me-2"></i>
+
+    Login / Register
+
+</a>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<style>
+.navbar-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 18px;
+    user-select: none;
+    transition: all 0.25s ease;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.navbar-avatar.bg-admin { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.navbar-avatar.bg-partner { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+.navbar-avatar.bg-driver { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+.navbar-avatar.bg-customer { background: linear-gradient(135deg, #10b981, #06b6d4); }
+
+.profile-dropdown-toggle::after {
+    display: none !important; /* Hide caret */
+}
+.profile-dropdown-toggle:hover .navbar-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    border-color: #ffc107;
+}
+.dropdown-menu .dropdown-item {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    margin: 2px 8px;
+    width: auto;
+}
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #ffc107 !important;
+}
+.dropdown-menu .dropdown-item:hover i {
+    color: #ffc107 !important;
+}
+</style>

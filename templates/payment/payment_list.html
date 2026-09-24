@@ -1,0 +1,238 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #2563eb, #1d4ed8);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        --dark-accent: #0f172a;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: var(--dark-accent);
+        margin: 0;
+        font-size: 1.75rem;
+    }
+
+    .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: transform 0.2s;
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+    }
+
+    .card-revenue .icon-box { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .card-paid .icon-box { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .card-pending .icon-box { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+    .summary-info h3 {
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+
+    .summary-info .value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark-accent);
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+        .summary-strip { grid-template-columns: 1fr; gap: 0.75rem; }
+
+        .table-container {
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+        .responsive-table thead {
+            display: none;
+        }
+        .responsive-table tbody tr {
+            display: block;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+        .responsive-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.65rem 0 !important;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: right;
+            font-size: 0.88rem;
+        }
+        .responsive-table tbody td:last-child {
+            border-bottom: none;
+        }
+        .responsive-table tbody td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 1rem;
+            text-align: left;
+            flex-shrink: 0;
+        }
+    }
+
+    .table thead th {
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .table tbody td {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+    .table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .badge-status {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-paid { background: #d1fae5; color: #059669; }
+    .badge-pending { background: #fef3c7; color: #d97706; }
+    .badge-failed { background: #fee2e2; color: #dc2626; }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="page-header">
+        <h1 class="page-title">Payments & Revenue</h1>
+    </div>
+
+    <div class="summary-strip">
+        <div class="summary-card card-revenue">
+            <div class="icon-box"><i class="bi bi-wallet2"></i></div>
+            <div class="summary-info">
+                <h3>Total Revenue</h3>
+                <div class="value">₹--</div>
+            </div>
+        </div>
+        <div class="summary-card card-paid">
+            <div class="icon-box"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="summary-info">
+                <h3>Total Paid</h3>
+                <div class="value">--</div>
+            </div>
+        </div>
+        <div class="summary-card card-pending">
+            <div class="icon-box"><i class="bi bi-hourglass-split"></i></div>
+            <div class="summary-info">
+                <h3>Pending Payments</h3>
+                <div class="value">--</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="table responsive-table">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Booking Ref</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td data-label="Payment ID" class="fw-bold text-muted font-monospace">PAY-{{ payment.id|stringformat:"s"|slice:":8" }}</td>
+                    <td data-label="Booking Ref"><a href="#" class="text-decoration-none fw-bold font-monospace">#{{ payment.booking.id|stringformat:"s"|slice:":8"|default:payment.booking }}</a></td>
+                    <td data-label="Customer" class="fw-semibold">{{ payment.booking.customer.name|default:payment.booking.customer }}</td>
+                    <td data-label="Amount" class="fw-bold text-dark">₹{{ payment.amount }}</td>
+                    <td data-label="Date" class="text-nowrap">{{ payment.created_at|date:"M d, Y H:i" }}</td>
+                    <td data-label="Status">
+                        <span class="badge-status 
+                            {% if payment.status == 'PAID' %}badge-paid
+                            {% elif payment.status == 'PENDING' %}badge-pending
+                            {% elif payment.status == 'FAILED' %}badge-failed
+                            {% else %}badge-pending{% endif %}">
+                            {{ payment.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"><i class="bi bi-cash-coin"></i></div>
+                        <h4 class="text-muted">No payments recorded yet.</h4>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}

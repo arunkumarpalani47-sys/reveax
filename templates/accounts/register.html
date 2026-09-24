@@ -1,0 +1,497 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account — Rovexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: #04070f;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 16px;
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: drift 12s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-orb-1 { width: 600px; height: 600px; background: #10b981; top: -150px; right: -150px; animation-delay: 0s; }
+        .bg-orb-2 { width: 500px; height: 500px; background: #1a56ff; bottom: -100px; left: -100px; animation-delay: 4s; }
+        .bg-orb-3 { width: 300px; height: 300px; background: #8b5cf6; top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: 2s; }
+
+        @keyframes drift {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 20px) scale(1.08); }
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 500px;
+            animation: pageIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, #10b981, #1a56ff);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 0 24px rgba(16,185,129,0.45);
+        }
+        .brand-name {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Role badge */
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.35);
+            color: #10b981;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .reg-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 36px 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 28px;
+        }
+
+        .alert-block {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-error   { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5; }
+        .alert-success { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); color: #6ee7b7; }
+
+        /* Two-column row */
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .field-group { margin-bottom: 16px; }
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 7px;
+        }
+        .field-wrap { position: relative; }
+        .field-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 15px;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .field-input {
+            width: 100%;
+            padding: 12px 13px 12px 40px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+        .field-input::placeholder { color: rgba(255,255,255,0.2); }
+        .field-input:focus {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(16,185,129,0.6);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+        }
+        .field-wrap:focus-within .field-icon { color: #10b981; }
+
+        .toggle-pass {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .toggle-pass:hover { color: rgba(255,255,255,0.7); }
+
+        /* Password strength */
+        .pw-strength {
+            margin-top: 8px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .pw-bar {
+            flex: 1;
+            height: 3px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+            transition: background 0.3s;
+        }
+        .pw-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981, #0ea5e9);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+        }
+        .btn-register::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(rgba(255,255,255,0.12), transparent);
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16,185,129,0.45);
+        }
+        .btn-register:active { transform: translateY(0); }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0;
+            color: rgba(255,255,255,0.2);
+            font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .auth-footer {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.35);
+        }
+        .auth-footer a {
+            color: #00d4aa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .auth-footer a:hover { color: #5eead4; }
+
+        /* Partner info note */
+        .info-note {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 14px 16px;
+            background: rgba(59,130,246,0.1);
+            border: 1px solid rgba(59,130,246,0.25);
+            border-radius: 12px;
+            margin-bottom: 22px;
+            font-size: 12.5px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.6;
+        }
+        .info-note i { color: #3b82f6; font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+
+        .back-home {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-home a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-home a:hover { color: rgba(255,255,255,0.7); }
+
+        @media (max-width: 520px) {
+            .reg-card { padding: 24px 18px; }
+            .field-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+
+<div class="page-wrapper">
+
+    <div class="brand">
+        <a href="/" class="brand-logo">
+            <div class="brand-icon"><i class="bi bi-taxi-front-fill"></i></div>
+            <span class="brand-name">Rovexa</span>
+        </a>
+    </div>
+
+    <div style="text-align:center; margin-bottom: 20px;">
+        <span class="role-badge">
+            <i class="bi bi-person-fill"></i> Customer Registration
+        </span>
+    </div>
+
+    <div class="reg-card">
+        <h1 class="card-title">Create your account</h1>
+        <p class="card-subtitle">Join Rovexa and book rides instantly across the city.</p>
+
+        <div class="info-note">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Are you a fleet owner or driver? Partner accounts are set up by our admin team. <strong style="color:#fff">Contact us to get started.</strong></span>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-block {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <i class="bi {% if message.tags == 'error' %}bi-exclamation-circle-fill{% else %}bi-check-circle-fill{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="regForm" autocomplete="off">
+            {% csrf_token %}
+            <input type="hidden" name="role" value="CUSTOMER">
+
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label" for="first_name">First Name</label>
+                    <div class="field-wrap">
+                        <input class="field-input" type="text" id="first_name" name="first_name" placeholder="John" required>
+                        <i class="bi bi-person field-icon"></i>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="last_name">Last Name</label>
+                    <div class="field-wrap">
+                        <input class="field-input" type="text" id="last_name" name="last_name" placeholder="Doe" required>
+                        <i class="bi bi-person field-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="username">Username</label>
+                <div class="field-wrap">
+                    <input class="field-input" type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username" required>
+                    <i class="bi bi-at field-icon"></i>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="email">Email Address</label>
+                <div class="field-wrap">
+                    <input class="field-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+                    <i class="bi bi-envelope field-icon"></i>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="phone">Phone Number</label>
+                <div class="field-wrap">
+                    <input class="field-input" type="text" id="phone" name="phone" placeholder="+91 9876543210">
+                    <i class="bi bi-telephone field-icon"></i>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="password">Password</label>
+                <div class="field-wrap">
+                    <input class="field-input" type="password" id="password" name="password" placeholder="Min. 8 characters" style="padding-right: 40px;" required oninput="checkStrength(this.value)">
+                    <i class="bi bi-lock field-icon"></i>
+                    <button type="button" class="toggle-pass" onclick="toggle('password','eye1')"><i class="bi bi-eye" id="eye1"></i></button>
+                </div>
+                <div class="pw-strength">
+                    <div class="pw-bar" id="bar1"></div>
+                    <div class="pw-bar" id="bar2"></div>
+                    <div class="pw-bar" id="bar3"></div>
+                    <div class="pw-bar" id="bar4"></div>
+                    <span class="pw-label" id="pwLabel"></span>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="confirm_password">Confirm Password</label>
+                <div class="field-wrap">
+                    <input class="field-input" type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" style="padding-right: 40px;" required>
+                    <i class="bi bi-lock-fill field-icon"></i>
+                    <button type="button" class="toggle-pass" onclick="toggle('confirm_password','eye2')"><i class="bi bi-eye" id="eye2"></i></button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register" id="regBtn">
+                Create Account &nbsp;<i class="bi bi-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="divider">already have an account?</div>
+
+        <div class="auth-footer">
+            <a href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in instead</a>
+        </div>
+    </div>
+
+    <div class="back-home">
+        <a href="/"><i class="bi bi-arrow-left"></i> Back to Home</a>
+    </div>
+
+</div>
+
+<script>
+    function toggle(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+
+    function checkStrength(val) {
+        const bars = ['bar1','bar2','bar3','bar4'];
+        const label = document.getElementById('pwLabel');
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        const colors = ['#ef4444','#f59e0b','#3b82f6','#10b981'];
+        const labels = ['Weak','Fair','Good','Strong'];
+
+        bars.forEach((b, i) => {
+            document.getElementById(b).style.background =
+                i < score ? colors[score - 1] : 'rgba(255,255,255,0.1)';
+        });
+        label.textContent = score > 0 ? labels[score - 1] : '';
+        label.style.color = score > 0 ? colors[score - 1] : 'rgba(255,255,255,0.3)';
+    }
+
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+        const pw = document.getElementById('password').value;
+        const cpw = document.getElementById('confirm_password').value;
+        if (pw !== cpw) {
+            e.preventDefault();
+            alert('Passwords do not match.');
+            return;
+        }
+        const btn = document.getElementById('regBtn');
+        btn.innerHTML = '<span style="opacity:0.7">Creating account…</span>';
+        btn.disabled = true;
+    });
+</script>
+
+</body>
+</html>

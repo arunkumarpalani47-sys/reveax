@@ -1,0 +1,33 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Django
+db.sqlite3
+staticfiles/
+media/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Deployment
+.vercel/
+
+# Logs & temp
+*.log
+scratch/

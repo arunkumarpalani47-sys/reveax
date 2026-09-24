@@ -1,0 +1,70 @@
+services:
+  # ══════════════════════════════════════════════════════════════════════════════
+  #  Rovexa Cab Booking Platform — Render.com Deployment
+  #  GitHub: https://github.com/itsarunkumarx/taxigo
+  #  Live:   https://rovexa.onrender.com
+  # ══════════════════════════════════════════════════════════════════════════════
+  - type: web
+    name: rovexa
+    runtime: python
+    region: singapore        # Closest to India for low latency
+    plan: starter            # $7/mo — NO spin-down, always-on 24/7
+    buildCommand: "./build.sh"
+    startCommand: "daphne -b 0.0.0.0 -p $PORT Rovexa.asgi:application"
+    healthCheckPath: /ping/
+    autoDeploy: true         # Auto-deploy on every GitHub push
+
+    envVars:
+      # ── Django Core ──────────────────────────────────────────────────────────
+      - key: DJANGO_SETTINGS_MODULE
+        value: Rovexa.settings
+
+      - key: DEBUG
+        value: "False"
+
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: PYTHON_VERSION
+        value: "3.13.0"
+
+      - key: ALLOWED_HOSTS
+        value: "rovexa.onrender.com"
+
+      # ── CSRF ─────────────────────────────────────────────────────────────────
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://rovexa.onrender.com"
+
+      # ── Database (MongoDB Atlas) ──────────────────────────────────────────────
+      - key: MONGODB_URI
+        sync: false    # ← Paste in Render Dashboard → Environment
+
+      # ── Redis (Upstash — free tier) ───────────────────────────────────────────
+      - key: REDIS_URL
+        sync: false    # ← Paste Upstash Redis URL in Render Dashboard
+
+      # ── Production HTTPS Security ─────────────────────────────────────────────
+      - key: SECURE_SSL_REDIRECT
+        value: "True"
+
+      - key: SESSION_COOKIE_SECURE
+        value: "True"
+
+      - key: CSRF_COOKIE_SECURE
+        value: "True"
+
+      - key: SECURE_HSTS_SECONDS
+        value: "31536000"
+
+      - key: SECURE_HSTS_INCLUDE_SUBDOMAINS
+        value: "True"
+
+      - key: SECURE_HSTS_PRELOAD
+        value: "True"
+
+      # ── Payment Gateway ───────────────────────────────────────────────────────
+      - key: RAZORPAY_KEY_ID
+        sync: false
+
+      - key: RAZORPAY_KEY_SECRET
+        sync: false

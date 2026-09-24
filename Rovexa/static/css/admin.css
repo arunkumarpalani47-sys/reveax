@@ -1,0 +1,440 @@
+/* ======================================
+   ROVEXA CABS ADMIN PANEL
+====================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f4f7fb;
+    font-family:'Segoe UI',sans-serif;
+    color:#333;
+}
+
+/* ======================================
+   SIDEBAR
+====================================== */
+
+.sidebar{
+    width:260px;
+    min-height:100vh;
+    background:#111827;
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    left:0;
+    top:0;
+    z-index:1000;
+}
+
+.sidebar .logo{
+    padding:25px;
+    text-align:center;
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.sidebar .logo img{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:50%;
+    border:3px solid #f4b400;
+}
+
+.sidebar .logo h3{
+    color:#fff;
+    margin-top:12px;
+    font-weight:700;
+}
+
+.sidebar .logo span{
+    color:#f4b400;
+    font-size:13px;
+}
+
+.sidebar .nav{
+    margin-top:20px;
+}
+
+.sidebar .nav-link{
+    color:#d1d5db;
+    padding:14px 22px;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    transition:.3s;
+}
+
+.sidebar .nav-link i{
+    width:25px;
+    font-size:18px;
+    margin-right:10px;
+}
+
+.sidebar .nav-link:hover{
+    background:#f4b400;
+    color:#111 !important;
+    padding-left:28px;
+}
+
+.sidebar .nav-link.active{
+    background:#f4b400;
+    color:#111 !important;
+    font-weight:600;
+}
+
+.sidebar .logout{
+    margin-top:auto;
+    padding:20px;
+}
+
+.sidebar .logout .btn{
+    border-radius:10px;
+}
+
+/* ======================================
+   MAIN CONTENT
+====================================== */
+
+.main-content{
+    margin-left:260px;
+    padding:25px;
+}
+
+/* ======================================
+   NAVBAR
+====================================== */
+
+.admin-navbar{
+    background:#fff;
+    padding:15px 30px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+    margin-bottom:30px;
+}
+
+.admin-navbar h4{
+    margin:0;
+    font-weight:700;
+}
+
+.admin-navbar img{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+
+/* ======================================
+   DASHBOARD
+====================================== */
+
+.dashboard-title{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:25px;
+}
+
+/* ======================================
+   CARDS
+====================================== */
+
+.dashboard-card{
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
+    transition:.3s;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-8px);
+}
+
+.dashboard-card .card-body{
+    padding:28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.dashboard-count{
+    font-size:38px;
+    font-weight:700;
+    color:#fff;
+}
+
+.dashboard-text{
+    color:#fff;
+    margin:0;
+    font-size:16px;
+}
+
+.dashboard-icon{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:rgba(255,255,255,.20);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.dashboard-icon i{
+    font-size:34px;
+    color:#fff;
+}
+
+/* ======================================
+   CARD COLORS
+====================================== */
+
+.bg-blue{
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+}
+
+.bg-green{
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+}
+
+.bg-orange{
+    background:linear-gradient(135deg,#f59e0b,#fbbf24);
+}
+
+.bg-red{
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+.bg-purple{
+    background:linear-gradient(135deg,#7c3aed,#8b5cf6);
+}
+
+.bg-cyan{
+    background:linear-gradient(135deg,#0891b2,#06b6d4);
+}
+
+.bg-darkblue{
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+}
+
+/* ======================================
+   NORMAL CARDS
+====================================== */
+
+.card{
+    border:none;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.card-header{
+    background:#fff;
+    border:none;
+    font-weight:700;
+}
+
+/* ======================================
+   BUTTONS
+====================================== */
+
+.btn{
+    border-radius:10px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+}
+
+/* ======================================
+   TABLE
+====================================== */
+
+.table{
+    background:#fff;
+}
+
+.table thead{
+    background:#111827;
+    color:#fff;
+}
+
+.table th,
+.table td{
+    padding:14px;
+    vertical-align:middle;
+}
+
+.table tbody tr:hover{
+    background:#f5f7fb;
+}
+
+/* ======================================
+   FORMS
+====================================== */
+
+.form-control,
+.form-select{
+    border-radius:10px;
+    padding:10px 14px;
+}
+
+.form-control:focus{
+    border-color:#2563eb;
+    box-shadow:none;
+}
+
+/* ======================================
+   BADGES
+====================================== */
+
+.badge{
+    padding:8px 12px;
+    border-radius:30px;
+}
+
+/* ======================================
+   ALERTS
+====================================== */
+
+.alert{
+    border:none;
+    border-radius:10px;
+}
+
+/* ======================================
+   PAGINATION
+====================================== */
+
+.pagination .page-link{
+    border-radius:8px;
+    margin:0 3px;
+}
+
+/* ======================================
+   RESPONSIVE
+====================================== */
+
+@media(max-width:992px){
+
+.sidebar{
+    width:80px;
+}
+
+.sidebar .logo h3,
+.sidebar .logo span,
+.sidebar .nav-link span{
+    display:none;
+}
+
+.main-content{
+    margin-left:80px;
+}
+
+.sidebar .nav-link{
+    justify-content:center;
+}
+
+.sidebar .nav-link i{
+    margin-right:0;
+}
+
+}
+
+@media(max-width:768px){
+
+.main-content{
+    margin-left:0;
+}
+
+.sidebar{
+    position:relative;
+    width:100%;
+    min-height:auto;
+}
+
+.dashboard-card .card-body{
+    flex-direction:column;
+    text-align:center;
+}
+
+.dashboard-icon{
+    margin-top:20px;
+}
+
+.dashboard-title{
+    font-size:26px;
+}
+
+}
+
+@media(max-width:576px){
+
+.dashboard-count{
+    font-size:30px;
+}
+
+.dashboard-icon{
+    width:60px;
+    height:60px;
+}
+
+.dashboard-icon i{
+    font-size:28px;
+}
+
+.card{
+    margin-bottom:20px;
+}
+
+}
+/* Admin Navbar */
+
+.admin-navbar{
+    background:#ffffff;
+    border-radius:15px;
+    padding:15px 25px;
+    margin-bottom:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.admin-navbar .form-control{
+    width:260px;
+}
+
+.admin-navbar .btn-light{
+    background:#f8f9fa;
+    border:none;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.admin-navbar .btn-light:hover{
+    background:#f4b400;
+    color:#fff;
+}
+
+.admin-navbar img{
+    object-fit:cover;
+}
+
+.dropdown-menu{
+    border:none;
+    border-radius:12px;
+}
+
+.dropdown-item{
+    padding:10px 15px;
+}
+
+.dropdown-item:hover{
+    background:#f4b400;
+    color:#fff;
+}

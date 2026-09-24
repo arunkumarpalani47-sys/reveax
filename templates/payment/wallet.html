@@ -1,0 +1,581 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Banking Passbook & Rovexa Wallet{% endblock %}
+
+{% block extra_css %}
+<style>
+  .wallet-card {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 24px;
+    padding: 32px;
+    color: white;
+    border: 2px solid #334155;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .wallet-card::after {
+    content: '🏛️';
+    position: absolute;
+    right: 20px;
+    bottom: -10px;
+    font-size: 120px;
+    opacity: 0.08;
+  }
+  .balance-val {
+    font-size: 42px;
+    font-weight: 800;
+    color: #f59e0b;
+    letter-spacing: -1px;
+    transition: all 0.3s ease;
+  }
+  .quick-chip {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .quick-chip:hover {
+    background: #f59e0b;
+    color: #0f172a;
+  }
+  .ws-status-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  /* Banking Passbook Table Styling */
+  .passbook-table th {
+    background: #f8fafc;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+  }
+  .passbook-table td {
+    font-size: 13.5px;
+    vertical-align: middle;
+  }
+  .pay-tab-btn {
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: #e2e8f0;
+    cursor: pointer;
+  }
+  .pay-tab-btn.active {
+    background: #f59e0b;
+    color: #0f172a;
+    border-color: #f59e0b;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 1050px;">
+
+  <!-- Page Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">
+        <i class="bi bi-bank text-warning me-2"></i>Banking Passbook & Wallet
+      </h3>
+      <p class="text-muted small mb-0">Real-Time Ledger • Instant Atomic Credit & Debit Stream</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span id="ws_wallet_status" class="ws-status-badge bg-warning-subtle text-dark">
+        <i class="bi bi-wifi-off me-1"></i>Connecting Stream...
+      </span>
+      <a href="/booking/search/" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">
+        <i class="bi bi-car-front-fill me-1"></i> Book Ride
+      </a>
+    </div>
+  </div>
+
+  <!-- Wallet Balance Hero Card -->
+  <div class="wallet-card mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-7">
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted small fw-bold text-uppercase tracking-wider">REAL-TIME BANKING BALANCE</span>
+          <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 small">LIVE LEDGER</span>
+        </div>
+
+        <div class="balance-val" id="wallet_balance_display">₹{{ wallet.balance|floatformat:2 }}</div>
+        <p class="text-muted small mb-3">Instant atomic credit/debit with real-time WebSocket passbook ledger.</p>
+        
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="quick-chip" onclick="selectTopupAmount(100)">+ ₹100</span>
+          <span class="quick-chip" onclick="selectTopupAmount(200)">+ ₹200</span>
+          <span class="quick-chip" onclick="selectTopupAmount(500)">+ ₹500</span>
+          <span class="quick-chip" onclick="selectTopupAmount(1000)">+ ₹1000</span>
+        </div>
+      </div>
+
+      <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex flex-column gap-2">
+        <button class="btn btn-warning btn-lg rounded-pill px-4 fw-bold shadow-lg" onclick="openTopupModal()">
+          <i class="bi bi-plus-circle-fill me-2"></i>Add Money / Top Up
+        </button>
+        <button class="btn btn-outline-light rounded-pill px-4 fw-bold" onclick="openWithdrawalModal()">
+          <i class="bi bi-arrow-up-right-circle me-2"></i>Withdraw to Bank Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banking Passbook Table Card -->
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-dark text-white p-3 rounded-top-4 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold"><i class="bi bi-journal-bookmark-fill text-warning me-2"></i>Banking Passbook Ledger</h5>
+      <span class="badge bg-secondary" id="passbook_count_badge">{{ transactions|length }} entries</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 passbook-table">
+          <thead>
+            <tr>
+              <th>Reference ID</th>
+              <th>Description & Category</th>
+              <th class="text-end">Opening Bal</th>
+              <th class="text-end">Credit / Debit</th>
+              <th class="text-end">Closing Bal</th>
+              <th class="text-center">Date & Time</th>
+            </tr>
+          </thead>
+          <tbody id="passbook_table_body">
+            {% for txn in transactions %}
+            <tr>
+              <td>
+                <code class="fw-bold text-dark">{{ txn.txn_reference_id|default:"TXN_INIT" }}</code>
+                {% if txn.booking_ref %}<div class="text-muted x-small">Ref: #{{ txn.booking_ref }}</div>{% endif %}
+              </td>
+              <td>
+                <div class="fw-bold text-dark">{{ txn.description }}</div>
+                <span class="badge {% if txn.category == 'TOPUP' %}bg-primary-subtle text-primary{% elif txn.category == 'DRIVER_EARNINGS' %}bg-success-subtle text-success{% elif txn.category == 'WITHDRAWAL' %}bg-danger-subtle text-danger{% else %}bg-secondary-subtle text-dark{% endif %} rounded-pill x-small">
+                  {{ txn.get_category_display|default:txn.category }}
+                </span>
+              </td>
+              <td class="text-end text-muted">₹{{ txn.opening_balance|floatformat:2 }}</td>
+              <td class="text-end fw-bold fs-6 {% if txn.txn_type == 'CREDIT' %}text-success{% else %}text-danger{% endif %}">
+                {% if txn.txn_type == 'CREDIT' %}+{% else %}-{% endif %}₹{{ txn.amount|floatformat:2 }}
+              </td>
+              <td class="text-end fw-bold text-dark">₹{{ txn.closing_balance|floatformat:2 }}</td>
+              <td class="text-center text-muted small">{{ txn.created_at|date:"d M Y, h:i A" }}</td>
+            </tr>
+            {% empty %}
+            <tr id="empty_passbook_row">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i class="bi bi-bank fs-1 d-block mb-2 text-secondary"></i>
+                No passbook transactions recorded yet. Add money or complete a ride to generate ledger entries!
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 1. Topup Amount Modal -->
+<div class="modal fade" id="topupModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header bg-dark text-white rounded-top-4">
+        <h5 class="modal-header-title fw-bold mb-0"><i class="bi bi-wallet2 text-warning me-2"></i>Add Money to Wallet</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <label class="form-label fw-bold small text-muted">ENTER AMOUNT (₹)</label>
+        <input type="number" id="topup_amount_input" class="form-control form-control-lg fw-bold text-center mb-3" placeholder="500" value="500">
+        
+        <div class="d-flex justify-content-center gap-2 mb-4">
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" onclick="setTopupAmount(100)">₹100</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" onclick="setTopupAmount(200)">₹200</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" onclick="setTopupAmount(500)">₹500</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" onclick="setTopupAmount(1000)">₹1000</button>
+        </div>
+
+        <button type="button" onclick="openPaymentGatewayModal()" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill text-dark">
+          Proceed to Pay
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Interactive Payment Gateway Modal -->
+<div class="modal fade" id="paymentGatewayModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 border-0" style="background:#1e293b; color:white;">
+      <div class="modal-header border-secondary rounded-top-4">
+        <div>
+          <h5 class="modal-title fw-bold text-white"><i class="bi bi-shield-check text-warning me-2"></i>Rovexa Payment Gateway</h5>
+          <span class="text-muted small">Secured with 256-bit SSL Banking Encryption</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <div class="p-3 mb-3 rounded-3 text-center" style="background:#0f172a; border:1px solid #334155;">
+          <span class="text-muted small d-block">TOTAL AMOUNT TO CREDIT</span>
+          <div class="fs-2 fw-bold text-warning" id="gateway_pay_amount">₹500.00</div>
+        </div>
+
+        <!-- Testing Mode Notice Banner -->
+        <div class="alert alert-warning border-0 text-dark small py-2 px-3 mb-4 rounded-3 d-flex align-items-center justify-content-between shadow-sm">
+          <div>
+            <i class="bi bi-lightning-charge-fill me-1 text-dark fs-6"></i>
+            <strong>Testing Mode:</strong> Click <strong>"Pay ₹500 Now"</strong> below to execute instant atomic credit & see live passbook updates!
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-4">
+          <div class="pay-tab-btn active" onclick="switchPayTab('upi', this)"><i class="bi bi-qr-code-scan me-1"></i> UPI / QR Code</div>
+          <div class="pay-tab-btn" onclick="switchPayTab('card', this)"><i class="bi bi-credit-card me-1"></i> Card</div>
+          <div class="pay-tab-btn" onclick="switchPayTab('netbanking', this)"><i class="bi bi-bank me-1"></i> NetBanking</div>
+        </div>
+
+        <!-- TAB 1: UPI -->
+        <div id="tab_upi" class="pay-tab-content">
+          <div class="row align-items-center">
+            <div class="col-md-5 text-center border-end border-secondary py-2">
+              <img id="dynamic_upi_qr_img"
+                   src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=9487351101@paytm&pn=Rovexa%20Cabs&am=500&cu=INR"
+                   alt="UPI QR Code" class="img-fluid rounded-3 p-2 bg-white mb-2 shadow" style="max-width:180px;">
+              <div class="text-muted x-small" id="qr_vpa_subtitle">Scan QR with Google Pay / PhonePe / Paytm</div>
+            </div>
+            <div class="col-md-7 ps-md-4 mt-3 mt-md-0">
+              <label class="form-label small fw-bold text-muted">YOUR MERCHANT / BUSINESS UPI ID</label>
+              <div class="input-group mb-2">
+                <input type="text" id="upi_vpa_input" oninput="updateDynamicUpiQr()" class="form-control bg-dark text-warning fw-bold border-secondary" value="9487351101@paytm" placeholder="e.g. 9487351101@paytm">
+                <button type="button" onclick="copyUpiVpa()" class="btn btn-outline-warning btn-sm">
+                  <i class="bi bi-copy me-1"></i> Copy
+                </button>
+              </div>
+              <small class="text-muted d-block mb-3 x-small">
+                <i class="bi bi-info-circle me-1 text-warning"></i>Type your registered GPay/PhonePe UPI ID above to generate a valid scannable QR Code!
+              </small>
+
+              <div class="d-flex gap-2 flex-wrap">
+                <button type="button" onclick="launchUpiApp('gpay')" class="btn btn-outline-light btn-sm rounded-pill"><i class="bi bi-google me-1"></i> GPay</button>
+                <button type="button" onclick="launchUpiApp('phonepe')" class="btn btn-outline-light btn-sm rounded-pill"><i class="bi bi-phone me-1"></i> PhonePe</button>
+                <button type="button" onclick="launchUpiApp('paytm')" class="btn btn-outline-light btn-sm rounded-pill"><i class="bi bi-wallet2 me-1"></i> Paytm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab_card" class="pay-tab-content" style="display:none;">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">CARD NUMBER</label>
+            <input type="text" class="form-control bg-dark text-white border-secondary" placeholder="4111 1111 1111 1111" value="4111 1111 1111 1111">
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">EXPIRY (MM/YY)</label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" placeholder="12/28" value="12/28">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">CVV</label>
+              <input type="password" class="form-control bg-dark text-white border-secondary" placeholder="123" value="123">
+            </div>
+          </div>
+        </div>
+
+        <div id="tab_netbanking" class="pay-tab-content" style="display:none;">
+          <label class="form-label small fw-bold text-muted">SELECT YOUR BANK</label>
+          <select class="form-select bg-dark text-white border-secondary mb-3">
+            <option>State Bank of India (SBI)</option>
+            <option>HDFC Bank</option>
+            <option>ICICI Bank</option>
+            <option>Axis Bank</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="executePayment()" id="gateway_pay_btn" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill mt-4 text-dark py-3">
+          <i class="bi bi-shield-lock-fill me-2"></i>Pay <span id="btn_pay_val">₹500.00</span> Now
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Bank Account Withdrawal Modal -->
+<div class="modal fade" id="withdrawalModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header bg-dark text-white rounded-top-4">
+        <h5 class="modal-header-title fw-bold mb-0"><i class="bi bi-bank text-warning me-2"></i>Bank Account Withdrawal</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-muted">WITHDRAWAL AMOUNT (₹)</label>
+          <input type="number" id="withdraw_amount_input" class="form-control fw-bold" placeholder="500" value="500">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-muted">ACCOUNT HOLDER NAME</label>
+          <input type="text" id="withdraw_holder_input" class="form-control" placeholder="Arun Kumar" value="{{ request.user.display_name }}">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-muted">BANK ACCOUNT NUMBER</label>
+          <input type="text" id="withdraw_acc_input" class="form-control" placeholder="123456789012" value="38294719283">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-muted">IFSC CODE</label>
+          <input type="text" id="withdraw_ifsc_input" class="form-control text-uppercase" placeholder="SBIN0001234" value="SBIN0001234">
+        </div>
+
+        <button type="button" onclick="executeBankWithdrawal()" id="withdraw_btn" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill text-dark py-2">
+          Confirm Bank Transfer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let topupModalObj, gatewayModalObj, withdrawalModalObj;
+  let currentPayAmount = 500;
+
+  document.addEventListener("DOMContentLoaded", function() {
+    topupModalObj      = new bootstrap.Modal(document.getElementById('topupModal'));
+    gatewayModalObj    = new bootstrap.Modal(document.getElementById('paymentGatewayModal'));
+    withdrawalModalObj = new bootstrap.Modal(document.getElementById('withdrawalModal'));
+
+    initWalletWebSocket();
+  });
+
+  // ── WebSocket Real-Time Stream ─────────────────────────────────────────────
+  function initWalletWebSocket() {
+    const statusBadge = document.getElementById("ws_wallet_status");
+    const wsScheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${wsScheme}//${window.location.host}/ws/wallet/`;
+
+    const socket = new WebSocket(wsUrl);
+
+    socket.onopen = function() {
+      statusBadge.className = "ws-status-badge bg-success-subtle text-success";
+      statusBadge.innerHTML = `<i class="bi bi-wifi me-1"></i>Live Ledger Connected`;
+    };
+
+    socket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      if (data.type === "wallet.update" || data.event) {
+        // Update live balance display
+        if (data.new_balance !== undefined) {
+          updateBalanceDisplay(data.new_balance);
+        }
+        // Append new passbook row
+        appendPassbookRow(data);
+      }
+    };
+
+    socket.onclose = function() {
+      statusBadge.className = "ws-status-badge bg-danger-subtle text-danger";
+      statusBadge.innerHTML = `<i class="bi bi-wifi-off me-1"></i>Reconnecting Stream...`;
+      setTimeout(initWalletWebSocket, 4000);
+    };
+  }
+
+  function updateBalanceDisplay(newBal) {
+    const el = document.getElementById("wallet_balance_display");
+    el.style.color = "#10b981";
+    el.textContent = "₹" + parseFloat(newBal).toFixed(2);
+    setTimeout(() => el.style.color = "#f59e0b", 1200);
+  }
+
+  function appendPassbookRow(data) {
+    const emptyRow = document.getElementById("empty_passbook_row");
+    if (emptyRow) emptyRow.remove();
+
+    const tbody = document.getElementById("passbook_table_body");
+    const tr = document.createElement("tr");
+    tr.className = "table-success";
+
+    const isCredit = data.event === "CREDIT";
+    const sign = isCredit ? "+" : "-";
+    const colorClass = isCredit ? "text-success" : "text-danger";
+
+    tr.innerHTML = `
+      <td>
+        <code class="fw-bold text-dark">${data.ref_id || 'TXN_NOW'}</code>
+      </td>
+      <td>
+        <div class="fw-bold text-dark">${data.description || 'Wallet Transaction'}</div>
+        <span class="badge bg-primary-subtle text-primary rounded-pill x-small">${data.category || 'TRANSACTION'}</span>
+      </td>
+      <td class="text-end text-muted">-</td>
+      <td class="text-end fw-bold fs-6 ${colorClass}">${sign}₹${parseFloat(data.amount).toFixed(2)}</td>
+      <td class="text-end fw-bold text-dark">₹${parseFloat(data.new_balance).toFixed(2)}</td>
+      <td class="text-center text-muted small">Just now</td>
+    `;
+
+    tbody.insertBefore(tr, tbody.firstChild);
+    setTimeout(() => tr.classList.remove("table-success"), 2500);
+  }
+
+  function openTopupModal() { topupModalObj.show(); }
+  function openWithdrawalModal() { withdrawalModalObj.show(); }
+
+  function selectTopupAmount(amt) {
+    setTopupAmount(amt);
+    openPaymentGatewayModal();
+  }
+
+  function setTopupAmount(amt) {
+    document.getElementById("topup_amount_input").value = amt;
+    currentPayAmount = amt;
+  }
+
+  function openPaymentGatewayModal() {
+    const amt = parseFloat(document.getElementById("topup_amount_input").value) || 500;
+    currentPayAmount = amt;
+    document.getElementById("gateway_pay_amount").textContent = "₹" + amt.toFixed(2);
+    document.getElementById("btn_pay_val").textContent = "₹" + amt.toFixed(2);
+
+    updateDynamicUpiQr();
+
+    topupModalObj.hide();
+    gatewayModalObj.show();
+  }
+
+  function updateDynamicUpiQr() {
+    const vpa = document.getElementById("upi_vpa_input") ? document.getElementById("upi_vpa_input").value.trim() : "9487351101@paytm";
+    const amt = currentPayAmount || 500;
+    const qrImg = document.getElementById("dynamic_upi_qr_img");
+    const sub = document.getElementById("qr_vpa_subtitle");
+
+    if (qrImg) {
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${encodeURIComponent(vpa)}&pn=Rovexa%20Cabs&am=${amt}&cu=INR`;
+    }
+    if (sub) {
+      sub.innerHTML = `Scanning will pay <strong class="text-warning">₹${amt}</strong> to <strong class="text-white">${vpa}</strong>`;
+    }
+  }
+
+  function copyUpiVpa() {
+    const vpa = document.getElementById("upi_vpa_input").value;
+    navigator.clipboard.writeText(vpa).then(() => {
+      alert("UPI VPA copied: " + vpa);
+    });
+  }
+
+  function launchUpiApp(app) {
+    const vpa = document.getElementById("upi_vpa_input").value;
+    const amt = currentPayAmount || 500;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=Rovexa&am=${amt}&cu=INR`;
+
+    if (app === 'gpay') {
+      window.location.href = `intent://pay?pa=${encodeURIComponent(vpa)}&pn=Rovexa&am=${amt}&cu=INR#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+    } else if (app === 'phonepe') {
+      window.location.href = `intent://pay?pa=${encodeURIComponent(vpa)}&pn=Rovexa&am=${amt}&cu=INR#Intent;scheme=upi;package=com.phonepe.app;end`;
+    } else {
+      window.location.href = upiUri;
+    }
+  }
+
+  function switchPayTab(tabName, el) {
+    document.querySelectorAll(".pay-tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".pay-tab-content").forEach(c => c.style.display = "none");
+    el.classList.add("active");
+    document.getElementById("tab_" + tabName).style.display = "block";
+  }
+
+  function executePayment() {
+    const btn = document.getElementById("gateway_pay_btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Processing Banking Credit...`;
+
+    fetch("/payment/api/wallet/topup/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+      body: JSON.stringify({ amount: currentPayAmount, razorpay_payment_id: "RZP_PAY_" + Date.now() })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        gatewayModalObj.hide();
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-shield-lock-fill me-2"></i>Pay ₹${currentPayAmount.toFixed(2)} Now`;
+      } else {
+        alert(data.message || data.error || "Payment failed.");
+        btn.disabled = false;
+      }
+    })
+    .catch(() => {
+      alert("Network error.");
+      btn.disabled = false;
+    });
+  }
+
+  function executeBankWithdrawal() {
+    const amt    = parseFloat(document.getElementById("withdraw_amount_input").value);
+    const holder = document.getElementById("withdraw_holder_input").value.trim();
+    const acc    = document.getElementById("withdraw_acc_input").value.trim();
+    const ifsc   = document.getElementById("withdraw_ifsc_input").value.trim();
+
+    if (!amt || amt <= 0 || !holder || !acc || !ifsc) {
+      alert("Please fill in all bank details and a valid amount.");
+      return;
+    }
+
+    const btn = document.getElementById("withdraw_btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Processing Bank Transfer...`;
+
+    fetch("/payment/api/wallet/withdraw/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+      body: JSON.stringify({
+        amount: amt,
+        account_number: acc,
+        ifsc_code: ifsc,
+        account_holder: holder
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.message);
+        withdrawalModalObj.hide();
+        btn.disabled = false;
+        btn.innerHTML = "Confirm Bank Transfer";
+      } else {
+        alert(data.message || "Withdrawal failed.");
+        btn.disabled = false;
+        btn.innerHTML = "Confirm Bank Transfer";
+      }
+    })
+    .catch(() => {
+      alert("Network error.");
+      btn.disabled = false;
+    });
+  }
+
+  function getCookie(name) {
+    return document.cookie.split(";").map(c => c.trim())
+      .find(c => c.startsWith(name + "="))?.split("=")[1] || "";
+  }
+</script>
+{% endblock %}

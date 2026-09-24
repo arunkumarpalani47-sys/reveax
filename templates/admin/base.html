@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} - Rovexa</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f5f9;
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+        .admin-wrapper { 
+            display: flex; 
+            min-height: 100vh; 
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .admin-sidebar { 
+            width: 260px; 
+            min-height: 100vh; 
+            background: #0f172a; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1000; 
+            overflow-y: auto; 
+        }
+        .admin-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .admin-content { 
+            margin-left: 260px; 
+            width: calc(100% - 260px);
+            min-width: 0;
+            flex: 1; 
+            background: #f1f5f9; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        .admin-main { 
+            padding: 24px; 
+            flex: 1;
+            min-width: 0;
+            overflow-x: hidden;
+        }
+        @media (max-width: 991px) {
+            .admin-sidebar {
+                left: -270px;
+                transition: transform 0.3s ease;
+                box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+            }
+            .admin-sidebar.show-sidebar {
+                transform: translateX(270px);
+            }
+            .admin-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .admin-main {
+                padding: 16px 12px;
+            }
+        }
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+        }
+        .sidebar-backdrop.active {
+            display: block;
+        }
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeAdminSidebar()"></div>
+
+    <div class="admin-wrapper">
+        <div class="admin-sidebar">
+            {% include 'admin/sidebar.html' %}
+        </div>
+        
+        <div class="admin-content">
+            {% include 'admin/navbar.html' %}
+            
+            <div class="admin-main">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        function toggleAdminSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) sidebar.classList.toggle('show-sidebar');
+            if (backdrop) backdrop.classList.toggle('active');
+        }
+        function closeAdminSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) sidebar.classList.remove('show-sidebar');
+            if (backdrop) backdrop.classList.remove('active');
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

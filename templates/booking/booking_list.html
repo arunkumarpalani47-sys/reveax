@@ -1,0 +1,571 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #2563eb, #1d4ed8);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        --dark-accent: #0f172a;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: var(--dark-accent);
+        margin: 0;
+        font-size: 1.75rem;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border-left: 4px solid #cbd5e1;
+    }
+    
+    .stat-card.total { border-left-color: #64748b; }
+    .stat-card.pending { border-left-color: #f59e0b; }
+    .stat-card.confirmed { border-left-color: #3b82f6; }
+    .stat-card.completed { border-left-color: #10b981; }
+    .stat-card.cancelled { border-left-color: #ef4444; }
+
+    .stat-title {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark-accent);
+    }
+
+    .controls-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .filter-tab {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-decoration: none;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.9rem;
+        background: #f8fafc;
+        transition: all 0.2s;
+    }
+
+    .filter-tab:hover {
+        background: #e2e8f0;
+        color: var(--dark-accent);
+    }
+
+    .filter-tab.active {
+        background: var(--dark-accent);
+        color: white;
+    }
+
+    .search-box {
+        position: relative;
+        min-width: 0;
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+        .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        .stats-container { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .stat-card { padding: 1rem; }
+        .controls-container { flex-direction: column; align-items: stretch; padding: 0.75rem; overflow: hidden; }
+        .filter-tabs { 
+            display: flex;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto; 
+            white-space: nowrap; 
+            -webkit-overflow-scrolling: touch; 
+            padding-bottom: 6px; 
+            gap: 0.5rem;
+            scrollbar-width: none;
+        }
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .filter-tab {
+            flex: 0 0 auto;
+            padding: 0.45rem 0.85rem;
+            font-size: 0.82rem;
+        }
+        .search-box { max-width: 100%; }
+
+        .table-card {
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+        .responsive-table thead {
+            display: none;
+        }
+        .responsive-table tbody tr {
+            display: block;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+        .responsive-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.65rem 0 !important;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: right;
+            font-size: 0.88rem;
+        }
+        .responsive-table tbody td:last-child {
+            border-bottom: none;
+            padding-bottom: 0 !important;
+            padding-top: 0.85rem !important;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .responsive-table tbody td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 1rem;
+            text-align: left;
+            flex-shrink: 0;
+        }
+        .responsive-table tbody td:last-child::before {
+            margin-bottom: 0.5rem;
+        }
+        .responsive-table tbody td .route-point {
+            max-width: 200px;
+        }
+        .responsive-table tbody td .d-flex {
+            width: 100%;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+    }
+
+    .table thead th {
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .table tbody td {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+    .table tbody tr {
+        transition: background 0.2s;
+    }
+
+    .table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .badge-status {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-pending { background: #fef3c7; color: #d97706; }
+    .badge-confirmed { background: #dbeafe; color: #2563eb; }
+    .badge-completed { background: #d1fae5; color: #059669; }
+    .badge-cancelled { background: #fee2e2; color: #dc2626; }
+
+    .route {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .route-point {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+    }
+    .route-point i { font-size: 0.7rem; }
+    .route-point.pickup i { color: #10b981; }
+    .route-point.dropoff i { color: #ef4444; }
+
+    .btn-export {
+        background: white;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-export:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: var(--dark-accent);
+    }
+    /* Ultra-Attractive Premium Action Buttons */
+    .action-btn-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+    .btn-action-primary {
+        background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+        color: #0f172a !important;
+        font-weight: 800;
+        font-size: 0.82rem;
+        padding: 6px 14px;
+        border-radius: 9px;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 10px rgba(245, 158, 11, 0.25);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        white-space: nowrap;
+    }
+
+    .btn-action-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        color: #0f172a !important;
+    }
+
+    .btn-action-accept {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 6px 14px;
+        border-radius: 9px;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-action-accept:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        color: #ffffff !important;
+    }
+
+    .btn-action-reject {
+        background: rgba(239, 68, 68, 0.08);
+        color: #dc2626 !important;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 6px 12px;
+        border-radius: 9px;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-action-reject:hover {
+        background: #ef4444;
+        color: #ffffff !important;
+    }
+
+    .btn-action-view {
+        background: rgba(37, 99, 235, 0.08);
+        color: #2563eb !important;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 6px 12px;
+        border-radius: 9px;
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-action-view:hover {
+        background: #2563eb;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-action-delete {
+        background: rgba(239, 68, 68, 0.08);
+        color: #ef4444 !important;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 6px 10px;
+        border-radius: 9px;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-action-delete:hover {
+        background: #ef4444;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .action-btn-group {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="page-header">
+        <h1 class="page-title">Bookings</h1>
+        <a href="?export=csv" class="btn-export">
+            <i class="bi bi-download me-2"></i> Export CSV
+        </a>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-container">
+        <div class="stat-card total">
+            <div class="stat-title">Total Bookings</div>
+            <div class="stat-value">{{ bookings.count|default:"0" }}</div>
+        </div>
+        <div class="stat-card pending">
+            <div class="stat-title">Pending Review</div>
+            <div class="stat-value">{{ pending_c|default:"0" }}</div>
+        </div>
+        <div class="stat-card confirmed">
+            <div class="stat-title">Accepted</div>
+            <div class="stat-value">{{ confirmed_c|default:"0" }}</div>
+        </div>
+        <div class="stat-card completed">
+            <div class="stat-title">Completed</div>
+            <div class="stat-value">{{ completed_c|default:"0" }}</div>
+        </div>
+        <div class="stat-card cancelled">
+            <div class="stat-title">Rejected / Cancelled</div>
+            <div class="stat-value">{{ cancelled_c|default:"0" }}</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-container">
+        <div class="filter-tabs">
+            <a href="?status=" class="filter-tab {% if not request.GET.status %}active{% endif %}">All</a>
+            <a href="?status=PENDING" class="filter-tab {% if request.GET.status == 'PENDING' %}active{% endif %}">Pending</a>
+            <a href="?status=CONFIRMED" class="filter-tab {% if request.GET.status == 'CONFIRMED' %}active{% endif %}">Confirmed</a>
+            <a href="?status=COMPLETED" class="filter-tab {% if request.GET.status == 'COMPLETED' %}active{% endif %}">Completed</a>
+            <a href="?status=CANCELLED" class="filter-tab {% if request.GET.status == 'CANCELLED' %}active{% endif %}">Cancelled</a>
+        </div>
+        <form method="GET" class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" name="q" placeholder="Search customer name..." value="{{ request.GET.q }}">
+            {% if request.GET.status %}
+                <input type="hidden" name="status" value="{{ request.GET.status }}">
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table class="table responsive-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Vehicle</th>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Fare</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td data-label="ID" class="fw-bold text-muted font-monospace" title="{{ booking.id }}">#{{ booking.id|stringformat:"s"|slice:":8" }}</td>
+                    <td data-label="Customer" class="fw-bold">
+                        <div>{{ booking.safe_customer_name }}</div>
+                        <div class="small text-primary fw-normal">
+                            <i class="bi bi-telephone-fill"></i> {{ booking.safe_customer_phone }}
+                        </div>
+                    </td>
+                    <td data-label="Vehicle">
+                        <div class="fw-semibold text-dark">{{ booking.safe_vehicle_name }}</div>
+                        <div class="extra-small text-muted font-monospace">{{ booking.safe_vehicle_number }}</div>
+                    </td>
+                    <td data-label="Route">
+                        <div class="route">
+                            <div class="route-point pickup" title="{{ booking.pickup_location }}"><i class="bi bi-circle-fill me-1"></i> {{ booking.pickup_location }}</div>
+                            <div class="route-point dropoff" title="{{ booking.drop_location }}"><i class="bi bi-square-fill me-1"></i> {{ booking.drop_location }}</div>
+                        </div>
+                    </td>
+                    <td data-label="Date">
+                        <div class="text-nowrap fw-medium">{{ booking.created_at|date:"M d, Y" }}</div>
+                        <div class="text-muted small">{{ booking.created_at|time:"H:i" }}</div>
+                    </td>
+                    <td data-label="Fare" class="fw-bold text-success text-nowrap">₹{{ booking.total_fare }}</td>
+                    <td data-label="Status">
+                        <span class="badge-status 
+                            {% if booking.status == 'PENDING' or booking.status == 'SEARCHING_DRIVER' %}badge-pending
+                            {% elif booking.status == 'ACCEPTED' or booking.status == 'CONFIRMED' or booking.status == 'DRIVER_ASSIGNED' or booking.status == 'TRIP_STARTED' %}badge-confirmed
+                            {% elif booking.status == 'COMPLETED' or booking.status == 'TRIP_COMPLETED' %}badge-completed
+                            {% elif booking.status == 'CANCELLED' or booking.status == 'REJECTED' %}badge-cancelled
+                            {% else %}badge-pending{% endif %}">
+                            {{ booking.status }}
+                        </span>
+                    </td>
+                    <td data-label="Actions">
+                        <div class="action-btn-group">
+                            {% if booking.status == 'PENDING' or booking.status == 'Pending' or booking.status == 'SEARCHING_DRIVER' %}
+                                <a href="{% url 'accept_booking' booking.id %}" class="btn-action-accept flex-fill"><i class="bi bi-check-circle-fill"></i> Accept</a>
+                                <a href="{% url 'reject_booking' booking.id %}" class="btn-action-reject" onclick="return confirm('Reject booking #{{ booking.id }}?');"><i class="bi bi-x-circle-fill"></i> Reject</a>
+                            {% elif booking.status == 'REJECTED' or booking.status == 'Rejected' or booking.status == 'CANCELLED' or booking.status == 'Cancelled' %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-3 fw-bold small flex-fill text-center" style="font-size: 0.78rem;">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Rejected
+                                </span>
+                            {% else %}
+                                <a href="{% url 'driver_console' booking.id %}" class="btn-action-primary flex-fill"><i class="bi bi-speedometer2"></i> Driver Console</a>
+                            {% endif %}
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn-action-view" title="View Details"><i class="bi bi-eye-fill"></i><span class="d-none d-sm-inline"> View</span></a>
+                            <a href="{% url 'delete_booking' booking.id %}" class="btn-action-delete" onclick="return confirm('Delete Booking #{{ booking.id }}?');" title="Delete Booking"><i class="bi bi-trash-fill"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">No bookings found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<script>
+// Auto-refresh Admin Bookings List every 5 seconds without manual F5
+setInterval(function() {
+    if (document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+        fetch(window.location.href, { cache: 'no-store' })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+
+                // Update Stats Bar
+                const oldStats = document.querySelector('.stats-container');
+                const newStats = newDoc.querySelector('.stats-container');
+                if (oldStats && newStats) oldStats.innerHTML = newStats.innerHTML;
+
+                // Update Booking Table
+                const oldTable = document.querySelector('.table.responsive-table tbody');
+                const newTable = newDoc.querySelector('.table.responsive-table tbody');
+                if (oldTable && newTable) oldTable.innerHTML = newTable.innerHTML;
+            })
+            .catch(err => console.log('Bookings table auto-update silent fail', err));
+    }
+}, 5000);
+</script>
+{% endblock %}

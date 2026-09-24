@@ -1,0 +1,178 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Checkout Payment — Booking #{{ booking.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background-color: #0f172a; color: #f8fafc; }
+  .pay-card {
+    background: #1e293b;
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid #334155;
+    max-width: 600px;
+    margin: 40px auto;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+  }
+  .pay-option-card {
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .pay-option-card:hover, .pay-option-card.active {
+    border-color: #f59e0b;
+    background: rgba(245,158,11,0.12);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="pay-card">
+    
+    <div class="text-center mb-4">
+      <h3 class="fw-bold text-white mb-1"><i class="bi bi-shield-check text-warning me-2"></i>Checkout Payment</h3>
+      <p class="text-muted small">Booking #{{ booking.id }} • {{ booking.vehicle_type }}</p>
+    </div>
+
+    <!-- Amount Summary Box -->
+    <div class="p-3 rounded-4 mb-4 text-center" style="background:#0f172a; border:1px solid #334155;">
+      <span class="text-muted small d-block">TOTAL FARE TO PAY</span>
+      <div class="fs-1 fw-bold text-warning">₹{{ booking.total_fare|floatformat:2 }}</div>
+      <div class="text-muted x-small">Pickup: {{ booking.pickup_location|truncatechars:35 }}</div>
+    </div>
+
+    <!-- Payment Method Selection Form -->
+    <form id="payment_method_form" method="POST">
+      {% csrf_token %}
+      <input type="hidden" id="selected_method" name="payment_method" value="Cash">
+
+      <h6 class="fw-bold text-white mb-3">Select Payment Method:</h6>
+
+      <!-- Option 1: Cash -->
+      <div class="pay-option-card active" onclick="selectMethod('Cash', this)">
+        <div class="d-flex align-items-center gap-3">
+          <div class="fs-2">💵</div>
+          <div>
+            <strong class="text-white d-block">Cash to Driver</strong>
+            <span class="text-muted small">Pay cash directly to driver at pickup/drop</span>
+          </div>
+        </div>
+        <i class="bi bi-check-circle-fill text-warning fs-5 option-check"></i>
+      </div>
+
+      <!-- Option 2: Rovexa Wallet -->
+      <div class="pay-option-card" onclick="selectMethod('Wallet', this)">
+        <div class="d-flex align-items-center gap-3">
+          <div class="fs-2">👛</div>
+          <div>
+            <strong class="text-white d-block">Rovexa Wallet</strong>
+            <span class="text-muted small">Available Balance: <strong class="text-warning">₹{{ wallet.balance|floatformat:2 }}</strong></span>
+          </div>
+        </div>
+        <i class="bi bi-circle text-secondary fs-5 option-check"></i>
+      </div>
+
+      <!-- Option 3: Razorpay / UPI -->
+      <div class="pay-option-card" onclick="selectMethod('Razorpay', this)">
+        <div class="d-flex align-items-center gap-3">
+          <div class="fs-2">💳</div>
+          <div>
+            <strong class="text-white d-block">Razorpay / UPI / Cards</strong>
+            <span class="text-muted small">Google Pay, PhonePe, Paytm, Cards & NetBanking</span>
+          </div>
+        </div>
+        <i class="bi bi-circle text-secondary fs-5 option-check"></i>
+      </div>
+
+      <button type="submit" id="pay_btn" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill mt-4 py-3 text-dark">
+        Confirm & Pay ₹{{ booking.total_fare|floatformat:0 }}
+      </button>
+
+      <a href="{% url 'booking_list' %}" class="btn btn-outline-secondary w-100 rounded-pill mt-2">
+        Cancel
+      </a>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  let currentMethod = "Cash";
+  const razorpayKeyId = "{{ RAZORPAY_KEY_ID|default:'rzp_test_rovexaKey123' }}";
+
+  function selectMethod(method, el) {
+    document.querySelectorAll(".pay-option-card").forEach(card => {
+      card.classList.remove("active");
+      const check = card.querySelector(".option-check");
+      check.className = "bi bi-circle text-secondary fs-5 option-check";
+    });
+    el.classList.add("active");
+    el.querySelector(".option-check").className = "bi bi-check-circle-fill text-warning fs-5 option-check";
+    currentMethod = method;
+    document.getElementById("selected_method").value = method;
+  }
+
+  document.getElementById("payment_method_form").addEventListener("submit", function(e) {
+    if (currentMethod === "Razorpay") {
+      e.preventDefault();
+      const amt = {{ booking.total_fare }};
+
+      fetch("/payment/api/razorpay/create-order/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+        body: JSON.stringify({ amount: amt })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && typeof Razorpay !== "undefined") {
+          const keyToUse = razorpayKeyId && !razorpayKeyId.includes("test_rovexaKey123") ? razorpayKeyId : "rzp_test_1DP5mmOlF5G5ag";
+          const options = {
+            "key": keyToUse,
+            "amount": Math.round(amt * 100),
+            "currency": "INR",
+            "name": "Rovexa Ride Payment",
+            "description": "Booking #{{ booking.id }}",
+            "handler": function (response) {
+              document.getElementById("selected_method").value = "Razorpay";
+              document.getElementById("payment_method_form").submit();
+            },
+            "prefill": {
+              "name": "{{ request.user.display_name|escapejs }}",
+              "email": "{{ request.user.email|default:'customer@rovexa.com'|escapejs }}",
+              "contact": "{{ request.user.phone|default:'9876543210'|escapejs }}"
+            },
+            "theme": { "color": "#f59e0b" }
+          };
+
+          if (data.order && data.order.order_id && !data.order.order_id.startsWith("order_")) {
+            options.order_id = data.order.order_id;
+          }
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        } else {
+          document.getElementById("selected_method").value = "Razorpay";
+          document.getElementById("payment_method_form").submit();
+        }
+      });
+    }
+  });
+
+  function getCookie(name) {
+    return document.cookie.split(";").map(c => c.trim())
+      .find(c => c.startsWith(name + "="))?.split("=")[1] || "";
+  }
+</script>
+{% endblock %}

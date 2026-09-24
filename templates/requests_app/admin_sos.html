@@ -1,0 +1,120 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Emergency SOS Operations Room{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold mb-1 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Emergency SOS Operations Center</h3>
+            <p class="text-muted small mb-0">Live High-Priority Safety Stream & Emergency Response Dispatch</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge {% if active_count > 0 %}bg-danger animate-pulse{% else %}bg-success{% endif %} fs-6 px-3 py-2 rounded-pill">
+                {% if active_count > 0 %}🚨 {{ active_count }} ACTIVE SOS ALERTS{% else %}🟢 System Normal (0 Active Alerts){% endif %}
+            </span>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Table of Emergency Alerts -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-dark text-white p-3 rounded-top-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-shield-slash-fill text-danger me-2"></i>Emergency Incident Log</h5>
+            <span class="badge bg-secondary">{{ alerts|length }} total</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Alert ID & Time</th>
+                            <th>Passenger Contact</th>
+                            <th>Driver & Vehicle</th>
+                            <th>GPS Coordinates & Location</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts %}
+                        <tr class="{% if alert.status == 'ACTIVE' %}table-danger{% endif %}">
+                            <td>
+                                <code class="fw-bold text-dark">#SOS-{{ alert.id }}</code>
+                                <div class="text-muted small">Booking #{{ alert.booking.id }}</div>
+                                <div class="text-muted x-small">{{ alert.created_at|date:"d M Y, h:i:s A" }}</div>
+                            </td>
+
+                            <td>
+                                <strong class="text-dark">{{ alert.user.get_full_name|default:alert.user.username }}</strong>
+                                <div class="text-muted small"><i class="bi bi-telephone-fill me-1"></i>{{ alert.user.phone|default:"-- " }}</div>
+                                <div class="text-muted x-small">{{ alert.user.email|default:"" }}</div>
+                            </td>
+
+                            <td>
+                                {% if alert.booking.driver %}
+                                    <strong class="text-dark">{{ alert.booking.driver.full_name }}</strong>
+                                    <div class="text-muted small">Reg: {{ alert.booking.vehicle.registration_number|default:"Cab" }}</div>
+                                {% else %}
+                                    <span class="text-muted small">Unassigned</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="fw-bold text-dark">{{ alert.current_address|truncatechars:40 }}</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query={{ alert.lat }},{{ alert.lng }}"
+                                   target="_blank" class="btn btn-outline-danger btn-sm rounded-pill py-0 px-2 mt-1" style="font-size:11px;">
+                                    <i class="bi bi-geo-alt-fill me-1"></i> Open GPS Map ({{ alert.lat|floatformat:4 }}, {{ alert.lng|floatformat:4 }})
+                                </a>
+                            </td>
+
+                            <td>
+                                {% if alert.status == 'ACTIVE' %}
+                                    <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill animate-pulse">🚨 ACTIVE SOS</span>
+                                {% else %}
+                                    <span class="badge bg-success rounded-pill">RESOLVED</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if alert.status == 'ACTIVE' %}
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="alert_id" value="{{ alert.id }}">
+                                        <button type="submit" class="btn btn-success btn-sm rounded-pill fw-bold">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Resolve Alert
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted small"><i class="bi bi-check-all text-success me-1"></i>Dismissed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-shield-check fs-1 d-block mb-2 text-success"></i>
+                                No Emergency SOS alerts triggered yet. System operating normally!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

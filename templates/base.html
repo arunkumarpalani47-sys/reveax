@@ -1,0 +1,92 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Rovexa - Taxi Booking System{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+    <style>
+      /* Global Mobile Responsiveness & Touch Optimizations */
+      html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+      }
+      @media (max-width: 768px) {
+        body { font-size: 14px; }
+        .container, .container-fluid { padding-left: 12px !important; padding-right: 12px !important; }
+        .btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; touch-action: manipulation; }
+        .form-control, .form-select { min-height: 44px; font-size: 14px; }
+        .table-responsive, table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .card, .info-card, .action-card { border-radius: 16px !important; padding: 16px !important; }
+        .nav-pills { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+        .nav-pills .nav-item { flex: 0 0 auto; }
+        .modal-dialog { margin: 0.5rem; }
+        .whatsapp-float { bottom: 16px; right: 16px; padding: 10px 14px; }
+      }
+      /* Horizontal Scrollable Tabs & Tables Utilities */
+      .horizontal-scroll-container {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .horizontal-scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    {% include 'navbar.html' %}
+
+    {% block layout %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+
+    {% endblock %}
+
+    {% include 'footer.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/919487351101?text=Hello%20Rovexa%20Cabs,%20I%20want%20to%20book%20a%20taxi."
+       class="whatsapp-float"
+       target="_blank">
+
+        <i class="bi bi-whatsapp"></i>
+
+        <span class="wa-text">
+            Enquiry
+        </span>
+
+    </a>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

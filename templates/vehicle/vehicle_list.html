@@ -1,0 +1,585 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<style>
+/* Premium Fleet Catalog Styling */
+:root {
+  --primary-gradient: linear-gradient(135deg, #2563eb, #1d4ed8);
+  --card-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+  --card-hover-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+  --dark-accent: #0f172a;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-weight: 800;
+  color: var(--dark-accent);
+  margin: 0;
+  font-size: 1.85rem;
+  letter-spacing: -0.3px;
+}
+
+.btn-gradient {
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+  color: white;
+}
+
+.controls-bar {
+  background: white;
+  padding: 1.1rem;
+  border-radius: 18px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-filter {
+  display: flex;
+  gap: 1rem;
+  flex-grow: 1;
+  max-width: 600px;
+}
+
+.search-filter input, .search-filter select {
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.6rem 1.1rem;
+  font-weight: 500;
+}
+
+.search-filter input:focus, .search-filter select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  outline: none;
+}
+
+.view-toggles .btn {
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  border-radius: 10px;
+}
+
+.view-toggles .btn.active {
+  background: #f1f5f9;
+  color: var(--dark-accent);
+  border-color: #cbd5e1;
+  font-weight: bold;
+}
+
+/* ==========================================
+   ULTRA-PREMIUM FLEET VEHICLE CARDS
+   ========================================== */
+.admin-vehicle-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-vehicle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: #93c5fd;
+}
+
+/* Photo Cover Viewport */
+.admin-car-cover {
+  position: relative;
+  height: 150px;
+  width: 100%;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.admin-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.admin-vehicle-card:hover .admin-car-img {
+  transform: scale(1.08);
+}
+
+.admin-car-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.85) 100%);
+}
+
+.admin-car-type-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  color: #38bdf8;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-car-status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.admin-car-status-badge.available {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.admin-car-status-badge.unavailable {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.admin-car-plate-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Card Body Content */
+.admin-card-body {
+  padding: 1.25rem;
+  background: #ffffff;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.admin-car-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
+
+.admin-car-model {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-bottom: 0.85rem;
+}
+
+/* Driver Box */
+.admin-driver-box {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin-driver-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  flex-shrink: 0;
+}
+
+.admin-driver-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.admin-driver-phone {
+  font-size: 0.72rem;
+  color: #2563eb;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Specs Bar */
+.admin-specs-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.admin-spec-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Price & Availability Row */
+.admin-price-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.admin-price-tag {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.admin-price-unit {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Card Action Footer */
+.admin-card-actions {
+  display: flex;
+  border-top: 1px solid #f1f5f9;
+  background: #fafaf9;
+}
+
+.admin-card-actions a {
+  flex: 1;
+  padding: 0.8rem;
+  text-align: center;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.admin-card-actions a:first-child {
+  border-right: 1px solid #f1f5f9;
+}
+
+.admin-card-actions a.edit:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.admin-card-actions a.delete:hover {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+/* List View Table */
+.table-container {
+  background: white;
+  border-radius: 18px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.table thead th {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 700;
+  padding: 1rem 1.25rem;
+}
+
+.table tbody td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+  .controls-bar { padding: 0.8rem; flex-direction: column; align-items: stretch; }
+  .search-filter { max-width: 100%; flex-direction: column; }
+  .search-filter select { max-width: 100% !important; }
+  .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+</style>
+
+<div class="container-fluid px-0">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-4 mb-4 shadow-sm border-0" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-car-front-fill text-primary me-2"></i> Fleet Catalog</h1>
+      <p class="text-secondary small mb-0 mt-1">Manage active luxury cabs, pricing rates, and verified drivers</p>
+    </div>
+    <a href="{% url 'vehicle_create' %}" class="btn btn-gradient">
+      <i class="bi bi-plus-lg me-2"></i> Add New Vehicle
+    </a>
+  </div>
+
+  <!-- Controls & Filters Bar -->
+  <div class="controls-bar">
+    <div class="search-filter">
+      <input type="text" class="form-control" placeholder="Search vehicle name, brand, model or plate number..." id="searchInput">
+      <select class="form-select" style="max-width: 200px;">
+        <option value="">All Vehicle Types</option>
+        <option value="Car Cab">Car Cab</option>
+      </select>
+    </div>
+    <div class="view-toggles btn-group" role="group">
+      <button type="button" class="btn active" id="btnGrid" onclick="setView('grid')">
+        <i class="bi bi-grid-fill me-1"></i> Grid
+      </button>
+      <button type="button" class="btn" id="btnList" onclick="setView('list')">
+        <i class="bi bi-list-ul me-1"></i> List
+      </button>
+    </div>
+  </div>
+
+  {% if vehicles %}
+    <!-- Grid View of Premium Cards -->
+    <div id="gridView" class="row g-4">
+      {% for vehicle in vehicles %}
+        <div class="col-md-6 col-lg-4 col-xl-4">
+          <div class="admin-vehicle-card">
+            
+            <!-- Photo Cover Viewport -->
+            <div class="admin-car-cover">
+              {% if vehicle.image %}
+                <img src="{{ vehicle.image.url }}" alt="{{ vehicle.vehicle_name }}" class="admin-car-img" onerror="this.onerror=null; this.src='{{ vehicle.get_image_url }}';">
+              {% else %}
+                <img src="{{ vehicle.get_image_url }}" alt="{{ vehicle.vehicle_name }}" class="admin-car-img">
+              {% endif %}
+
+              <div class="admin-car-overlay"></div>
+
+              <!-- Top Left Category Pill -->
+              <span class="admin-car-type-badge">{{ vehicle.vehicle_type }}</span>
+
+              <!-- Top Right Status Badge -->
+              <span class="admin-car-status-badge {% if vehicle.is_available %}available{% else %}unavailable{% endif %}">
+                {% if vehicle.is_available %}✓ Available{% else %}✕ Unavailable{% endif %}
+              </span>
+
+              <!-- Bottom Right Plate Number -->
+              <span class="admin-car-plate-badge">{{ vehicle.vehicle_number|default:"TN-01-AX-4040" }}</span>
+            </div>
+
+            <!-- Card Body Content -->
+            <div class="admin-card-body">
+              <div>
+                <h3 class="admin-car-name text-truncate" title="{{ vehicle.vehicle_name }}">{% if vehicle.vehicle_name %}{{ vehicle.vehicle_name }}{% else %}{{ vehicle.name }}{% endif %}</h3>
+                <div class="admin-car-model text-truncate">{{ vehicle.brand }} {{ vehicle.model }}</div>
+
+                <!-- Driver Box -->
+                <div class="admin-driver-box">
+                  {% if vehicle.driver_image %}
+                    <img src="{{ vehicle.driver_image.url }}" alt="{{ vehicle.driver_name }}" class="admin-driver-avatar" onerror="this.onerror=null; this.src='{{ vehicle.get_driver_image_url }}';">
+                  {% else %}
+                    <img src="{{ vehicle.get_driver_image_url }}" alt="{{ vehicle.driver_name }}" class="admin-driver-avatar">
+                  {% endif %}
+
+                  <div>
+                    <div class="admin-driver-name">
+                      {{ vehicle.driver_name|default:"Ramesh Kumar (Verified Driver)" }}
+                    </div>
+                    <div class="admin-driver-phone">
+                      <i class="bi bi-telephone-fill"></i>
+                      {{ vehicle.driver_phone|default:"+91 98452 98351" }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Specs Bar -->
+                <div class="admin-specs-bar">
+                  <span class="admin-spec-pill"><i class="bi bi-people-fill text-primary"></i> {{ vehicle.seats|default:4 }} Seats</span>
+                  <span class="admin-spec-pill"><i class="bi bi-snow2 text-info"></i> AC</span>
+                  <span class="admin-spec-pill"><i class="bi bi-fuel-pump-fill text-warning"></i> {{ vehicle.fuel_type|default:"Diesel" }}</span>
+                </div>
+              </div>
+
+              <!-- Price Tag & Toggle Switch -->
+              <div class="admin-price-toggle-row">
+                <div>
+                  <div class="admin-price-tag">₹{{ vehicle.price_per_km }}</div>
+                  <div class="admin-price-unit">per km rate</div>
+                </div>
+
+                <div class="form-check form-switch mb-0">
+                  <input class="form-check-input" type="checkbox" role="switch" style="width: 2.5em; height: 1.25em; cursor: pointer;" {% if vehicle.is_available %}checked{% endif %} onchange="location.href='{% url 'toggle_vehicle' vehicle.id %}';">
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Card Actions Footer -->
+            <div class="admin-card-actions">
+              <a href="{% url 'vehicle_edit' vehicle.id %}" class="edit"><i class="bi bi-pencil-square me-1"></i> Edit Vehicle</a>
+              <a href="{% url 'vehicle_delete' vehicle.id %}" class="delete" onclick="return confirm('Are you sure you want to permanently delete {{ vehicle.vehicle_name|escapejs }}?');"><i class="bi bi-trash3 me-1"></i> Delete</a>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Table List View -->
+    <div id="listView" class="d-none mt-3">
+      <div class="table-container">
+        <table class="table table-hover mb-0 align-middle">
+          <thead>
+            <tr>
+              <th>Vehicle Name & Photo</th>
+              <th>Type</th>
+              <th>Driver & Contact</th>
+              <th>Specs & Plate</th>
+              <th>Price / KM</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vehicle in vehicles %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    {% if vehicle.image %}
+                      <img src="{{ vehicle.image.url }}" alt="{{ vehicle.vehicle_name }}" class="rounded-3" style="width:48px; height:36px; object-fit:cover;">
+                    {% else %}
+                      <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=150&auto=format&fit=crop&q=80" alt="Car Photo" class="rounded-3" style="width:48px; height:36px; object-fit:cover;">
+                    {% endif %}
+                    <div>
+                      <div class="fw-bold text-dark mb-0">{% if vehicle.vehicle_name %}{{ vehicle.vehicle_name }}{% else %}{{ vehicle.name }}{% endif %}</div>
+                      <div class="text-secondary small">{{ vehicle.brand }} {{ vehicle.model }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-light text-primary border border-primary border-opacity-20 px-2.5 py-1.5 rounded-pill font-monospace" style="font-size:0.75rem;">{{ vehicle.vehicle_type }}</span></td>
+                <td>
+                  <div class="fw-semibold text-dark" style="font-size:0.85rem;">
+                    {{ vehicle.driver_name|default:"Ramesh Kumar" }}
+                  </div>
+                  <div class="text-primary small">
+                    {{ vehicle.driver_phone|default:"+91 98452 98351" }}
+                  </div>
+                </td>
+                <td>
+                  <div class="badge bg-dark text-warning font-monospace" style="font-size:0.72rem;">{{ vehicle.vehicle_number|default:"TN-01-AX-4040" }}</div>
+                  <div class="text-secondary small mt-1">{{ vehicle.seats|default:4 }} Seats • {{ vehicle.fuel_type|default:"Diesel" }}</div>
+                </td>
+                <td class="fw-bold text-success fs-6">₹{{ vehicle.price_per_km }}</td>
+                <td>
+                  <span class="badge {% if vehicle.is_available %}bg-success{% else %}bg-danger{% endif %} rounded-pill px-3 py-1.5">
+                    {{ vehicle.is_available|yesno:"Available,Unavailable" }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <a href="{% url 'vehicle_edit' vehicle.id %}" class="btn btn-sm btn-light text-primary me-1 rounded-3"><i class="bi bi-pencil"></i></a>
+                  <a href="{% url 'vehicle_delete' vehicle.id %}" class="btn btn-sm btn-light text-danger rounded-3" onclick="return confirm('Are you sure you want to permanently delete {{ vehicle.vehicle_name|escapejs }}?');"><i class="bi bi-trash"></i></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="alert alert-info rounded-4 py-4 text-center border-0 shadow-sm">
+      <i class="bi bi-car-front fs-2 d-block text-primary mb-2"></i>
+      <h5 class="fw-bold">No Vehicles in Fleet Catalog</h5>
+      <p class="text-secondary mb-3">Get started by adding your first vehicle cab to the system.</p>
+      <a href="{% url 'vehicle_create' %}" class="btn btn-primary rounded-pill px-4">
+        <i class="bi bi-plus-lg me-1"></i> Add Vehicle Now
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+function setView(viewMode) {
+  const gridView = document.getElementById("gridView");
+  const listView = document.getElementById("listView");
+  const btnGrid = document.getElementById("btnGrid");
+  const btnList = document.getElementById("btnList");
+
+  if (viewMode === 'list') {
+    gridView.classList.add("d-none");
+    listView.classList.remove("d-none");
+    btnList.classList.add("active");
+    btnGrid.classList.remove("active");
+  } else {
+    listView.classList.add("d-none");
+    gridView.classList.remove("d-none");
+    btnGrid.classList.add("active");
+    btnList.classList.remove("active");
+  }
+}
+</script>
+{% endblock %}

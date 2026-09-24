@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Rovexa/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxDuration": 60 }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "staticfiles/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "Rovexa/wsgi.py"
+    }
+  ]
+}

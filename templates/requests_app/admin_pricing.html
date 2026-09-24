@@ -1,0 +1,217 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Pricing & Coupons Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-tags-fill text-warning me-2"></i>Pricing Rules & Promo Coupons</h3>
+            <p class="text-muted small mb-0">Manage rate rules per vehicle type, surge pricing multipliers, and promo coupons.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/admin/" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <i class="bi bi-shield-lock-fill me-1"></i> Django Core Admin
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 1. PRICING RULES PER VEHICLE TYPE -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-header bg-dark text-white p-3 rounded-top-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-sliders me-2"></i>Vehicle Rate Cards & Surge Rules</h5>
+            <span class="badge bg-warning text-dark">5 Active Categories</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Vehicle Type</th>
+                            <th style="width: 120px;">Base Fare (₹)</th>
+                            <th style="width: 120px;">Rate / KM (₹)</th>
+                            <th style="width: 120px;">Rate / Min (₹)</th>
+                            <th style="width: 130px;">Surge Multiplier</th>
+                            <th style="width: 120px;">Night Charge %</th>
+                            <th style="width: 120px;">Airport Fee (₹)</th>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 120px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rule in rules %}
+                        <tr>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_rule">
+                                <input type="hidden" name="rule_id" value="{{ rule.id }}">
+
+                                <td>
+                                    <div class="fw-bold text-dark">{{ rule.display_name }}</div>
+                                    <code>{{ rule.vehicle_type }}</code>
+                                </td>
+                                <td>
+                                    <input type="number" step="0.5" name="base_fare" value="{{ rule.base_fare }}" class="form-control form-control-sm text-center fw-bold" required>
+                                </td>
+                                <td>
+                                    <input type="number" step="0.5" name="rate_per_km" value="{{ rule.rate_per_km }}" class="form-control form-control-sm text-center fw-bold" required>
+                                </td>
+                                <td>
+                                    <input type="number" step="0.5" name="rate_per_min" value="{{ rule.rate_per_min }}" class="form-control form-control-sm text-center fw-bold" required>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.1" min="1.0" max="3.0" name="surge_multiplier" value="{{ rule.surge_multiplier }}" class="form-control text-center fw-bold text-warning" required>
+                                        <span class="input-group-text bg-dark text-warning">x</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="1" name="night_charge_percent" value="{{ rule.night_charge_percent }}" class="form-control text-center" required>
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="number" step="1" name="airport_flat_charge" value="{{ rule.airport_flat_charge }}" class="form-control form-control-sm text-center" required>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_active" {% if rule.is_active %}checked{% endif %}>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold rounded-pill">
+                                        Save
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. PROMO COUPONS MANAGEMENT -->
+    <div class="row g-4">
+        
+        <!-- Add New Coupon Form -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-dark text-white p-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-ticket-perforated me-2"></i>Create New Promo Coupon</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_coupon">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted">COUPON CODE</label>
+                            <input type="text" name="code" placeholder="e.g. WELCOME50" class="form-control text-uppercase fw-bold" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted">DISCOUNT PERCENT (%)</label>
+                            <input type="number" step="1" min="1" max="100" name="discount_percent" value="15" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted">MAX DISCOUNT AMOUNT (₹)</label>
+                            <input type="number" step="10" name="max_discount_amount" value="100" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted">MIN TRIP FARE (₹)</label>
+                            <input type="number" step="10" name="min_trip_fare" value="150" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 fw-bold rounded-pill py-2">
+                            <i class="bi bi-plus-circle me-1"></i> Create Promo Coupon
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coupon List Table -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-dark text-white p-3 rounded-top-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-tags me-2"></i>Active Promo Coupons</h5>
+                    <span class="badge bg-secondary">{{ coupons|length }} total</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Discount</th>
+                                    <th>Max Limit</th>
+                                    <th>Min Trip</th>
+                                    <th>Uses</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cp in coupons %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-warning text-dark fs-6 px-3 py-2 fw-bold">{{ cp.code }}</span>
+                                    </td>
+                                    <td class="fw-bold text-success">{{ cp.discount_percent }}% OFF</td>
+                                    <td>₹{{ cp.max_discount_amount }}</td>
+                                    <td>₹{{ cp.min_trip_fare }}</td>
+                                    <td><span class="badge bg-dark">{{ cp.uses_count }} / {{ cp.max_uses }}</span></td>
+                                    <td>
+                                        {% if cp.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Disabled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="POST" style="display:inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="toggle_coupon">
+                                            <input type="hidden" name="coupon_id" value="{{ cp.id }}">
+                                            <button type="submit" class="btn btn-sm {% if cp.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %} rounded-pill">
+                                                {% if cp.is_active %}Disable{% else %}Enable{% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        No promo coupons created yet. Use the form on the left to add one!
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

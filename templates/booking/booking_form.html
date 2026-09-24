@@ -1,0 +1,1160 @@
+{% extends 'dashboard_base.html' %}
+
+{% block content %}
+
+<style>
+/* Modern Glassmorphism & Luxury Dashboard Layout for Booking Page */
+.booking-page-wrapper {
+  padding: 1.5rem 1rem;
+}
+
+.booking-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.booking-card-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 1.35rem 2rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.booking-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.step-badge {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  color: #38bdf8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.4rem 0.85rem;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Location Selector Box */
+.location-selector-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.route-connector {
+  position: absolute;
+  left: 27px;
+  top: 48px;
+  bottom: 48px;
+  width: 2.5px;
+  background: linear-gradient(180deg, #ef4444 0%, #10b981 100%);
+  z-index: 1;
+}
+
+.location-input-group {
+  position: relative;
+  z-index: 2;
+}
+
+.location-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.location-icon.pickup-icon {
+  background: #fee2e2;
+  color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.location-icon.drop-icon {
+  background: #d1fae5;
+  color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+.form-control-custom {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.form-control-custom:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  background: #ffffff;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 45px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1050;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.suggestion-item {
+  padding: 11px 16px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
+  padding-left: 20px;
+}
+
+/* ==========================================
+   ULTRA-PREMIUM VEHICLE & DRIVER CARDS GRID
+   ========================================== */
+.vehicle-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.premium-car-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+}
+
+.premium-car-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-5px);
+  box-shadow: 0 16px 35px rgba(37, 99, 235, 0.15);
+}
+
+.premium-car-card.active {
+  border-color: #2563eb;
+  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.22);
+  transform: translateY(-4px);
+}
+
+/* Photo Cover Viewport */
+.car-cover-viewport {
+  position: relative;
+  height: 145px;
+  width: 100%;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.car-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.premium-car-card:hover .car-cover-img {
+  transform: scale(1.08);
+}
+
+.car-cover-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%);
+}
+
+/* Badges on Car Image */
+.car-type-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  color: #38bdf8;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.car-active-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.premium-car-card.active .car-active-check {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+
+.car-plate-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Card Body Content */
+.premium-card-body {
+  padding: 1.15rem;
+  background: #ffffff;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.car-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.car-main-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.car-rating-badge {
+  background: #fef3c7;
+  color: #d97706;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Driver Profile Info Box */
+.driver-profile-box {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.driver-avatar-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  flex-shrink: 0;
+}
+
+.driver-info-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.driver-info-phone {
+  font-size: 0.74rem;
+  color: #2563eb;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Specs Bar */
+.car-specs-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.spec-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Rate Footer */
+.premium-price-footer {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 14px;
+  color: #ffffff;
+}
+
+.price-amount {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #4ade80;
+  line-height: 1;
+}
+
+.price-per-km-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.select-cab-btn-hint {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.premium-car-card.active .select-cab-btn-hint {
+  color: #4ade80;
+}
+
+/* Dynamic Live Fare Estimation Card */
+.fare-estimate-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 18px;
+  padding: 1.35rem 1.6rem;
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
+}
+
+.fare-price-tag {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #4ade80;
+  text-shadow: 0 2px 12px rgba(74, 222, 128, 0.25);
+}
+
+/* Sticky Map View Container */
+.map-container-box {
+  height: 100%;
+  min-height: 560px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .map-container-box, #map {
+    min-height: 320px !important;
+    height: 320px !important;
+    border-radius: 16px;
+  }
+  .booking-card-header {
+    padding: 1rem !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .vehicle-selector-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .booking-page-wrapper {
+    padding: 0.5rem !important;
+  }
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  z-index: 1;
+}
+
+.map-floating-bar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 500;
+  pointer-events: none;
+}
+
+.map-badge {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  padding: 0.55rem 1.1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-book-submit {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s ease;
+  width: 100%;
+  letter-spacing: 0.2px;
+}
+
+.btn-book-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 35px rgba(37, 99, 235, 0.45);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  color: #ffffff;
+}
+
+.pulse-icon {
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+</style>
+
+<div class="booking-page-wrapper">
+  
+  {% if form.errors %}
+    <div class="alert alert-danger rounded-4 mb-4 shadow-sm border-0 d-flex align-items-center gap-3">
+      <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+      <div>
+        <strong>Please check form inputs:</strong> {{ form.errors }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="booking-card">
+    <!-- Card Header -->
+    <div class="booking-card-header">
+      <h2 class="booking-title">
+        <i class="bi bi-taxi-front-fill text-warning"></i> Book Your Luxury Ride
+      </h2>
+      <span class="step-badge"><i class="bi bi-shield-check me-1"></i> Rovexa Premium Fleet</span>
+    </div>
+
+    <div class="p-4">
+      <form method="POST" id="bookingForm">
+        {% csrf_token %}
+
+        <div class="row g-4">
+          <!-- LEFT COLUMN: Form Inputs & Ride Selection -->
+          <div class="col-lg-6">
+
+            <!-- STEP 1: Pickup & Drop Location -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <label class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                  <span class="badge bg-primary rounded-circle" style="width:24px; height:24px; font-size:11px; display:inline-flex; align-items:center; justify-content:center;">1</span>
+                  Route Locations
+                </label>
+                <div class="d-flex gap-1">
+                  <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-primary" onclick="getCurrentLocation()" style="font-size: 0.8rem;">
+                    <i class="bi bi-crosshair pulse-icon text-danger me-1"></i> Use My Location
+                  </button>
+                  <button type="button" class="btn btn-sm btn-light border rounded-pill px-2 text-secondary" onclick="resetSelection()" title="Clear Selection" style="font-size: 0.8rem;">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="location-selector-card">
+                <div class="route-connector"></div>
+
+                <!-- Pickup Input -->
+                <div class="location-input-group mb-3 d-flex align-items-center gap-3 position-relative">
+                  <div class="location-icon pickup-icon">
+                    <i class="bi bi-geo-alt-fill"></i>
+                  </div>
+                  <div class="flex-grow-1 position-relative">
+                    <input 
+                      type="text" 
+                      id="pickup" 
+                      name="pickup_location" 
+                      class="form-control form-control-custom" 
+                      placeholder="Enter pickup address or click map..." 
+                      required 
+                      autocomplete="off" 
+                      value="{{ pickup }}">
+                    <div class="autocomplete-suggestions" id="pickup_suggestions" style="display: none;"></div>
+                  </div>
+                </div>
+
+                <!-- Drop Input -->
+                <div class="location-input-group d-flex align-items-center gap-3 position-relative">
+                  <div class="location-icon drop-icon">
+                    <i class="bi bi-flag-fill"></i>
+                  </div>
+                  <div class="flex-grow-1 position-relative">
+                    <input 
+                      type="text" 
+                      id="drop" 
+                      name="drop_location" 
+                      class="form-control form-control-custom" 
+                      placeholder="Enter drop address or click map..." 
+                      required 
+                      autocomplete="off" 
+                      value="{{ drop }}">
+                    <div class="autocomplete-suggestions" id="drop_suggestions" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2: Luxury Available Cars Selector -->
+            <div class="mb-4">
+              <label class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-circle" style="width:24px; height:24px; font-size:11px; display:inline-flex; align-items:center; justify-content:center;">2</span>
+                Select Available Luxury Cab & Driver
+              </label>
+
+              <!-- Hidden Category, Payment Method & Vehicle Fields -->
+              <input type="hidden" name="booking_category" value="DAILY_RIDE">
+              <input type="hidden" name="payment_method" value="CASH">
+              <div style="display: none;">
+                {{ form.vehicle_type }}
+              </div>
+              <input type="hidden" id="selected_vehicle_id" name="vehicle_id" value="{% if available_vehicles %}{{ available_vehicles.0.id }}{% endif %}">
+
+              <!-- Dynamic Admin Created Premium Vehicle & Driver Cards Grid -->
+              <div class="vehicle-selector-grid" id="vehicleCardGrid">
+                {% for v in available_vehicles %}
+                  <div class="premium-car-card vehicle-card-btn {% if forloop.first %}active{% endif %}" 
+                       data-vid="{{ v.id }}" 
+                       data-vtype="{{ v.vehicle_type }}" 
+                       data-price="{{ v.price_per_km }}">
+
+                    <!-- Photo Cover Viewport -->
+                    <div class="car-cover-viewport">
+                      {% if v.image %}
+                        <img src="{{ v.image.url }}" alt="{{ v.vehicle_name }}" class="car-cover-img" onerror="this.onerror=null; this.src='{{ v.get_image_url }}';">
+                      {% else %}
+                        <img src="{{ v.get_image_url }}" alt="{{ v.vehicle_name }}" class="car-cover-img">
+                      {% endif %}
+
+                      <div class="car-cover-gradient"></div>
+
+                      <!-- Badges on Image -->
+                      <span class="car-type-badge">{{ v.vehicle_type }}</span>
+                      <span class="car-active-check">
+                        <i class="bi bi-check-circle-fill"></i> <span class="check-txt">{% if forloop.first %}Selected{% else %}Select{% endif %}</span>
+                      </span>
+                      <span class="car-plate-tag">{{ v.vehicle_number }}</span>
+                    </div>
+
+                    <!-- Card Body Content -->
+                    <div class="premium-card-body">
+
+                      <!-- Title Header -->
+                      <div class="car-title-row">
+                        <h4 class="car-main-title">{{ v.vehicle_name }}</h4>
+                        <span class="car-rating-badge"><i class="bi bi-star-fill"></i> {{ v.driver_rating|default:"4.9" }}</span>
+                      </div>
+
+                      <!-- Driver Profile Info Box -->
+                      <div class="driver-profile-box">
+                        {% if v.driver_image %}
+                          <img src="{{ v.driver_image.url }}" alt="{{ v.driver_name }}" class="driver-avatar-img" onerror="this.onerror=null; this.src='{{ v.get_driver_image_url }}';">
+                        {% else %}
+                          <img src="{{ v.get_driver_image_url }}" alt="{{ v.driver_name }}" class="driver-avatar-img">
+                        {% endif %}
+
+                        <div>
+                          <div class="driver-info-name">
+                            {{ v.driver_name|default:"Ramesh Kumar (Verified Driver)" }}
+                          </div>
+                          <div class="driver-info-phone">
+                            <i class="bi bi-telephone-fill"></i> 
+                            {{ v.driver_phone|default:"+91 98452 98351" }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Specs Bar -->
+                      <div class="car-specs-bar">
+                        <span class="spec-pill"><i class="bi bi-people-fill text-primary"></i> {{ v.seats }} Seats</span>
+                        <span class="spec-pill"><i class="bi bi-snow2 text-info"></i> AC</span>
+                        <span class="spec-pill"><i class="bi bi-fuel-pump-fill text-warning"></i> {{ v.fuel_type }}</span>
+                      </div>
+
+                      <!-- Price & Selection Footer -->
+                      <div class="premium-price-footer">
+                        <div>
+                          <div class="price-amount">₹{{ v.price_per_km|floatformat:2 }}</div>
+                          <div class="price-per-km-label">per km distance</div>
+                        </div>
+                        <div class="select-cab-btn-hint">
+                          <span>Book</span> <i class="bi bi-arrow-right-circle-fill fs-5"></i>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="alert alert-warning py-3 small mb-0 w-100 rounded-4 border-0">No active vehicles configured by Admin right now.</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- STEP 3: Customer & Passenger Details -->
+            <div class="mb-4">
+              <label class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-circle" style="width:24px; height:24px; font-size:11px; display:inline-flex; align-items:center; justify-content:center;">3</span>
+                Customer & Passenger Contact Information
+              </label>
+              
+              <div class="card card-body bg-light border-0 rounded-4 p-3">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-dark">Customer / Passenger Name</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0 text-primary" style="border-radius: 14px 0 0 14px;"><i class="bi bi-person-fill"></i></span>
+                      <input type="text" name="passenger_name" class="form-control form-control-custom border-start-0" placeholder="e.g. Anish Kumar" value="{{ request.user.get_full_name|default:request.user.username }}" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-dark">Customer Contact Phone</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0 text-success" style="border-radius: 14px 0 0 14px;"><i class="bi bi-telephone-fill"></i></span>
+                      <input type="text" name="passenger_phone" class="form-control form-control-custom border-start-0" placeholder="+91 9876543210" value="{{ request.user.phone|default:'' }}" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-secondary">Scheduled Pickup (Optional)</label>
+                    <input type="datetime-local" id="scheduled_datetime" name="scheduled_datetime" class="form-control form-control-custom">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-secondary">Driver Notes / Special Requests</label>
+                    <input type="text" name="driver_notes" class="form-control form-control-custom" placeholder="e.g. AC cab, carrying 2 suitcases">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4: Live Trip Fare Estimate Card -->
+            <div id="route-summary-card" class="fare-estimate-card mb-4" style="display: none;">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-20 px-3 py-1.5 rounded-pill fw-bold" style="font-size: 0.78rem;">
+                  <i class="bi bi-lightning-charge-fill me-1"></i> Live Fare Estimate
+                </span>
+                <span class="text-white-50 small" id="rate_per_km_display">Base Rate Applicable</span>
+              </div>
+
+              <div class="d-flex align-items-baseline justify-content-between mt-2">
+                <div>
+                  <div class="fare-price-tag" id="fare_amount_display">₹0.00</div>
+                  <div class="text-white-50 small mt-1">Includes distance fare & taxes</div>
+                </div>
+                <div class="text-end">
+                  <div class="fw-bold text-white fs-5" id="trip_dist_display">0 km</div>
+                  <div class="text-white-50 small" id="trip_time_display">Est. 0 mins</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hidden Location Coordinates -->
+            <input type="hidden" id="pickup_lat" name="pickup_lat">
+            <input type="hidden" id="pickup_lng" name="pickup_lng">
+            <input type="hidden" id="drop_lat" name="drop_lat">
+            <input type="hidden" id="drop_lng" name="drop_lng">
+            <input type="hidden" id="distance" name="distance" value="0">
+
+            <!-- Submit Buttons -->
+            <div class="d-flex gap-3">
+              <button type="submit" class="btn-book-submit">
+                <i class="bi bi-send-check-fill me-2"></i> Confirm & Book Luxury Ride Now
+              </button>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Interactive Live Route Map -->
+          <div class="col-lg-6">
+            <div class="map-container-box">
+              <div class="map-floating-bar">
+                <div class="map-badge">
+                  <i class="bi bi-map-fill text-warning"></i> Click map to pick locations or search address
+                </div>
+              </div>
+              <div id="map"></div>
+            </div>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const initialPickupAddress = "{{ pickup|escapejs }}";
+const initialDropAddress = "{{ drop|escapejs }}";
+
+// CREATE MAP - Using OpenStreetMap Germany tile layer (100% free, high performance, no API key required)
+var map = L.map("map", { zoomControl: false }).setView([12.2253, 79.0747], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+let pickupMarker = null;
+let dropMarker = null;
+let routeLine = null;
+let selectingPickup = true;
+
+// Custom Leaflet Icons
+const pickupPinIcon = L.divIcon({
+    className: 'custom-pin-pickup',
+    html: `<div style="background:#ef4444; width:28px; height:28px; border-radius:50%; border:3px solid #fff; box-shadow:0 4px 12px rgba(239,68,68,0.4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:12px;">📍</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+});
+
+const dropPinIcon = L.divIcon({
+    className: 'custom-pin-drop',
+    html: `<div style="background:#10b981; width:28px; height:28px; border-radius:50%; border:3px solid #fff; box-shadow:0 4px 12px rgba(16,185,129,0.4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:12px;">🏁</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+});
+
+// CURRENT LOCATION
+function getCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
+                map.setView([lat, lng], 15);
+                
+                reverseGeocode(lat, lng, "pickup");
+                if (pickupMarker) map.removeLayer(pickupMarker);
+                pickupMarker = L.marker([lat, lng], { icon: pickupPinIcon }).addTo(map).bindPopup("Current Location (Pickup)").openPopup();
+                document.getElementById("pickup_lat").value = lat;
+                document.getElementById("pickup_lng").value = lng;
+                selectingPickup = false;
+            },
+            function(error) {
+                alert("Unable to fetch current location. Please check browser permissions.");
+            }
+        );
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+
+// MAP CLICK
+map.on("click", function(e) {
+    let lat = e.latlng.lat;
+    let lng = e.latlng.lng;
+
+    if (selectingPickup) {
+        if (pickupMarker) map.removeLayer(pickupMarker);
+        pickupMarker = L.marker([lat, lng], { icon: pickupPinIcon }).addTo(map).bindPopup("Pickup Location").openPopup();
+        document.getElementById("pickup_lat").value = lat;
+        document.getElementById("pickup_lng").value = lng;
+        reverseGeocode(lat, lng, "pickup");
+        selectingPickup = false;
+    } else {
+        if (dropMarker) map.removeLayer(dropMarker);
+        dropMarker = L.marker([lat, lng], { icon: dropPinIcon }).addTo(map).bindPopup("Drop Location").openPopup();
+        document.getElementById("drop_lat").value = lat;
+        document.getElementById("drop_lng").value = lng;
+        reverseGeocode(lat, lng, "drop");
+        selectingPickup = true;
+    }
+});
+
+// REVERSE GEOCODE
+function reverseGeocode(lat, lng, field) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById(field).value = data.display_name;
+            updateRoute();
+        })
+        .catch(err => console.error("Reverse Geocoding error:", err));
+}
+
+// OSRM ROUTE CALCULATION & PLOTTING
+function updateRoute() {
+    const pLat = document.getElementById("pickup_lat").value;
+    const pLng = document.getElementById("pickup_lng").value;
+    const dLat = document.getElementById("drop_lat").value;
+    const dLng = document.getElementById("drop_lng").value;
+
+    if (pLat && pLng && dLat && dLng) {
+        fetch(`https://router.project-osrm.org/route/v1/driving/${pLng},${pLat};${dLng},${dLat}?overview=full&geometries=geojson`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    const distanceKm = (route.distance / 1000).toFixed(2);
+                    const durationMins = Math.round(route.duration / 60);
+
+                    document.getElementById("distance").value = distanceKm;
+
+                    // Draw glowing blue route line
+                    if (routeLine) map.removeLayer(routeLine);
+                    routeLine = L.geoJSON(route.geometry, {
+                        style: { color: '#2563eb', weight: 6, opacity: 0.85 }
+                    }).addTo(map);
+
+                    map.fitBounds(routeLine.getBounds(), { padding: [60, 60] });
+
+                    // Update summary fare estimate card
+                    updateFareEstimate(distanceKm, durationMins);
+                }
+            })
+            .catch(err => console.error("OSRM Routing error:", err));
+    } else {
+        document.getElementById("route-summary-card").style.display = 'none';
+        if (routeLine) {
+            map.removeLayer(routeLine);
+            routeLine = null;
+        }
+    }
+}
+
+// DYNAMIC FARE ESTIMATE BASED ON ACTIVE ADMIN VEHICLE CARD
+function updateFareEstimate(distanceKm, durationMins) {
+    if (!distanceKm) {
+        distanceKm = document.getElementById("distance").value;
+    }
+
+    const summaryCard = document.getElementById("route-summary-card");
+    if (!distanceKm || distanceKm === "0" || parseFloat(distanceKm) <= 0) {
+        summaryCard.style.display = 'none';
+        return;
+    }
+
+    const activeCard = document.querySelector('.premium-car-card.active');
+    let vtype = "MINI";
+    let rate = 15.0;
+    if (activeCard) {
+        if (activeCard.getAttribute('data-vtype')) vtype = activeCard.getAttribute('data-vtype');
+        if (activeCard.getAttribute('data-price')) rate = parseFloat(activeCard.getAttribute('data-price'));
+    }
+
+    const pLat = document.getElementById("pickup_lat").value;
+    const pLng = document.getElementById("pickup_lng").value;
+    const dLat = document.getElementById("drop_lat").value;
+    const dLng = document.getElementById("drop_lng").value;
+    const pickup = document.getElementById("pickup").value;
+    const drop = document.getElementById("drop").value;
+
+    fetch("/booking/api/calculate-fare/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            vehicle_type: vtype,
+            distance: parseFloat(distanceKm),
+            duration: parseInt(durationMins || 0),
+            pickup: pickup,
+            drop: drop,
+            pickup_lat: pLat,
+            pickup_lng: pLng,
+            drop_lat: dLat,
+            drop_lng: dLng,
+            booking_category: "DAILY_RIDE"
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success && data.fare_details) {
+            const details = data.fare_details;
+            summaryCard.style.display = 'block';
+            document.getElementById("fare_amount_display").innerText = `₹${details.total_fare.toFixed(2)}`;
+            document.getElementById("rate_per_km_display").innerText = `Rate: ₹${rate}/km (Base ₹${details.base_fare})`;
+            document.getElementById("trip_dist_display").innerText = `${distanceKm} km`;
+            document.getElementById("trip_time_display").innerText = `Est. ${durationMins || Math.round(distanceKm * 1.5)} mins`;
+        } else {
+            fallbackEstimate();
+        }
+    })
+    .catch(err => {
+        fallbackEstimate();
+    });
+
+    function fallbackEstimate() {
+        const baseFare = 40.0;
+        const dur = durationMins || Math.round(distanceKm * 1.5);
+        const fare = (baseFare + (parseFloat(distanceKm) * rate) + (dur * 2)).toFixed(2);
+        summaryCard.style.display = 'block';
+        document.getElementById("fare_amount_display").innerText = `₹${fare}`;
+        document.getElementById("rate_per_km_display").innerText = `Rate: ₹${rate}/km (Base ₹${baseFare})`;
+        document.getElementById("trip_dist_display").innerText = `${distanceKm} km`;
+        document.getElementById("trip_time_display").innerText = `Est. ${dur} mins`;
+    }
+}
+
+// ADDRESS GEOCODING
+function geocodeAddress(address, isPickup) {
+    if (!address) return;
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=in&limit=1`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lng = parseFloat(data[0].lon);
+                setCoordinates(lat, lng, isPickup, address);
+            }
+        })
+        .catch(err => console.error("Geocoding error:", err));
+}
+
+function setCoordinates(lat, lng, isPickup, addressName) {
+    if (isPickup) {
+        if (pickupMarker) map.removeLayer(pickupMarker);
+        pickupMarker = L.marker([lat, lng], { icon: pickupPinIcon }).addTo(map).bindPopup("Pickup: " + addressName).openPopup();
+        document.getElementById("pickup_lat").value = lat;
+        document.getElementById("pickup_lng").value = lng;
+        document.getElementById("pickup").value = addressName;
+        selectingPickup = false;
+    } else {
+        if (dropMarker) map.removeLayer(dropMarker);
+        dropMarker = L.marker([lat, lng], { icon: dropPinIcon }).addTo(map).bindPopup("Drop: " + addressName).openPopup();
+        document.getElementById("drop_lat").value = lat;
+        document.getElementById("drop_lng").value = lng;
+        document.getElementById("drop").value = addressName;
+        selectingPickup = true;
+    }
+
+    if (!pickupMarker || !dropMarker) {
+        map.setView([lat, lng], 14);
+    }
+    updateRoute();
+}
+
+// FORM ADDRESS AUTOCOMPLETE
+function initFormAutocomplete(inputId, suggestionsId, isPickup) {
+    const input = document.getElementById(inputId);
+    const suggestionsContainer = document.getElementById(suggestionsId);
+    let debounceTimer;
+
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 3) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`)
+                .then(res => res.json())
+                .then(data => {
+                    suggestionsContainer.innerHTML = '';
+                    if (data.length > 0) {
+                        suggestionsContainer.style.display = 'block';
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.innerHTML = `<i class="bi bi-geo-alt text-primary"></i> <span>${item.display_name}</span>`;
+                            div.addEventListener('click', () => {
+                                const lat = parseFloat(item.lat);
+                                const lng = parseFloat(item.lon);
+                                setCoordinates(lat, lng, isPickup, item.display_name);
+                                suggestionsContainer.innerHTML = '';
+                                suggestionsContainer.style.display = 'none';
+                            });
+                            suggestionsContainer.appendChild(div);
+                        });
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                })
+                .catch(err => console.error(err));
+        }, 400);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target !== input && e.target !== suggestionsContainer) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+}
+
+// RESET SELECTION
+function resetSelection() {
+    if (pickupMarker) map.removeLayer(pickupMarker);
+    if (dropMarker) map.removeLayer(dropMarker);
+    if (routeLine) map.removeLayer(routeLine);
+
+    pickupMarker = null;
+    dropMarker = null;
+    routeLine = null;
+    selectingPickup = true;
+
+    document.getElementById("pickup").value = "";
+    document.getElementById("drop").value = "";
+    document.getElementById("pickup_lat").value = "";
+    document.getElementById("pickup_lng").value = "";
+    document.getElementById("drop_lat").value = "";
+    document.getElementById("drop_lng").value = "";
+    document.getElementById("distance").value = "0";
+    document.getElementById("route-summary-card").style.display = 'none';
+    map.setView([12.2253, 79.0747], 13);
+}
+
+// LUXURY VEHICLE CARD SELECTION & SYNC LOGIC
+function initVehicleCardSelection() {
+    const vehicleSelect = document.querySelector('select[name="vehicle_type"]') || document.querySelector('select[name="vehicle"]');
+    const hiddenVidInput = document.getElementById('selected_vehicle_id');
+    const cards = document.querySelectorAll('.premium-car-card');
+
+    cards.forEach(card => {
+        card.addEventListener('click', function() {
+            cards.forEach(c => {
+                c.classList.remove('active');
+                const checkTxt = c.querySelector('.check-txt');
+                if (checkTxt) checkTxt.innerText = 'Select';
+            });
+            this.classList.add('active');
+            const activeCheckTxt = this.querySelector('.check-txt');
+            if (activeCheckTxt) activeCheckTxt.innerText = 'Selected';
+
+            const vid = this.getAttribute('data-vid');
+            const vtype = this.getAttribute('data-vtype');
+
+            if (hiddenVidInput && vid) {
+                hiddenVidInput.value = vid;
+            }
+
+            if (vehicleSelect && vtype) {
+                for (let option of vehicleSelect.options) {
+                    if (option.value.toUpperCase() === vtype.toUpperCase()) {
+                        vehicleSelect.value = option.value;
+                        break;
+                    }
+                }
+            }
+            updateRoute();
+        });
+    });
+}
+
+// LISTENERS & INITIALIZATION
+document.addEventListener("DOMContentLoaded", function() {
+    initFormAutocomplete("pickup", "pickup_suggestions", true);
+    initFormAutocomplete("drop", "drop_suggestions", false);
+    initVehicleCardSelection();
+
+    if (initialPickupAddress) {
+        geocodeAddress(initialPickupAddress, true);
+    }
+    if (initialDropAddress) {
+        geocodeAddress(initialDropAddress, false);
+    }
+});
+</script>
+{% endblock %}

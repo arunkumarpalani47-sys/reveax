@@ -1,0 +1,771 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+/* ==========================================
+   DRIVER ACTIVE TRIP COCKPIT - MOBILE FIRST
+   ========================================== */
+.driver-cockpit-wrapper {
+  padding: 1rem 0.25rem;
+  max-width: 1150px;
+  margin: 0 auto;
+}
+
+.cockpit-card {
+  background: #0f172a;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  color: #f8fafc;
+}
+
+/* Cockpit Header Bar */
+.cockpit-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cockpit-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.phase-pill-badge {
+  padding: 0.45rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.3px;
+}
+
+.phase-pill-badge.enroute {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+.phase-pill-badge.onride {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+.phase-pill-badge.done {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+/* Dynamic Live Map Box & Fullscreen */
+.driver-map-viewport {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: #090d16;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: all 0.3s ease;
+}
+
+.driver-map-viewport:fullscreen,
+.driver-map-viewport:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+#driver-map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .driver-map-viewport {
+    height: 340px !important;
+    border-radius: 14px;
+  }
+  .cockpit-header {
+    padding: 1rem !important;
+  }
+}
+
+.driver-telemetry-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+  flex-wrap: wrap;
+}
+
+.hud-chip {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+.hud-chip-action {
+  pointer-events: auto;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.hud-chip-action:hover {
+  transform: translateY(-2px);
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+}
+
+.hud-chip-btn {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fbbf24;
+  border-radius: 50px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  transition: all 0.2s ease;
+}
+
+.hud-chip-btn:hover {
+  background: #fbbf24;
+  color: #0f172a;
+}
+
+/* Customer & Trip Spec Cards */
+.dark-spec-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.customer-profile-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn-call-customer {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-weight: 800;
+  padding: 0.65rem 1.25rem;
+  border-radius: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-call-customer:hover {
+  transform: translateY(-2px);
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+}
+
+/* Big Touch Target OTP Input Box for Drivers */
+.driver-otp-box {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 2px dashed #f59e0b;
+  border-radius: 20px;
+  padding: 1.25rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+}
+
+.otp-input-field {
+  background: #090d16;
+  border: 2px solid #f59e0b;
+  border-radius: 14px;
+  color: #f59e0b;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  max-width: 260px;
+  margin: 0.5rem auto 1rem auto;
+}
+
+.otp-input-field:focus {
+  outline: none;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  border-color: #fbbf24;
+}
+
+.btn-start-trip-huge {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 0.95rem 1.75rem;
+  border-radius: 16px;
+  border: none;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-start-trip-huge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 35px rgba(245, 158, 11, 0.55);
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+}
+
+.btn-complete-trip-huge {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 900;
+  padding: 1rem 1.75rem;
+  border-radius: 16px;
+  border: none;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-complete-trip-huge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 35px rgba(16, 185, 129, 0.55);
+}
+
+.btn-gmaps-turnbyturn {
+  background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+  color: #ffffff;
+  font-weight: 800;
+  padding: 0.8rem 1.25rem;
+  border-radius: 14px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 25px rgba(66, 133, 244, 0.35);
+  transition: all 0.2s ease;
+  margin-bottom: 1.25rem;
+}
+
+.btn-gmaps-turnbyturn:hover {
+  transform: translateY(-2px);
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(66, 133, 244, 0.5);
+}
+
+@media (max-width: 768px) {
+  .driver-map-viewport {
+    height: 380px;
+  }
+  .otp-input-field {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<div class="driver-cockpit-wrapper">
+  <div class="cockpit-card">
+    
+    <!-- HEADER BAR -->
+    <div class="cockpit-header">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <a href="{% url 'booking_list' %}" class="btn btn-sm btn-outline-light rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Fleet List
+          </a>
+          <h1 class="cockpit-title">
+            <i class="bi bi-speedometer text-warning"></i> Driver Trip Navigation Console
+          </h1>
+        </div>
+        <div class="text-white-50 small mt-1 ps-1">
+          Booking ID: <code class="text-warning fw-bold">#{{ booking.id }}</code>
+        </div>
+      </div>
+
+      <div>
+        {% if booking.status == 'TRIP_STARTED' %}
+          <span class="phase-pill-badge onride" id="phase-badge">
+            <i class="bi bi-geo-fill"></i> Phase 2: In Transit to Destination
+          </span>
+        {% elif booking.status == 'TRIP_COMPLETED' %}
+          <span class="phase-pill-badge done" id="phase-badge">
+            <i class="bi bi-check-circle-fill"></i> Trip Completed & Paid
+          </span>
+        {% else %}
+          <span class="phase-pill-badge enroute" id="phase-badge">
+            <i class="bi bi-compass-fill"></i> Phase 1: En Route to Customer Pickup
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- MAIN TWO COLUMN COCKPIT CONTENT -->
+    <div class="p-3 p-md-4">
+      <div class="row g-4">
+        
+        <!-- LEFT COLUMN: LIVE DYNAMIC ROUTE MAP -->
+        <div class="col-lg-7">
+          <div class="driver-map-viewport mb-3" id="map-viewport-container">
+            <div class="driver-telemetry-hud">
+              <div class="hud-chip">
+                <i class="bi bi-speedometer2 text-warning fs-6"></i>
+                <span id="hud-mode-title">
+                  {% if booking.status == 'TRIP_STARTED' %}Destination Route Navigation{% else %}En Route to Customer Pickup{% endif %}
+                </span>
+              </div>
+
+              <div class="d-flex gap-2">
+                <a id="gmaps-nav-btn" href="#" target="_blank" class="hud-chip-action" title="Open Turn-by-Turn Navigation in Google Maps">
+                  <i class="bi bi-compass-fill"></i> Google Maps Navigation
+                </a>
+                <button type="button" class="hud-chip-btn" onclick="toggleFullScreenMap()" title="Full Screen Map View">
+                  <i class="bi bi-arrows-fullscreen"></i> Full Screen
+                </button>
+              </div>
+            </div>
+
+            <div id="driver-map"></div>
+          </div>
+
+          <!-- Direct Google Maps Navigation Action Bar for Mobile Drivers -->
+          <div class="d-flex flex-column flex-sm-row gap-2 mb-3">
+            <a id="gmaps-big-nav-btn" href="#" target="_blank" class="btn-gmaps-turnbyturn flex-fill mb-0">
+              <i class="bi bi-compass-fill fs-5 me-1"></i> Launch Trip Navigation (Pickup ➔ Drop)
+            </a>
+            <a id="gmaps-pickup-nav-btn" href="#" target="_blank" class="btn btn-outline-warning fw-bold rounded-3 px-3 py-2.5 d-inline-flex align-items-center justify-content-center gap-1.5" style="border-width:2px;">
+              <i class="bi bi-geo-alt-fill text-warning"></i> Navigate to Pickup
+            </a>
+          </div>
+
+          <!-- Trip Info Summary -->
+          <div class="dark-spec-card mb-0">
+            <h5 class="fw-bold text-white mb-3 small text-uppercase tracking-wider">
+              <i class="bi bi-map-fill text-warning me-1"></i> Route Locations
+            </h5>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                  <div class="text-success extra-small fw-bold mb-1"><i class="bi bi-circle-fill me-1"></i> PICKUP LOCATION</div>
+                  <div class="text-white fw-bold small">{{ booking.pickup_location }}</div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                  <div class="text-danger extra-small fw-bold mb-1"><i class="bi bi-geo-alt-fill me-1"></i> DROP DESTINATION</div>
+                  <div class="text-white fw-bold small">{{ booking.drop_location }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-2 text-center mt-3">
+              <div class="col-4">
+                <div class="p-2.5 rounded-3 bg-dark bg-opacity-40">
+                  <div class="text-white-50 extra-small" style="font-size:0.7rem;">Trip Distance</div>
+                  <div class="text-white fw-bold small mt-1">{{ booking.distance|floatformat:1 }} km</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-2.5 rounded-3 bg-dark bg-opacity-40">
+                  <div class="text-white-50 extra-small" style="font-size:0.7rem;">Est. Time</div>
+                  <div class="text-white fw-bold small mt-1">{{ booking.estimated_duration|default:"15" }} mins</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-2.5 rounded-3 bg-dark bg-opacity-40">
+                  <div class="text-white-50 extra-small" style="font-size:0.7rem;">Trip Fare</div>
+                  <div class="text-success fw-bold small mt-1">₹{{ booking.total_fare|floatformat:2 }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: CUSTOMER DETAILS, OTP & CONTROLS -->
+        <div class="col-lg-5">
+          
+          <!-- Customer Profile & One-Tap Call Card -->
+          <div class="dark-spec-card">
+            <h5 class="fw-bold text-white mb-3 small text-uppercase tracking-wider">
+              <i class="bi bi-person-badge-fill text-warning me-1"></i> Customer Contact
+            </h5>
+
+            <div class="customer-profile-box">
+              <div>
+                <div class="text-white fw-bold fs-6">
+                  {{ booking.safe_customer_name }}
+                </div>
+                <div class="text-info small font-monospace mt-1">
+                  <i class="bi bi-telephone-fill me-1"></i>
+                  {{ booking.safe_customer_phone }}
+                </div>
+              </div>
+
+              <a href="tel:{{ booking.safe_customer_phone }}" class="btn-call-customer">
+                <i class="bi bi-telephone-outbound-fill fs-6"></i> Call
+              </a>
+            </div>
+
+            {% if booking.driver_notes %}
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-warning border-opacity-30">
+                <div class="text-warning extra-small fw-bold"><i class="bi bi-chat-left-text-fill me-1"></i> Customer Special Note</div>
+                <div class="text-white small mt-1 fw-medium">{{ booking.driver_notes }}</div>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- DYNAMIC ACTION PANELS -->
+          {% if booking.status == 'TRIP_COMPLETED' %}
+
+            <!-- PHASE 3: COMPLETED PANEL -->
+            <div class="dark-spec-card text-center py-4">
+              <div class="display-3 text-success mb-2">🎉</div>
+              <h4 class="fw-bold text-white mb-1">Trip Completed Successfully!</h4>
+              <p class="text-white-50 small mb-3">Fare Amount Collected: <strong class="text-success fs-5">₹{{ booking.total_fare|floatformat:2 }}</strong></p>
+              
+              <a href="{% url 'booking_list' %}" class="btn btn-warning w-100 fw-bold rounded-pill py-2.5 text-dark">
+                <i class="bi bi-check-circle-fill me-2"></i> Return to Fleet Bookings
+              </a>
+            </div>
+
+          {% elif booking.status == 'TRIP_STARTED' %}
+
+            <!-- PHASE 2: IN TRANSIT PANEL -->
+            <div class="dark-spec-card">
+              <div class="alert alert-success bg-success bg-opacity-10 border-success text-success rounded-4 small mb-3">
+                <i class="bi bi-shield-check-fill me-1"></i> <strong>OTP Verified!</strong> Trip is currently in progress.
+              </div>
+
+              <div class="text-center py-2">
+                <div class="text-white-50 extra-small mb-1">CURRENT TRIP FARE TO COLLECT</div>
+                <div class="text-success display-6 fw-bold mb-3">₹{{ booking.total_fare|floatformat:2 }}</div>
+
+                <button type="button" class="btn-complete-trip-huge" onclick="completeTripNow()">
+                  <i class="bi bi-check-circle-fill me-2"></i> COMPLETE TRIP & COLLECT FARE
+                </button>
+              </div>
+            </div>
+
+          {% else %}
+
+            <!-- PHASE 1: EN ROUTE & OTP VERIFICATION PANEL -->
+            <div class="driver-otp-box">
+              <div class="text-warning extra-small fw-bold text-uppercase tracking-wider mb-1">
+                <i class="bi bi-key-fill me-1"></i> Customer OTP Verification
+              </div>
+              <div class="text-white-50 extra-small">Ask passenger for their 6-digit OTP upon pickup arrival</div>
+
+              <form id="otpVerifyForm" onsubmit="verifyOtpAndStartTrip(event)">
+                <input type="text" id="input_otp" class="otp-input-field" placeholder="------" maxlength="6" required autocomplete="off">
+
+                <button type="submit" class="btn-start-trip-huge">
+                  <i class="bi bi-play-circle-fill me-2"></i> VERIFY OTP & START TRIP
+                </button>
+              </form>
+            </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const bookingId = "{{ booking.id }}";
+const pLat = {{ booking.pickup_lat|default:12.9716 }};
+const pLng = {{ booking.pickup_lng|default:77.5946 }};
+const dLat = {{ booking.drop_lat|default:12.9352 }};
+const dLng = {{ booking.drop_lng|default:77.6245 }};
+
+// Initial Driver Position (Simulated slightly offset from pickup)
+const driverLat = {{ driver_lat|default:12.9600 }};
+const driverLng = {{ driver_lng|default:77.5800 }};
+
+const pickupLocStr = "{{ booking.pickup_location|escapejs }}";
+const dropLocStr = "{{ booking.drop_location|escapejs }}";
+
+let currentStatus = "{{ booking.status|default:'ACCEPTED' }}";
+
+// Set Google Maps Turn-by-Turn Links
+const gmapsNavBtn = document.getElementById("gmaps-nav-btn");
+const gmapsBigNavBtn = document.getElementById("gmaps-big-nav-btn");
+const gmapsPickupNavBtn = document.getElementById("gmaps-pickup-nav-btn");
+
+// 1. Full Trip Route Link (Pickup Location ➔ Drop Destination)
+const fullTripUrl = `https://www.google.com/maps/dir/?api=1&origin=${pLat},${pLng}&destination=${dLat},${dLng}&travelmode=driving`;
+
+// 2. Pickup Location Navigation Link (Current/Driver Location ➔ Customer Pickup)
+const pickupNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${pLat},${pLng}&travelmode=driving`;
+
+if (gmapsNavBtn) gmapsNavBtn.href = fullTripUrl;
+
+if (gmapsBigNavBtn) {
+  gmapsBigNavBtn.href = fullTripUrl;
+  gmapsBigNavBtn.innerHTML = `<i class="bi bi-compass-fill fs-5 me-1"></i> Launch Full Trip Navigation (${bookingId ? 'Pickup ➔ Drop' : 'Google Maps'})`;
+}
+
+if (gmapsPickupNavBtn) {
+  gmapsPickupNavBtn.href = pickupNavUrl;
+}
+
+// CREATE MAP USING WATERMARK-FREE OPENSTREETMAP TILES
+var map = L.map("driver-map", { zoomControl: false }).setView([pLat, pLng], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+// Watermark-Free Crisp Tile Layer
+L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Markers
+const carIcon = L.divIcon({
+  className: 'custom-car-pin',
+  html: `<div style="width:28px; height:28px; border-radius:50%; background:#f59e0b; border:2.5px solid #ffffff; box-shadow:0 0 20px rgba(245,158,11,0.9); display:flex; align-items:center; justify-content:center; font-size:14px;">🚖</div>`,
+  iconSize: [28, 28],
+  iconAnchor: [14, 14]
+});
+
+const pickupIcon = L.divIcon({
+  className: 'custom-pin-pickup',
+  html: `<div style="width:24px; height:24px; border-radius:50%; background:#10b981; border:2.5px solid #ffffff; box-shadow:0 0 18px rgba(16,185,129,0.9); display:flex; align-items:center; justify-content:center; font-size:11px;">📍</div>`,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
+
+const dropIcon = L.divIcon({
+  className: 'custom-pin-drop',
+  html: `<div style="width:26px; height:26px; border-radius:50%; background:#ef4444; border:2.5px solid #ffffff; box-shadow:0 0 18px rgba(239,68,68,0.9); display:flex; align-items:center; justify-content:center; font-size:12px;">🏁</div>`,
+  iconSize: [26, 26],
+  iconAnchor: [13, 13]
+});
+
+function drawPhaseRoute() {
+  const allBounds = [];
+
+  // 1. Driver Location Marker
+  const driverMarker = L.marker([driverLat, driverLng], { icon: carIcon }).addTo(map).bindPopup("<b>Your Cab Location</b>");
+  allBounds.push([driverLat, driverLng]);
+
+  // 2. Pickup Location Marker
+  const pickupMarker = L.marker([pLat, pLng], { icon: pickupIcon }).addTo(map).bindPopup("<b>Pickup:</b> " + pickupLocStr);
+  allBounds.push([pLat, pLng]);
+
+  // 3. Drop Location Marker
+  const dropMarker = L.marker([dLat, dLng], { icon: dropIcon }).addTo(map).bindPopup("<b>Destination:</b> " + dropLocStr);
+  allBounds.push([dLat, dLng]);
+
+  // Draw Driver ➔ Pickup Route (Orange Line)
+  fetch(`https://router.project-osrm.org/route/v1/driving/${driverLng},${driverLat};${pLng},${pLat}?overview=full&geometries=geojson`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.routes && data.routes.length > 0) {
+        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        L.polyline(coords, { color: '#f59e0b', weight: 5, opacity: 0.95, dashArray: '8, 8' }).addTo(map);
+      } else {
+        L.polyline([[driverLat, driverLng], [pLat, pLng]], { color: '#f59e0b', weight: 4, dashArray: '6, 6' }).addTo(map);
+      }
+    })
+    .catch(() => {
+      L.polyline([[driverLat, driverLng], [pLat, pLng]], { color: '#f59e0b', weight: 4, dashArray: '6, 6' }).addTo(map);
+    });
+
+  // Draw Pickup ➔ Drop Route (Green Solid Line)
+  fetch(`https://router.project-osrm.org/route/v1/driving/${pLng},${pLat};${dLng},${dLat}?overview=full&geometries=geojson`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.routes && data.routes.length > 0) {
+        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        L.polyline(coords, { color: '#10b981', weight: 6, opacity: 0.95 }).addTo(map);
+        coords.forEach(pt => allBounds.push(pt));
+        map.fitBounds(L.latLngBounds(allBounds), { padding: [50, 50] });
+      } else {
+        L.polyline([[pLat, pLng], [dLat, dLng]], { color: '#10b981', weight: 5 }).addTo(map);
+        map.fitBounds(L.latLngBounds(allBounds), { padding: [50, 50] });
+      }
+    })
+    .catch(() => {
+      L.polyline([[pLat, pLng], [dLat, dLng]], { color: '#10b981', weight: 5 }).addTo(map);
+      map.fitBounds(L.latLngBounds(allBounds), { padding: [50, 50] });
+    });
+}
+
+drawPhaseRoute();
+
+// FULLSCREEN TOGGLE FOR MAP
+function toggleFullScreenMap() {
+  const container = document.getElementById("map-viewport-container");
+  if (!document.fullscreenElement) {
+    if (container.requestFullscreen) {
+      container.requestFullscreen();
+    } else if (container.webkitRequestFullscreen) {
+      container.webkitRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
+}
+
+document.addEventListener("fullscreenchange", () => {
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
+});
+
+// VERIFY OTP AND START TRIP
+function verifyOtpAndStartTrip(e) {
+  e.preventDefault();
+  const otpInput = document.getElementById("input_otp").value.trim();
+
+  if (!otpInput) {
+    alert("Please enter the 6-digit OTP provided by customer.");
+    return;
+  }
+
+  fetch("/booking/api/verify-otp/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ booking_id: bookingId, otp: otpInput })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      alert("✅ OTP Verified! Trip Started.");
+      window.location.reload();
+    } else {
+      alert("❌ " + (data.message || "Incorrect OTP. Please check with customer."));
+    }
+  })
+  .catch(err => alert("Error verifying OTP: " + err));
+}
+
+// COMPLETE TRIP & COLLECT FARE
+function completeTripNow() {
+  if (confirm("Confirm complete trip and collect fare of ₹{{ booking.total_fare|floatformat:2 }}?")) {
+    fetch("/booking/api/complete-trip/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ booking_id: bookingId })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        alert("🎉 Trip Completed Successfully!");
+        window.location.reload();
+      } else {
+        alert("Error completing trip: " + (data.error || "Please try again."));
+      }
+    })
+    .catch(err => alert("Error completing trip: " + err));
+  }
+}
+
+// AUTO-POLL DRIVER CONSOLE STATUS
+function pollDriverStatus() {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+  fetch(`/booking/api/status/${bookingId}/`)
+    .then(r => {
+      if (!r.ok) return null;
+      return r.json();
+    })
+    .then(data => {
+      if (data && data.success && data.status) {
+        if (data.status === "CANCELLED" || data.status === "REJECTED" || data.status === "Cancelled" || data.status === "Rejected") {
+          alert("⚠️ This booking was cancelled or rejected.");
+          window.location.href = "{% url 'booking_list' %}";
+        } else if (data.status !== currentStatus && (data.status === "TRIP_STARTED" || data.status === "TRIP_COMPLETED")) {
+          window.location.reload();
+        }
+      }
+    })
+    .catch(e => {
+      // Quietly ignore network offline errors
+    });
+}
+setInterval(pollDriverStatus, 4000);
+</script>
+{% endblock %}

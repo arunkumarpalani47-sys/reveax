@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+
+<section class="about-hero text-white d-flex align-items-center" style="background:url('{% static 'images/banner.png' %}') center/cover no-repeat;min-height:450px; position:relative;">
+
+<div style="position:absolute;inset:0;background:rgba(0,0,0,.55);"></div>
+
+<div class="container position-relative">
+
+<div class="row">
+
+<div class="col-lg-8">
+
+<h1 class="display-3 fw-bold">
+About <span class="text-warning">Rovexa Cabs</span>
+</h1>
+
+<p class="lead mt-3">
+Safe, Reliable and Affordable Taxi Booking Service
+available 24×7 for city rides, airport transfers,
+and outstation trips.
+</p>
+
+<a href="{% url 'add_booking' %}"
+class="btn btn-warning btn-lg mt-3">
+
+<i class="bi bi-taxi-front-fill"></i>
+Book Your Ride
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= ABOUT ================= -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="row align-items-center">
+
+<div class="col-lg-6">
+
+<img src="{% static 'images/banner.png' %}"
+class="img-fluid rounded-4 shadow-lg">
+
+</div>
+
+<div class="col-lg-6">
+
+<h2 class="fw-bold mb-4">
+
+Welcome to
+<span class="text-warning">Rovexa Cabs</span>
+
+</h2>
+
+<p class="text-muted">
+
+Rovexa Cabs is a trusted taxi booking platform
+designed to make every journey comfortable,
+safe and affordable.
+
+Whether you need a quick city ride,
+airport pickup, railway station drop,
+or an outstation trip,
+our professional drivers are ready to serve you.
+
+</p>
+
+<p class="text-muted">
+
+Our mission is to provide reliable transportation
+through modern technology, transparent pricing,
+and exceptional customer service.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= MISSION ================= -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<div class="card border-0 shadow rounded-4 p-4 h-100">
+
+<div class="display-5 text-warning">
+
+<i class="bi bi-bullseye"></i>
+
+</div>
+
+<h3 class="mt-3">
+
+Our Mission
+
+</h3>
+
+<p class="text-muted">
+
+To provide safe,
+affordable,
+and convenient transportation
+with excellent customer satisfaction.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="card border-0 shadow rounded-4 p-4 h-100">
+
+<div class="display-5 text-warning">
+
+<i class="bi bi-eye-fill"></i>
+
+</div>
+
+<h3 class="mt-3">
+
+Our Vision
+
+</h3>
+
+<p class="text-muted">
+
+To become India's most trusted
+cab booking platform by delivering
+quality rides with modern technology.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= WHY CHOOSE US ================= -->
+
+<section class="py-5">
+
+<div class="container">
+
+<h2 class="text-center fw-bold mb-5">
+
+Why Choose
+<span class="text-warning">
+Rovexa Cabs
+</span>
+
+</h2>
+
+<div class="row g-4">
+
+<div class="col-sm-6 col-md-3">
+
+<div class="card border-0 shadow text-center p-4 rounded-4 h-100">
+
+<i class="bi bi-shield-check display-4 text-warning"></i>
+
+<h5 class="mt-3">
+
+Safe Journey
+
+</h5>
+
+<p>
+
+Verified drivers and GPS tracking.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="col-sm-6 col-md-3">
+
+<div class="card border-0 shadow text-center p-4 rounded-4 h-100">
+
+<i class="bi bi-clock-history display-4 text-primary"></i>
+
+<h5 class="mt-3">
+
+24×7 Service
+
+</h5>
+
+<p>
+
+Available anytime you need.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="col-sm-6 col-md-3">
+
+<div class="card border-0 shadow text-center p-4 rounded-4 h-100">
+
+<i class="bi bi-cash-coin display-4 text-success"></i>
+
+<h5 class="mt-3">
+
+Affordable Fare
+
+</h5>
+
+<p>
+
+No hidden charges.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="col-sm-6 col-md-3">
+
+<div class="card border-0 shadow text-center p-4 rounded-4 h-100">
+
+<i class="bi bi-star-fill display-4 text-danger"></i>
+
+<h5 class="mt-3">
+
+Premium Support
+
+</h5>
+
+<p>
+
+Friendly customer support.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= STATISTICS ================= -->
+
+<section class="py-5 bg-warning">
+<div class="container">
+<div class="row text-center text-dark g-4">
+
+<div class="col-6 col-md-3">
+<h1 id="live-customers" class="fw-bold display-4">{{ customers|default:10 }}+</h1>
+<h5 class="fw-bold">Happy Customers</h5>
+</div>
+
+<div class="col-6 col-md-3">
+<h1 id="live-drivers" class="fw-bold display-4">{{ drivers|default:5 }}+</h1>
+<h5 class="fw-bold">Professional Drivers</h5>
+</div>
+
+<div class="col-6 col-md-3">
+<h1 id="live-vehicles" class="fw-bold display-4">{{ vehicles|default:3 }}+</h1>
+<h5 class="fw-bold">Vehicles</h5>
+</div>
+
+<div class="col-6 col-md-3">
+<h1 id="live-trips" class="fw-bold display-4">{{ trips|default:15 }}+</h1>
+<h5 class="fw-bold">Completed Trips</h5>
+</div>
+
+</div>
+</div>
+</section>
+
+{% block extra_js %}
+<script>
+function updateRealtimeStats() {
+    fetch('/api/stats/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.customers !== undefined) document.getElementById('live-customers').innerText = data.customers + '+';
+            if (data.drivers !== undefined) document.getElementById('live-drivers').innerText = data.drivers + '+';
+            if (data.vehicles !== undefined) document.getElementById('live-vehicles').innerText = data.vehicles + '+';
+            if (data.trips !== undefined) document.getElementById('live-trips').innerText = data.trips + '+';
+        })
+        .catch(err => console.log('Realtime stats fetch error:', err));
+}
+// Poll real-time database stats every 5 seconds
+setInterval(updateRealtimeStats, 5000);
+</script>
+{% endblock %}
+
+<!-- ================= CTA ================= -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="card bg-dark text-white border-0 rounded-5 p-4 p-md-5 text-center">
+
+<h2>
+
+Ready to Book Your Next Ride?
+
+</h2>
+
+<p class="mt-3">
+
+Travel safely and comfortably with Rovexa Cabs.
+
+</p>
+
+<a href="{% url 'add_booking' %}"
+class="btn btn-warning btn-lg mt-3">
+
+Book Now
+
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}

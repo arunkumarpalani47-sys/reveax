@@ -1,0 +1,260 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0" style="color: #1e293b;">Reports & Analytics</h2>
+        <div class="d-flex gap-2">
+            <a href="?export=bookings" class="btn btn-outline-primary shadow-sm"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Bookings CSV</a>
+            <a href="?export=payments" class="btn btn-outline-success shadow-sm"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Payments CSV</a>
+            <a href="?export=users" class="btn btn-outline-info shadow-sm"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Users CSV</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 overflow-hidden">
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted fw-semibold mb-0">Total Revenue</h6>
+                        <div class="bg-success bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-currency-rupee text-success fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">₹{{ total_revenue|default:"0" }}</h3>
+                    <div class="position-absolute bottom-0 end-0 opacity-10 translate-middle-x">
+                        <i class="bi bi-graph-up-arrow display-1 text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 overflow-hidden">
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted fw-semibold mb-0">Total Bookings</h6>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-journal-check text-primary fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ total_bookings|default:"0" }}</h3>
+                    <div class="position-absolute bottom-0 end-0 opacity-10 translate-middle-x">
+                        <i class="bi bi-journal-text display-1 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 overflow-hidden">
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted fw-semibold mb-0">Total Customers</h6>
+                        <div class="bg-warning bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-people text-warning fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ total_customers|default:"0" }}</h3>
+                    <div class="position-absolute bottom-0 end-0 opacity-10 translate-middle-x">
+                        <i class="bi bi-person-hearts display-1 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 overflow-hidden">
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted fw-semibold mb-0">Total Drivers</h6>
+                        <div class="bg-info bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-person-badge text-info fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ total_drivers|default:"0" }}</h3>
+                    <div class="position-absolute bottom-0 end-0 opacity-10 translate-middle-x">
+                        <i class="bi bi-steering display-1 text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 1: Charts -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 p-4">
+                <h5 class="fw-bold mb-4" style="color: #334155;">Monthly Revenue (Last 6 Months)</h5>
+                <div style="position: relative; height:300px; width:100%">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 p-4">
+                <h5 class="fw-bold mb-4" style="color: #334155;">Booking Status</h5>
+                <div style="position: relative; height:300px; width:100%; display: flex; justify-content: center;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Charts -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 p-4">
+                <h5 class="fw-bold mb-4" style="color: #334155;">Top 5 Vehicles by Bookings</h5>
+                <div style="position: relative; height:300px; width:100%">
+                    <canvas id="topVehiclesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 p-4">
+                <h5 class="fw-bold mb-4" style="color: #334155;">Customer Growth</h5>
+                <div style="position: relative; height:300px; width:100%">
+                    <canvas id="customerGrowthChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Common options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: "'Inter', sans-serif" } }
+                }
+            }
+        };
+
+        // 1. Revenue Chart (Line Chart with gradient)
+        const revCtx = document.getElementById('revenueChart').getContext('2d');
+        const revGradient = revCtx.createLinearGradient(0, 0, 0, 300);
+        revGradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+        revGradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        
+        // Get last 6 months labels
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const today = new Date();
+        const last6Months = [];
+        for (let i = 5; i >= 0; i--) {
+            let d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            last6Months.push(monthNames[d.getMonth()]);
+        }
+        
+        let revenueData = {{ monthly_revenue|default:'[12000, 19000, 15000, 22000, 18000, 25000]' }};
+        
+        new Chart(revCtx, {
+            type: 'line',
+            data: {
+                labels: last6Months,
+                datasets: [{
+                    label: 'Revenue (₹)',
+                    data: revenueData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: revGradient,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#3b82f6',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#e2e8f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Status Chart (Doughnut)
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Pending', 'Cancelled', 'Ongoing'],
+                datasets: [{
+                    data: [65, 15, 10, 10], // Dummy fallback
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 3. Top Vehicles (Horizontal Bar)
+        const tvCtx = document.getElementById('topVehiclesChart').getContext('2d');
+        new Chart(tvCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Toyota Innova', 'Maruti Dzire', 'Hyundai Aura', 'Tata Nexon', 'Honda City'],
+                datasets: [{
+                    label: 'Bookings',
+                    data: [120, 95, 80, 65, 50],
+                    backgroundColor: '#8b5cf6',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                ...commonOptions,
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. Customer Growth (Area Chart)
+        const cgCtx = document.getElementById('customerGrowthChart').getContext('2d');
+        const cgGradient = cgCtx.createLinearGradient(0, 0, 0, 300);
+        cgGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+        cgGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+        
+        new Chart(cgCtx, {
+            type: 'line',
+            data: {
+                labels: last6Months,
+                datasets: [{
+                    label: 'New Customers',
+                    data: [50, 75, 60, 90, 85, 110],
+                    borderColor: '#10b981',
+                    backgroundColor: cgGradient,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#e2e8f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

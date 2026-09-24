@@ -1,0 +1,322 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Rovexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: #050810;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated orbs */
+        .orb { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.15; pointer-events: none; animation: float 14s ease-in-out infinite alternate; }
+        .orb-1 { width: 700px; height: 700px; background: radial-gradient(circle, #f59e0b, #ef4444); top: -200px; left: -200px; }
+        .orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, #3b82f6, #8b5cf6); bottom: -150px; right: -150px; animation-delay: 5s; }
+        .orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, #10b981, #06b6d4); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 2.5s; }
+        @keyframes float { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(25px, 20px) scale(1.1); } }
+
+        /* Grid */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .page { position: relative; z-index: 1; width: 100%; max-width: 1200px; padding: 40px 24px; }
+
+        /* Brand */
+        .brand { text-align: center; margin-bottom: 48px; animation: slideDown 0.6s ease forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .logo-wrap { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; margin-bottom: 12px; }
+        .logo-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; color: #fff;
+            box-shadow: 0 0 30px rgba(245,158,11,0.4);
+        }
+        .logo-text { font-size: 36px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(135deg, #fff 40%, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .brand-sub { font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; }
+        .brand-heading { font-size: 20px; font-weight: 600; color: rgba(255,255,255,0.75); margin-top: 20px; }
+
+        /* Cards row */
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            max-width: 840px;
+            margin: 0 auto;
+        }
+
+        .role-card {
+            flex: 1;
+            max-width: 380px;
+            position: relative;
+            border-radius: 24px;
+            padding: 36px 28px 32px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            cursor: pointer;
+            text-decoration: none;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center;
+            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+            overflow: hidden;
+            animation: cardIn 0.7s ease forwards;
+            opacity: 0;
+        }
+        .role-card:nth-child(1) { animation-delay: 0.1s; }
+        .role-card:nth-child(2) { animation-delay: 0.2s; }
+        .role-card:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Glow gradient per card */
+        .role-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            border-radius: inherit;
+        }
+        .role-card.admin::before   { background: radial-gradient(ellipse at top, rgba(245,158,11,0.15), transparent 70%); }
+        .role-card.partner::before { background: radial-gradient(ellipse at top, rgba(59,130,246,0.15), transparent 70%); }
+        .role-card.customer::before{ background: radial-gradient(ellipse at top, rgba(16,185,129,0.15), transparent 70%); }
+        .role-card.driver::before  { background: radial-gradient(ellipse at top, rgba(139,92,246,0.15), transparent 70%); }
+
+        .role-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.18); }
+        .role-card:hover::before { opacity: 1; }
+        .role-card.admin:hover   { box-shadow: 0 20px 60px rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.3); }
+        .role-card.partner:hover { box-shadow: 0 20px 60px rgba(59,130,246,0.25); border-color: rgba(59,130,246,0.3); }
+        .role-card.customer:hover{ box-shadow: 0 20px 60px rgba(16,185,129,0.25); border-color: rgba(16,185,129,0.3); }
+        .role-card.driver:hover  { box-shadow: 0 20px 60px rgba(139,92,246,0.25); border-color: rgba(139,92,246,0.3); }
+
+        .card-icon-wrap {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            position: relative; z-index: 1;
+            transition: transform 0.35s ease;
+        }
+        .role-card:hover .card-icon-wrap { transform: scale(1.1); }
+        .admin   .card-icon-wrap { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(239,68,68,0.1)); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .partner .card-icon-wrap { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.1)); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+        .customer.card-icon-wrap { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1)); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .role-card.customer .card-icon-wrap { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1)); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .driver  .card-icon-wrap { background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.1)); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+
+        .card-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 8px; position: relative; z-index: 1;
+        }
+        .admin   .card-label { color: #f59e0b; }
+        .partner .card-label { color: #3b82f6; }
+        .role-card.customer .card-label { color: #10b981; }
+        .driver  .card-label { color: #a78bfa; }
+
+        .card-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 10px; position: relative; z-index: 1; }
+        .card-desc  { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 28px; position: relative; z-index: 1; }
+
+        .card-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 24px;
+            border-radius: 50px;
+            font-size: 13px; font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            position: relative; z-index: 1;
+        }
+        .admin   .card-btn { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.35); }
+        .admin   .card-btn:hover { background: #f59e0b; color: #000; box-shadow: 0 0 20px rgba(245,158,11,0.5); }
+        .partner .card-btn { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.35); }
+        .partner .card-btn:hover { background: #3b82f6; color: #fff; box-shadow: 0 0 20px rgba(59,130,246,0.5); }
+        .role-card.customer .card-btn { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.35); }
+        .role-card.customer .card-btn:hover { background: #10b981; color: #fff; box-shadow: 0 0 20px rgba(16,185,129,0.5); }
+        .driver  .card-btn { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.35); }
+        .driver  .card-btn:hover { background: #8b5cf6; color: #fff; box-shadow: 0 0 20px rgba(139,92,246,0.5); }
+
+        .card-content-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        /* Bottom */
+        .back-link { text-align: center; margin-top: 36px; animation: slideDown 0.9s ease forwards; opacity: 0; animation-delay: 0.5s; }
+        .back-link a { color: rgba(255,255,255,0.3); font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s; }
+        .back-link a:hover { color: rgba(255,255,255,0.7); }
+
+        @media (max-width: 768px) {
+            body {
+                justify-content: center;
+                overflow-y: auto;
+            }
+            .page {
+                padding: 16px 16px 24px;
+            }
+            .brand {
+                margin-bottom: 24px;
+            }
+            .logo-wrap {
+                margin-bottom: 6px;
+            }
+            .logo-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+                border-radius: 12px;
+            }
+            .logo-text {
+                font-size: 28px;
+            }
+            .brand-sub {
+                font-size: 12px;
+            }
+            .brand-heading {
+                font-size: 16px;
+                margin-top: 10px;
+            }
+            .cards {
+                flex-direction: column;
+                gap: 12px;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            .role-card {
+                flex-direction: row;
+                align-items: center;
+                text-align: left;
+                padding: 14px 18px;
+                border-radius: 18px;
+                gap: 16px;
+            }
+            .card-icon-wrap {
+                width: 46px;
+                height: 46px;
+                font-size: 20px;
+                margin-bottom: 0;
+                border-radius: 12px;
+                flex-shrink: 0;
+            }
+            .card-content-wrap {
+                align-items: flex-start;
+                text-align: left;
+                flex: 1;
+            }
+            .card-label {
+                font-size: 9px;
+                margin-bottom: 1px;
+            }
+            .card-title {
+                font-size: 16px;
+                margin-bottom: 1px;
+            }
+            .card-desc {
+                font-size: 11px;
+                margin-bottom: 0;
+                line-height: 1.3;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .card-btn {
+                display: none;
+            }
+            
+            /* Chevron arrow on the right */
+            .role-card::after {
+                content: '\f285';
+                font-family: "bootstrap-icons";
+                font-size: 16px;
+                opacity: 0.5;
+                transition: all 0.25s ease;
+            }
+            .role-card.admin::after { color: #f59e0b; }
+            .role-card.partner::after { color: #3b82f6; }
+            .role-card.customer::after { color: #10b981; }
+            .role-card.driver::after { color: #8b5cf6; }
+
+            .role-card:hover::after {
+                opacity: 1;
+                transform: translateX(4px);
+            }
+            
+            .back-link {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+
+    <div class="brand">
+        <a href="/" class="logo-wrap">
+            <div class="logo-icon"><i class="bi bi-taxi-front-fill"></i></div>
+            <span class="logo-text">Rovexa</span>
+        </a>
+        <p class="brand-sub">Your ride, your way — anytime, anywhere</p>
+        <p class="brand-heading">Who are you signing in as?</p>
+    </div>
+
+    <div class="cards">
+
+        <!-- Admin -->
+        <a href="{% url 'admin_login' %}" class="role-card admin">
+            <div class="card-icon-wrap"><i class="bi bi-shield-lock-fill"></i></div>
+            <div class="card-content-wrap">
+                <span class="card-label">Portal</span>
+                <h2 class="card-title">Admin</h2>
+                <p class="card-desc">Full system control — manage bookings, fleet catalog, users, and review booking requests.</p>
+            </div>
+            <span class="card-btn">Sign In <i class="bi bi-arrow-right"></i></span>
+        </a>
+
+        <!-- Customer -->
+        <a href="{% url 'customer_login' %}" class="role-card customer">
+            <div class="card-icon-wrap"><i class="bi bi-person-fill"></i></div>
+            <div class="card-content-wrap">
+                <span class="card-label">Portal</span>
+                <h2 class="card-title">Customer</h2>
+                <p class="card-desc">Book rides, browse fleet cars, track trips, and manage your bookings with ease.</p>
+            </div>
+            <span class="card-btn">Sign In <i class="bi bi-arrow-right"></i></span>
+        </a>
+
+    </div>
+
+    <div class="back-link">
+        <a href="/"><i class="bi bi-arrow-left"></i> Back to Home</a>
+    </div>
+
+</div>
+</body>
+</html>

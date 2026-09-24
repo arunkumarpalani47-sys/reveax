@@ -1,0 +1,172 @@
+<style>
+    .admin-navbar { 
+        background: #fff; 
+        border-bottom: 1px solid #e2e8f0; 
+        padding: 0 28px; 
+        height: 64px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        position: sticky; 
+        top: 0; 
+        z-index: 100; 
+    }
+    .page-title-area {
+        display: flex;
+        flex-direction: column;
+    }
+    .page-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+        margin: 0;
+    }
+    .breadcrumb-text {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 500;
+        margin: 0;
+    }
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .admin-clock {
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+        background: #f8fafc;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+    }
+    .icon-btn:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+    .icon-btn .badge-dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .avatar-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .bg-role-admin { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .bg-role-customer { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .bg-role-partner { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .bg-role-driver { background: linear-gradient(135deg, #a855f7, #9333ea); }
+    .profile-dropdown .dropdown-toggle::after {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .admin-navbar {
+            padding: 0 12px;
+            height: 56px;
+        }
+        .page-title {
+            font-size: 16px;
+        }
+        .breadcrumb-text {
+            display: none;
+        }
+        .admin-clock {
+            display: none;
+        }
+        .navbar-right {
+            gap: 8px;
+        }
+    }
+</style>
+
+<div class="admin-navbar">
+    <div class="d-flex align-items-center gap-2">
+        <button class="icon-btn border-0 d-lg-none" id="mobile-sidebar-toggle" onclick="toggleAdminSidebar()">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="page-title-area">
+            <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="breadcrumb-text">Admin / {% block breadcrumb %}Dashboard{% endblock %}</div>
+        </div>
+    </div>
+    
+    <div class="navbar-right">
+        <div class="admin-clock" id="admin-clock">
+            <i class="bi bi-clock"></i> <span>00:00:00</span>
+        </div>
+        
+        <button class="icon-btn border-0">
+            <i class="bi bi-bell"></i>
+            <span class="badge-dot"></span>
+        </button>
+        
+        <div class="dropdown profile-dropdown">
+            <div class="dropdown-toggle d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown">
+                <div class="avatar-circle 
+                    {% if request.user.role == 'ADMIN' %}bg-role-admin
+                    {% elif request.user.role == 'CUSTOMER' %}bg-role-customer
+                    {% elif request.user.role == 'PARTNER' %}bg-role-partner
+                    {% elif request.user.role == 'DRIVER' %}bg-role-driver
+                    {% else %}bg-role-admin{% endif %}">
+                    {{ request.user.display_name|default:"A"|make_list|first|upper }}
+                </div>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3">
+                <li class="px-3 py-2 border-bottom">
+                    <div class="fw-bold text-dark">{{ request.user.display_name|default:"Admin User" }}</div>
+                    <div class="text-muted small">{{ request.user.role|default:"Administrator" }}</div>
+                </li>
+                <li><a class="dropdown-item py-2" href="{% url 'profile' %}"><i class="bi bi-person me-2"></i> Profile</a></li>
+                <li><a class="dropdown-item py-2" href="{% url 'settings' %}"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const clockEl = document.querySelector('#admin-clock span');
+        if(!clockEl) return;
+        const now = new Date();
+        clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>

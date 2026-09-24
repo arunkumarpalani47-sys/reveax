@@ -1,0 +1,271 @@
+body{
+
+    background:#f8f9fa;
+
+}
+
+.display-4{
+
+    color:#0d6efd;
+    font-weight:bold;
+
+}
+
+/* ===============================
+   Footer
+================================= */
+
+.footer {
+    background: #1f2937;
+    color: #ffffff;
+    padding: 60px 0 20px;
+    margin-top: 60px;
+}
+
+.footer-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-section h3 {
+    color: #facc15;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.footer-section p {
+    color: #d1d5db;
+    line-height: 1.8;
+    margin-bottom: 10px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+    color: #d1d5db;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: #facc15;
+    padding-left: 6px;
+}
+
+.footer-bottom {
+    border-top: 1px solid #4b5563;
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    color: #9ca3af;
+    font-size: 15px;
+}
+
+/* Social Icons */
+
+.social-icons {
+    margin-top: 15px;
+}
+
+.social-icons a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background: #374151;
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+    transition: 0.3s;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.social-icons a:hover {
+    background: #facc15;
+    color: #111827;
+    transform: translateY(-4px);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-section {
+        margin-bottom: 30px;
+    }
+
+    .social-icons a {
+        margin: 5px;
+    }
+}
+.sidebar{
+    width:260px;
+    min-height:100vh;
+    background:#111827;
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar .nav-link{
+    color:#d1d5db;
+    padding:15px 25px;
+    font-size:16px;
+    font-weight:500;
+    transition:.3s;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.sidebar .nav-link:hover{
+    background:#fbbf24;
+    color:#000;
+    padding-left:35px;
+}
+
+.sidebar .nav-link i{
+    font-size:20px;
+    width:25px;
+}
+
+.sidebar .btn{
+    font-weight:600;
+}
+/* Floating WhatsApp */
+
+.whatsapp-float{
+    position:fixed;
+    bottom:25px;
+    right:25px;
+    background:#25D366;
+    color:#fff;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 22px;
+    border-radius:50px;
+    z-index:9999;
+    font-size:18px;
+    font-weight:600;
+    box-shadow:0 10px 25px rgba(0,0,0,.3);
+    animation:float 2s ease-in-out infinite;
+    transition:.3s;
+}
+
+.whatsapp-float i{
+    font-size:32px;
+    animation:pulse 1.2s infinite;
+}
+
+.whatsapp-float:hover{
+    color:#fff;
+    background:#1ebe5d;
+    transform:scale(1.08);
+}
+
+.wa-text{
+    white-space:nowrap;
+}
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.25);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+@keyframes float{
+
+    0%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-10px);
+    }
+
+    100%{
+        transform:translateY(0);
+    }
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.whatsapp-float{
+
+    padding:15px;
+    border-radius:50%;
+
+}
+
+.wa-text{
+
+    display:none;
+
+}
+
+.whatsapp-float i{
+
+    font-size:34px;
+
+}
+
+/* Responsive sidebar */
+div.col-md-2.bg-dark.min-vh-100 {
+    min-height: auto !important;
+}
+
+.sidebar-list {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 0;
+}
+
+.sidebar-list .list-group-item {
+    border-radius: 0 !important;
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 12px 10px !important;
+    font-size: 13px !important;
+    border-bottom: 1px solid rgba(255,255,255,.1) !important;
+}
+
+}

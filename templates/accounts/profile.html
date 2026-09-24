@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0" style="border-radius: 20px; background: #ffffff;">
+                <div class="card-header bg-dark text-white p-4 d-flex align-items-center justify-content-between" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    <div>
+                        <h3 class="mb-1 fw-bold">👤 My Profile</h3>
+                        <p class="text-secondary mb-0 small">Update your personal account details</p>
+                    </div>
+                    <div class="navbar-avatar d-flex align-items-center justify-content-center fw-bold shadow-sm 
+                        {% if request.user.role == 'ADMIN' %}bg-admin{% elif request.user.role == 'PARTNER' %}bg-partner{% elif request.user.role == 'DRIVER' %}bg-driver{% else %}bg-customer{% endif %}" style="width: 55px; height: 55px; font-size: 24px;">
+                        {{ request.user.display_name|slice:":1"|upper }}
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">Email Address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">Phone Number</label>
+                                {{ form.phone }}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top border-light d-flex gap-2">
+                            <button type="submit" class="btn btn-success px-4 py-2 rounded-pill fw-bold">
+                                Save Changes
+                            </button>
+                            <a href="{% if request.user.role == 'ADMIN' %}{% url 'admin_dashboard' %}{% elif request.user.role == 'PARTNER' %}{% url 'partner_dashboard' %}{% elif request.user.role == 'DRIVER' %}{% url 'driver_rides' %}{% else %}{% url 'customer_dashboard' %}{% endif %}" 
+                               class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
