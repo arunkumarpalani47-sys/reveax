@@ -95,52 +95,168 @@ def _send_whatsapp_notification(message: str):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> str:
-    """Build a clean HTML email with a table of key-value rows."""
+    """Build a professional branded HTML email."""
     now_str = datetime.now().strftime("%d %b %Y  %I:%M %p")
+
+    # Pick a lighter shade for the gradient
+    gradients = {
+        "#2563eb": "linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)",
+        "#059669": "linear-gradient(135deg, #065f46 0%, #059669 60%, #10b981 100%)",
+        "#7c3aed": "linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%)",
+    }
+    gradient = gradients.get(color, f"linear-gradient(135deg, {color}, {color})")
+
     row_html = ""
-    for label, value in rows:
+    for i, (label, value) in enumerate(rows):
+        bg = "#ffffff" if i % 2 == 0 else "#f8faff"
         row_html += f"""
-        <tr>
-          <td style="padding:10px 16px; color:#6b7280; font-size:13px; border-bottom:1px solid #f3f4f6; width:40%; font-weight:600;">{label}</td>
-          <td style="padding:10px 16px; color:#111827; font-size:13px; border-bottom:1px solid #f3f4f6;">{value or '—'}</td>
+        <tr style="background:{bg};">
+          <td style="padding:12px 20px;color:#64748b;font-size:13px;font-weight:600;
+                     width:38%;border-bottom:1px solid #e2e8f0;letter-spacing:0.3px;">
+            {label}
+          </td>
+          <td style="padding:12px 20px;color:#0f172a;font-size:13px;
+                     border-bottom:1px solid #e2e8f0;font-weight:500;">
+            {value or "—"}
+          </td>
         </tr>"""
 
-    return f"""
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:24px 0;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-        <!-- HEADER -->
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>{title}</title>
+</head>
+<body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0"
+       style="background:#ffffff;border-radius:16px;overflow:hidden;
+              box-shadow:0 8px 32px rgba(0,0,0,0.10);max-width:600px;">
+
+  <!-- ══ TOP BRAND BAR ══ -->
+  <tr>
+    <td style="background:#0f172a;padding:14px 28px;text-align:left;">
+      <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="background:{color};padding:24px 28px;">
-            <div style="font-size:28px;margin-bottom:4px;">{icon}</div>
-            <div style="color:#ffffff;font-size:20px;font-weight:800;">{title}</div>
-            <div style="color:rgba(255,255,255,0.8);font-size:12px;margin-top:4px;">{now_str} · Rovexa Cab Services</div>
+          <td>
+            <span style="color:#ffffff;font-size:20px;font-weight:900;
+                         letter-spacing:2px;text-transform:uppercase;">ROVEAX</span>
+            <span style="color:#94a3b8;font-size:11px;margin-left:8px;
+                         font-weight:400;letter-spacing:1px;">CAB SERVICES</span>
           </td>
-        </tr>
-        <!-- DATA TABLE -->
-        <tr>
-          <td style="padding:8px 0;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              {row_html}
-            </table>
-          </td>
-        </tr>
-        <!-- FOOTER -->
-        <tr>
-          <td style="background:#f9fafb;padding:16px 28px;text-align:center;color:#9ca3af;font-size:11px;border-top:1px solid #f3f4f6;">
-            This is an automated alert from <strong>Rovexa Cab Services</strong> admin dashboard.<br>
-            <a href="https://reveax.onrender.com/admin/" style="color:#2563eb;">Open Admin Panel</a>
+          <td align="right">
+            <span style="color:#64748b;font-size:11px;">Admin Notification</span>
           </td>
         </tr>
       </table>
-    </td></tr>
-  </table>
+    </td>
+  </tr>
+
+  <!-- ══ GRADIENT HERO BANNER ══ -->
+  <tr>
+    <td style="background:{gradient};padding:36px 28px 28px;">
+      <table cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:middle;padding-right:18px;">
+            <div style="background:rgba(255,255,255,0.18);border-radius:50%;
+                        width:64px;height:64px;text-align:center;line-height:64px;
+                        font-size:30px;border:2px solid rgba(255,255,255,0.3);">
+              {icon}
+            </div>
+          </td>
+          <td style="vertical-align:middle;">
+            <div style="color:rgba(255,255,255,0.75);font-size:11px;
+                        letter-spacing:2px;text-transform:uppercase;
+                        font-weight:600;margin-bottom:6px;">
+              Automated Alert
+            </div>
+            <div style="color:#ffffff;font-size:20px;font-weight:800;
+                        line-height:1.3;letter-spacing:0.2px;">
+              {title}
+            </div>
+            <div style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:6px;">
+              🕐 {now_str} &nbsp;|&nbsp; 📍 Roveax Admin Panel
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ DIVIDER ACCENT ══ -->
+  <tr>
+    <td style="height:4px;background:{gradient};"></td>
+  </tr>
+
+  <!-- ══ SECTION LABEL ══ -->
+  <tr>
+    <td style="padding:20px 20px 4px;">
+      <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:700;
+                   padding:4px 12px;border-radius:20px;letter-spacing:1px;
+                   text-transform:uppercase;border:1px solid #e2e8f0;">
+        &nbsp;Details
+      </span>
+    </td>
+  </tr>
+
+  <!-- ══ DATA TABLE ══ -->
+  <tr>
+    <td style="padding:8px 20px 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0"
+             style="border-radius:10px;overflow:hidden;
+                    border:1px solid #e2e8f0;">
+        {row_html}
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ ACTION BUTTON ══ -->
+  <tr>
+    <td style="padding:4px 20px 28px;text-align:center;">
+      <a href="https://reveax.onrender.com/admin/"
+         style="display:inline-block;background:{gradient};
+                color:#ffffff;font-size:14px;font-weight:700;
+                padding:14px 36px;border-radius:50px;text-decoration:none;
+                letter-spacing:0.5px;box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+        Open Admin Panel →
+      </a>
+    </td>
+  </tr>
+
+  <!-- ══ FOOTER ══ -->
+  <tr>
+    <td style="background:#0f172a;padding:20px 28px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="color:#94a3b8;font-size:12px;line-height:1.8;">
+            <strong style="color:#e2e8f0;">Roveax Cab Services</strong><br>
+            📞 +91 94873 51101 &nbsp;|&nbsp;
+            🌐 reveax.onrender.com<br>
+            <span style="color:#64748b;font-size:11px;">
+              This is an automated notification — do not reply to this email.
+            </span>
+          </td>
+          <td align="right" style="vertical-align:top;">
+            <span style="color:#1e40af;font-size:22px;font-weight:900;
+                         letter-spacing:2px;">R</span>
+            <span style="color:#64748b;font-size:10px;display:block;
+                         text-align:right;letter-spacing:1px;">ROVEAX</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+
 </body>
 </html>"""
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────

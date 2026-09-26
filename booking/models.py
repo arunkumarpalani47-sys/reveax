@@ -73,6 +73,9 @@ class Booking(models.Model):
     pickup_location = models.CharField(max_length=255)
     drop_location   = models.CharField(max_length=255)
 
+    # ── Readable Booking Number: RCS-2026-100001 ─────────────────────
+    booking_number  = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
     pickup_lat = models.FloatField(null=True, blank=True)
     pickup_lng = models.FloatField(null=True, blank=True)
     drop_lat   = models.FloatField(null=True, blank=True)
@@ -224,14 +227,39 @@ class Booking(models.Model):
 
     def save(self, *args, **kwargs):
         import uuid
+        from django.utils import timezone
+
         if not self.otp:
             self.otp = f"{random.randint(100000, 999999)}"
         if not self.share_token:
             self.share_token = f"TRACK_{uuid.uuid4().hex[:12].upper()}"
+
+        # ── Auto-generate Booking Number: RCS-2026-100001 ────────────
+        if not self.booking_number:
+            year = timezone.now().year
+            prefix = f"RCS-{year}-"
+            # Find the last booking number for this year
+            last = (
+                Booking.objects
+                .filter(booking_number__startswith=prefix)
+                .order_by("-booking_number")
+                .values_list("booking_number", flat=True)
+                .first()
+            )
+            if last:
+                try:
+                    last_seq = int(last.split("-")[-1])
+                    next_seq = last_seq + 1
+                except (ValueError, IndexError):
+                    next_seq = 100001
+            else:
+                next_seq = 100001  # First booking of the year
+            self.booking_number = f"{prefix}{next_seq}"
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Booking #{self.id} ({self.status})"
+        return f"Booking {self.booking_number or self.id} ({self.status})"
 
 
 
