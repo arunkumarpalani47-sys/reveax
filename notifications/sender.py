@@ -12,6 +12,7 @@ WhatsApp: via Twilio WhatsApp API (configure TWILIO_* in .env)
 """
 
 import logging
+import os
 import threading
 from datetime import datetime
 
@@ -37,7 +38,7 @@ def _run_in_thread(fn, *args, **kwargs):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _send_email_notification(subject: str, html_body: str):
-    """Send an HTML email to the admin."""
+    """Send an HTML email to the admin with multi-transport support (HTTPS API / Webhook / SMTP)."""
     admin_email = getattr(settings, "ADMIN_NOTIFICATION_EMAIL", "") or getattr(settings, "EMAIL_HOST_USER", "")
     if not admin_email:
         logger.warning("[Rovexa Notifications] ADMIN_NOTIFICATION_EMAIL not set — skipping email.")
@@ -45,6 +46,49 @@ def _send_email_notification(subject: str, html_body: str):
 
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", f"Rovexa Cab Services <{admin_email}>")
 
+    # 1. Check for HTTPS Email Webhook Relay (e.g. Google Apps Script Webhook — Port 443, never blocked)
+    webhook_url = getattr(settings, "EMAIL_WEBHOOK_URL", "") or os.environ.get("EMAIL_WEBHOOK_URL", "")
+    if webhook_url:
+        try:
+            import requests
+            resp = requests.post(
+                webhook_url,
+                json={"to": admin_email, "subject": subject, "html": html_body, "from": from_email},
+                timeout=10,
+            )
+            if resp.status_code in (200, 201, 302):
+                logger.info(f"[Rovexa Notifications] Email sent via Webhook to {admin_email}: {subject}")
+                return
+            else:
+                logger.warning(f"[Rovexa Notifications] Webhook status {resp.status_code}: {resp.text}")
+        except Exception as exc:
+            logger.warning(f"[Rovexa Notifications] Webhook error: {exc}")
+
+    # 2. Check for Resend API Key (Port 443 — never blocked on Render)
+    resend_key = getattr(settings, "RESEND_API_KEY", "") or os.environ.get("RESEND_API_KEY", "")
+    if resend_key:
+        try:
+            import requests
+            resp = requests.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+                json={
+                    "from": "Rovexa Cab Services <onboarding@resend.dev>",
+                    "to": [admin_email],
+                    "subject": subject,
+                    "html": html_body,
+                },
+                timeout=10,
+            )
+            if resp.status_code in (200, 201):
+                logger.info(f"[Rovexa Notifications] Email sent via Resend API to {admin_email}: {subject}")
+                return
+            else:
+                logger.warning(f"[Rovexa Notifications] Resend API {resp.status_code}: {resp.text}")
+        except Exception as exc:
+            logger.warning(f"[Rovexa Notifications] Resend API error: {exc}")
+
+    # 3. Standard Django SMTP backend (e.g. Gmail SMTP port 587)
     try:
         msg = EmailMultiAlternatives(
             subject=subject,
@@ -54,9 +98,10 @@ def _send_email_notification(subject: str, html_body: str):
         )
         msg.attach_alternative(html_body, "text/html")
         msg.send(fail_silently=False)
-        logger.info(f"[Rovexa Notifications] Email sent to {admin_email}: {subject}")
+        logger.info(f"[Rovexa Notifications] Email sent via SMTP to {admin_email}: {subject}")
     except Exception as exc:
-        logger.error(f"[Rovexa Notifications] Email failed: {exc}")
+        logger.error(f"[Rovexa Notifications] SMTP Email failed: {exc}")
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -264,10 +309,51 @@ def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> s
 # PUBLIC API: Trigger notifications
 # ─────────────────────────────────────────────────────────────────────────────
 
+def notify_customer_registered(user):
+    """Called when a new customer registers / account is created."""
+    if not user or getattr(user, "role", "") != "CUSTOMER":
+        return
+
+    name  = getattr(user, "display_name", None) or user.get_full_name() or user.username
+    email = user.email or "—"
+    phone = getattr(user, "phone", None) or "—"
+    now   = datetime.now().strftime("%d %b %Y  %I:%M %p")
+
+    # Email
+    subject   = f"👤 New Customer Registered: {name} — Rovexa Cab Services"
+    html_body = _build_email_html(
+        title=f"New Customer Registration — {name}",
+        color="#2563eb",
+        icon="👤",
+        rows=[
+            ("Customer Name",   name),
+            ("Email Address",   email),
+            ("Phone Number",    phone),
+            ("Username",        user.username),
+            ("Registration At", now),
+            ("Account Role",    "CUSTOMER"),
+            ("Account Status",  "✅ Active & Verified"),
+        ],
+    )
+    _run_in_thread(_send_email_notification, subject, html_body)
+
+    # WhatsApp
+    wa_msg = (
+        f"👤 *Rovexa Cab Services – New Customer Registered*\n\n"
+        f"👤 *Name:* {name}\n"
+        f"📧 *Email:* {email}\n"
+        f"📞 *Phone:* {phone}\n"
+        f"🕐 *Time:* {now}\n\n"
+        f"_New customer created an account on Rovexa!_"
+    )
+    _run_in_thread(_send_whatsapp_notification, wa_msg)
+
+
 def notify_customer_login(user):
     """Called when a customer logs in."""
     if not user or getattr(user, "role", "") != "CUSTOMER":
         return
+
 
     name  = getattr(user, "display_name", None) or user.get_full_name() or user.username
     email = user.email or "—"

@@ -68,3 +68,29 @@ services:
 
       - key: RAZORPAY_KEY_SECRET
         sync: false
+
+      # ── Email Notifications ──────────────────────────────────────────────────
+      - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.smtp.EmailBackend"
+
+      - key: EMAIL_HOST
+        value: "smtp.gmail.com"
+
+      - key: EMAIL_PORT
+        value: "587"
+
+      - key: EMAIL_USE_TLS
+        value: "True"
+
+      - key: EMAIL_HOST_USER
+        value: "rovexacabs@gmail.com"
+
+      - key: EMAIL_HOST_PASSWORD
+        value: "rbcmbmvtnYzcguuf"
+
+      - key: DEFAULT_FROM_EMAIL
+        value: "Rovexa Cab Services <rovexacabs@gmail.com>"
+
+      - key: ADMIN_NOTIFICATION_EMAIL
+        value: "rovexacabs@gmail.com"
+
