@@ -1,65 +1,183 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+/* ========================================================
+   Our Popular Fleets Section - Robust Grid & Card Styling
+   ======================================================== */
+.fleets-section {
+    padding: 60px 0 !important;
+    background-color: #f8fafc !important;
+}
+
+.fleets-section .row > [class*="col-"] {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.fleet-route-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 22px 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    transition: all 0.25s ease !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+}
+
+.fleet-route-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 14px 28px rgba(245, 158, 11, 0.14) !important;
+}
+
+.fleet-route-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 4px !important;
+    height: 100% !important;
+    background: #f59e0b !important;
+    opacity: 0 !important;
+    transition: opacity 0.2s ease !important;
+}
+
+.fleet-route-card:hover::before {
+    opacity: 1 !important;
+}
+
+.fleet-route-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 12px !important;
+}
+
+.fleet-route-title {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.35 !important;
+}
+
+.fleet-route-path {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #64748b !important;
+    font-size: 0.86rem !important;
+    margin: 8px 0 16px 0 !important;
+}
+
+.fleet-route-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-top: auto !important;
+    padding-top: 14px !important;
+    border-top: 1px dashed #e2e8f0 !important;
+    width: 100% !important;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- ================= HERO ================= -->
-<section class="hero-section">
+<section class="hero-section" style="background-image: url('{% static 'images/hero-car.jpg' %}');">
 
     <div class="hero-overlay"></div>
 
-    <div class="container-fluid h-100">
+    <div class="container position-relative py-5" style="z-index: 2;">
 
-        <div class="container h-100">
+        <div class="row align-items-center min-vh-hero">
 
-            <div class="row align-items-center h-100">
+            <!-- LEFT CONTENT -->
+            <div class="col-lg-7 col-xl-6 text-white py-4">
 
-                <!-- LEFT -->
+                <!-- Subheading -->
+                <div class="hero-subheading mb-3">
+                    <i class="bi bi-geo-alt-fill text-warning me-1"></i>
+                    <span>Reliable Cab Services from Tiruvannamalai</span>
+                </div>
 
-                <div class="col-lg-6 text-white">
+                <!-- Main Heading -->
+                <h1 class="hero-title fw-bold text-white mb-3">
+                    Your Journey. <span class="text-warning">Our Drive.</span>
+                </h1>
 
-                    
-                    <h1 class="hero-title">
+                <!-- Description -->
+                <p class="hero-description text-light lead fw-medium mb-2">
+                    Travel comfortably with Rovexa Cab Services, your local and outstation cab service from Tiruvannamalai City.
+                </p>
 
-                        Ride Anywhere,
-                        <br>
+                <!-- Supporting Content -->
+                <p class="hero-supporting text-white-50 mb-4">
+                    Whether it’s a local trip, family journey, airport transfer, pilgrimage, or long-distance outstation travel, we help you travel with comfort, safety, and dependable service.
+                </p>
 
-                        Anytime with
-                        <br>
+                <!-- CTA Actions -->
+                <div class="hero-actions d-flex flex-wrap gap-3 align-items-center">
 
-                        <span>ROVEXA</span>
-
-                    </h1>
-
-                    <p class="hero-text">
-
-                        Fast, Safe & Affordable Taxi Service
-                        <br>
-
-                        at Your Fingertips
-
-                    </p>
-
+                    <!-- Primary CTA -->
                     <a href="{% url 'add_booking' %}"
-                       class="btn btn-warning btn-lg px-4 me-3">
-
-                        Book Now
-
+                       class="btn btn-warning btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center">
+                        <i class="bi bi-taxi-front-fill me-2"></i>
+                        Book a Cab
                     </a>
 
-                    <a href="#"
-                       class="btn btn-light btn-lg px-4">
+                    <!-- Secondary CTA: WhatsApp Us -->
+                    <a href="https://wa.me/919487351101?text=Hello%20Rovexa%20Cab%20Services,%20I%20would%20like%20to%20book%20a%20cab."
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn btn-whatsapp-cta btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center"
+                       style="background-color: #25d366 !important; color: #ffffff !important; border: 2px solid #25d366 !important;">
+                        <i class="bi bi-whatsapp me-2" style="color: #ffffff !important; font-size: 1.2rem;"></i>
+                        <span style="color: #ffffff !important;">WhatsApp Us</span>
+                    </a>
 
+                    <!-- Learn More: Navigates to Services page -->
+                    <a href="{% url 'services' %}"
+                       class="btn btn-outline-light btn-lg px-4 fw-semibold d-inline-flex align-items-center">
                         Learn More
-
+                        <i class="bi bi-arrow-right ms-2"></i>
                     </a>
 
                 </div>
 
-                <!-- RIGHT -->
-                <div class="col-lg-6 text-center text-lg-end mt-4 mt-lg-0">
+                <!-- Live Trust & Visitor Counter -->
+                <div class="mt-4 pt-2 d-flex flex-wrap align-items-center gap-3">
+                    <div class="visitor-counter-pill d-inline-flex align-items-center px-3 py-2 rounded-pill shadow-sm"
+                         style="background: rgba(15, 23, 42, 0.85); border: 1.5px solid rgba(245, 158, 11, 0.5); backdrop-filter: blur(8px);">
+                        <span class="live-pulse-dot me-2"></span>
+                        <i class="bi bi-people-fill text-warning me-2 fs-6"></i>
+                        <span class="text-white-50 small me-2">Website Visitors:</span>
+                        <span class="fw-bold text-warning fs-6" id="hero-visitor-count">{{ visitor_count|default:"15,250" }}</span>
+                        <span class="badge rounded-pill ms-2 px-2 py-1" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.72rem;">
+                            <span id="hero-active-count">{{ active_visitors|default:"14" }}</span> Online Now
+                        </span>
+                    </div>
+                    <div class="d-inline-flex align-items-center px-3 py-2 rounded-pill shadow-sm"
+                         style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px);">
+                        <i class="bi bi-shield-check text-success me-2 fs-6"></i>
+                        <span class="text-white-50 small">Verified & Safe Travel Network</span>
+                    </div>
                 </div>
 
+            </div>
+
+            <!-- RIGHT (Space showcasing background car image) -->
+            <div class="col-lg-5 col-xl-6 d-none d-lg-block">
             </div>
 
         </div>
@@ -72,22 +190,21 @@
 
 <div class="container">
 
-<form method="GET" action="{% url 'search_vehicle' %}">
+<form method="GET" action="{% url 'add_booking' %}">
 
-<div class="search-box shadow-lg">
+<div class="search-box shadow-lg" style="position: relative; z-index: 20;">
 
 <div class="row g-3 align-items-end">
 
 <!-- Pickup -->
-
-<div class="col-md-3">
+<div class="col-md-3 position-relative">
 
 <label class="form-label fw-bold">
 <i class="bi bi-geo-alt-fill text-warning me-2"></i>
 Pickup Location
 </label>
 
-<div class="input-group position-relative">
+<div class="input-group">
 
 <span class="input-group-text">
 <i class="bi bi-geo-fill text-danger"></i>
@@ -102,22 +219,21 @@ placeholder="Enter Pickup"
 autocomplete="off"
 required>
 
-<div class="autocomplete-suggestions" id="home_pickup_suggestions" style="display: none;"></div>
-
 </div>
+
+<div class="autocomplete-suggestions shadow-lg" id="home_pickup_suggestions" style="display: none;"></div>
 
 </div>
 
 <!-- Drop -->
-
-<div class="col-md-3">
+<div class="col-md-3 position-relative">
 
 <label class="form-label fw-bold">
 <i class="bi bi-pin-map-fill text-success me-2"></i>
 Drop Location
 </label>
 
-<div class="input-group position-relative">
+<div class="input-group">
 
 <span class="input-group-text">
 <i class="bi bi-flag-fill text-success"></i>
@@ -132,9 +248,9 @@ placeholder="Enter Destination"
 autocomplete="off"
 required>
 
-<div class="autocomplete-suggestions" id="home_drop_suggestions" style="display: none;"></div>
-
 </div>
+
+<div class="autocomplete-suggestions shadow-lg" id="home_drop_suggestions" style="display: none;"></div>
 
 </div>
 
@@ -173,57 +289,34 @@ required>
 </div>
 
 <!-- Button -->
-
 <div class="col-md-2 d-grid">
-
-<button
-type="submit"
-class="btn btn-warning btn-lg">
-
-<i class="bi bi-search me-2"></i>
-
-Search Taxi
-
-</button>
-
+    <button
+        type="submit"
+        class="btn btn-warning btn-lg search-taxi-btn"
+        id="searchTaxiBtn">
+        <i class="bi bi-search me-2"></i>
+        <span>Search Taxi</span>
+    </button>
 </div>
 
 </div>
 
-<hr>
+<hr class="my-3">
 
 <!-- Popular Locations -->
-
-<div>
-
-<span class="fw-bold me-2">
-
-<i class="bi bi-star-fill text-warning"></i>
-
-Popular Locations
-
-</span>
-
-<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Kempegowda International Airport (BLR)';">
-Airport
-</button>
-
-<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='KSR Bengaluru Railway Station';">
-Railway Station
-</button>
-
-<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Tiruvannamalai, Tamil Nadu';">
-Tiruvannamalai
-</button>
-
-<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Chengam, Tamil Nadu';">
-Chengam
-</button>
-
-<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill m-1" onclick="document.getElementById('home_drop').value='Vellore, Tamil Nadu';">
-Vellore
-</button>
-
+<div class="d-flex flex-wrap align-items-center gap-2">
+    <span class="fw-bold text-dark small me-1">
+        <i class="bi bi-star-fill text-warning me-1"></i> Popular Locations:
+    </span>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Chennai');">Chennai</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Vellore');">Vellore</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Arani');">Arani</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Gingee');">Gingee</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Chengam');">Chengam</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Villupuram');">Villupuram</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Pandy');">Pandy</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Tirukovilur');">Tirukovilur</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" onclick="setPopularRoute('Thandarampattu');">Thandarampattu</button>
 </div>
 
 </div>
@@ -232,100 +325,1235 @@ Vellore
 
 </div>
 
+<!-- ================= WHY CHOOSE ROVEXA CABS ================= -->
+<section class="why-choose-section py-5 my-4">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2 shadow-sm" style="font-size: 0.82rem; letter-spacing: 0.5px;">
+                <i class="bi bi-patch-check-fill me-1"></i> Why Choose Rovexa Cabs
+            </span>
+            <h2 class="fw-bold text-dark display-6 mt-2 mb-3">
+                Your Trusted Travel Partner in <span class="text-warning">Tiruvannamalai</span>
+            </h2>
+            <p class="text-muted mx-auto" style="max-width: 680px; font-size: 1.05rem;">
+                Whether it's a local temple visit, outstation family journey, or urgent airport transfer, we deliver unmatched safety, comfort, and transparent fares every mile.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1: Safe & Sanitized Cabs -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 why-choose-card">
+                    <div class="feature-icon-wrapper mb-3 d-inline-flex align-items-center justify-content-center rounded-3 bg-warning-subtle text-warning" style="width: 58px; height: 58px;">
+                        <i class="bi bi-shield-check display-6 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Safe & Sanitized Cabs</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                        Spotless, air-conditioned vehicles sanitized before every ride. Safe and relaxed travel for families, seniors, and solo commuters.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2: Transparent Pricing -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 why-choose-card">
+                    <div class="feature-icon-wrapper mb-3 d-inline-flex align-items-center justify-content-center rounded-3 bg-success-subtle text-success" style="width: 58px; height: 58px;">
+                        <i class="bi bi-cash-coin display-6 text-success"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Transparent & Affordable Pricing</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                        Clear, honest per-kilometer fares with no hidden costs. Pay only for the distance you travel with one-way and round-trip options.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3: Verified Drivers -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 why-choose-card">
+                    <div class="feature-icon-wrapper mb-3 d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary" style="width: 58px; height: 58px;">
+                        <i class="bi bi-person-badge-fill display-6 text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Verified Professional Chauffeurs</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                        Polite, background-verified, and well-trained drivers with deep knowledge of highways, temples, and Tamil Nadu routes.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 4: 24x7 Customer Support -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 why-choose-card">
+                    <div class="feature-icon-wrapper mb-3 d-inline-flex align-items-center justify-content-center rounded-3 bg-danger-subtle text-danger" style="width: 58px; height: 58px;">
+                        <i class="bi bi-headset display-6 text-danger"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">24×7 Instant Support</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                        Always here for you day and night. Direct phone line and WhatsApp assistance for instantaneous booking and travel support.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 5: On-Time Guaranteed Pickup -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 why-choose-card">
+                    <div class="feature-icon-wrapper mb-3 d-inline-flex align-items-center justify-content-center rounded-3 bg-info-subtle text-info" style="width: 58px; height: 58px;">
+                        <i class="bi bi-clock-history display-6 text-info"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Punctual & On-Time Pickup</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                        We value your precious time. Guaranteed on-time doorstep arrival for early morning Girivalam, train catches, and flights.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 6: Outstation & Pilgrimage Specialists -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 why-choose-card">
+                    <div class="feature-icon-wrapper mb-3 d-inline-flex align-items-center justify-content-center rounded-3 bg-secondary-subtle text-warning" style="width: 58px; height: 58px;">
+                        <i class="bi bi-compass-fill display-6 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Outstation & Pilgrimage Specialists</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                        Specialized packages for Chennai, Bangalore, Tirupati, Sabarimala, Ooty, Kodaikanal, and temple circuits across South India.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= LIVE PLATFORM METRICS & VISITOR STATS ================= -->
+<section class="stats-counter-section py-5 position-relative" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-top: 2px solid rgba(245, 158, 11, 0.3); border-bottom: 2px solid rgba(245, 158, 11, 0.3);">
+    <div class="container">
+        <div class="text-center mb-4">
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2 shadow-sm" style="font-size: 0.82rem; letter-spacing: 0.5px;">
+                <i class="bi bi-activity me-1"></i> Live Platform Metrics
+            </span>
+            <h2 class="fw-bold text-white mb-2">
+                Trusted by Thousands Across <span class="text-warning">Tamil Nadu</span>
+            </h2>
+            <p class="text-white-50 mx-auto" style="max-width: 620px; font-size: 0.95rem;">
+                Real-time verified platform statistics, passenger milestones, and live visitor count.
+            </p>
+        </div>
+
+        <div class="row g-3 justify-content-center text-center">
+            <!-- Counter 1: Website Visitors -->
+            <div class="col-6 col-md-4 col-lg-auto flex-fill" style="min-width: 200px;">
+                <div class="stat-counter-card h-100 p-4 rounded-4 position-relative" style="background: rgba(255, 255, 255, 0.05); border: 1.5px solid rgba(245, 158, 11, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="stat-icon-wrap text-warning fs-2">
+                            <i class="bi bi-eye-fill"></i>
+                        </div>
+                        <span class="badge rounded-pill d-inline-flex align-items-center px-2 py-1" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.72rem;">
+                            <span class="live-pulse-dot me-1"></span>
+                            <span id="live-active-badge">{{ active_visitors|default:"14" }}</span>&nbsp;Online
+                        </span>
+                    </div>
+                    <h3 class="fw-bold text-warning display-6 mb-1 counter-animate" id="live-visitors-count" data-target="{{ visitor_count_raw|default:15250 }}">{{ visitor_count|default:"15,250" }}</h3>
+                    <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Total Website Visits</div>
+                </div>
+            </div>
+
+            <!-- Counter 2: Happy Customers -->
+            <div class="col-6 col-md-4 col-lg-auto flex-fill" style="min-width: 190px;">
+                <div class="stat-counter-card h-100 p-4 rounded-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                    <div class="stat-icon-wrap mb-2 text-info fs-2">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-customers" data-target="{{ customers|default:11 }}" data-suffix="+">{{ customers|default:10 }}+</h3>
+                    <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Happy Customers</div>
+                </div>
+            </div>
+
+            <!-- Counter 3: Professional Drivers -->
+            <div class="col-6 col-md-4 col-lg-auto flex-fill" style="min-width: 190px;">
+                <div class="stat-counter-card h-100 p-4 rounded-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                    <div class="stat-icon-wrap mb-2 text-success fs-2">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-drivers" data-target="{{ drivers|default:5 }}" data-suffix="+">{{ drivers|default:5 }}+</h3>
+                    <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Expert Drivers</div>
+                </div>
+            </div>
+
+            <!-- Counter 4: Fleet Vehicles -->
+            <div class="col-6 col-md-4 col-lg-auto flex-fill" style="min-width: 190px;">
+                <div class="stat-counter-card h-100 p-4 rounded-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                    <div class="stat-icon-wrap mb-2 text-warning fs-2">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-vehicles" data-target="{{ vehicles|default:3 }}" data-suffix="+">{{ vehicles|default:3 }}+</h3>
+                    <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Verified Cabs</div>
+                </div>
+            </div>
+
+            <!-- Counter 5: Completed Trips -->
+            <div class="col-6 col-md-4 col-lg-auto flex-fill" style="min-width: 190px;">
+                <div class="stat-counter-card h-100 p-4 rounded-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                    <div class="stat-icon-wrap mb-2 text-danger fs-2">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-trips" data-target="{{ trips|default:15 }}" data-suffix="+">{{ trips|default:15 }}+</h3>
+                    <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Completed Trips</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= OUR POPULAR FLEETS ================= -->
+<section class="fleets-section py-5 bg-light" style="background-color: #f8fafc !important;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2 shadow-sm" style="font-size: 0.82rem; letter-spacing: 0.5px;">
+                <i class="bi bi-geo-alt-fill me-1"></i> Popular Outstation & Pilgrimage Routes
+            </span>
+            <h2 class="fw-bold text-dark display-6 mt-2 mb-3">
+                Our Popular <span class="text-warning">Fleets</span>
+            </h2>
+            <p class="text-muted mx-auto" style="max-width: 680px; font-size: 1.05rem;">
+                Dependable cab services from Tiruvannamalai to all major cities, pilgrimage hubs, and hill stations across South India.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Row 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">City & Airport Hub</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Chennai</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Chennai</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Chennai" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Metro & Airport</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Bangalore</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Bangalore</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~4.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Bangalore" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Commercial Hub</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Salem</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Salem</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Salem" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Industrial City</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Coimbatore</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Coimbatore</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~5.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Coimbatore" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Heritage & Temple</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Madurai</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Madurai</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~5.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Madurai" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Temple Town</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Kumbakonam</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Kumbakonam</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Kumbakonam" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Beach & Heritage</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Pondicherry</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Pondicherry</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~2.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Pondicherry" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">CMC & Fort City</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Vellore</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Vellore</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~2.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Vellore" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Sacred Pilgrimage</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Tirupathi</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Tirupathi</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~4.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Tirupathi" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Holy Pilgrimage</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Sabarimala</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Sabarimala</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~10 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Sabarimala" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Hill Station</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Ooty</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Ooty</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~7.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Ooty" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Holy Island</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Rameshwaram</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Rameshwaram</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~8.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Rameshwaram" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Hill Resort</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Yelagiri</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Yelagiri</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~2.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Yelagiri" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Hill Retreat</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Yarcad</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Yarcad</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Yarcad" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Coastal District</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Ramanathapuram</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Ramanathapuram</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~7.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Ramanathapuram" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Princess of Hills</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Kodaikanal</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Kodaikanal</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~7.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Kodaikanal" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Goddess Temple</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Malayanur</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Malayanur</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~1.0 hr</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Malayanur" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Nature & Waterfalls</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Javathu Hills</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Javathu Hills</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~1.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Javathu Hills" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 7 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Historic Fort</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Gingee</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Gingee</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~50 mins</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Gingee" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Junction & Hub</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Villupuram</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Villupuram</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~1.2 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Villupuram" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Heritage City</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Thiruvallur</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Thiruvallur</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Thiruvallur" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 {% endblock %}
 
 {% block extra_js %}
 <style>
+/* Embedded Autocomplete Styles to prevent browser caching issues */
 .autocomplete-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #ffffff;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    max-height: 220px;
-    overflow-y: auto;
-    z-index: 1050;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    margin-top: 5px;
+    position: absolute !important;
+    top: 100% !important;
+    left: 12px !important;
+    right: 12px !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    max-height: 260px !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.25) !important;
+    padding: 6px 0 !important;
+    margin-top: 6px !important;
+    list-style: none !important;
 }
+
 .suggestion-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    border-bottom: 1px solid #f1f1f1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-    transition: all 0.2s ease;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 14px !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    cursor: pointer !important;
+    font-size: 13.5px !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    text-align: left !important;
+    user-select: none !important;
 }
+
 .suggestion-item:last-child {
-    border-bottom: none;
+    border-bottom: none !important;
 }
-.suggestion-item:hover {
-    background-color: #ffc107;
-    color: #000;
-    font-weight: 500;
+
+.suggestion-item:hover,
+.suggestion-item.active-item {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+    font-weight: 600 !important;
+}
+
+.suggestion-highlight {
+    background-color: #fef08a !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    padding: 0 2px !important;
+    border-radius: 2px !important;
+}
+
+.suggestion-badge {
+    font-size: 10px !important;
+    padding: 2px 7px !important;
+    border-radius: 6px !important;
+    margin-left: auto !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+/* WhatsApp CTA Button */
+.btn-whatsapp-cta {
+    background-color: #25d366 !important;
+    color: #ffffff !important;
+    border: 2px solid #25d366 !important;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35) !important;
+}
+.btn-whatsapp-cta:hover,
+.btn-whatsapp-cta:focus {
+    background-color: #1eb956 !important;
+    border-color: #1eb956 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45) !important;
+}
+
+/* Search Taxi Centered Button */
+.search-taxi-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    height: 48px !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    border-radius: 10px !important;
+    background-color: #ffc107 !important;
+    border: 2px solid #ffc107 !important;
+    color: #111827 !important;
+    box-shadow: 0 4px 14px rgba(255, 193, 7, 0.35) !important;
+    transition: all 0.2s ease-in-out !important;
+    padding: 0 16px !important;
+    width: 100% !important;
+    line-height: 1 !important;
+}
+.search-taxi-btn i {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+    margin-right: 8px !important;
+}
+
+/* Visitor Counter & Live Pulse Styles */
+.live-pulse-dot {
+    display: inline-block !important;
+    width: 9px !important;
+    height: 9px !important;
+    background-color: #10b981 !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7) !important;
+    animation: livePulseAnim 1.8s infinite !important;
+}
+
+@keyframes livePulseAnim {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.visitor-counter-pill {
+    transition: all 0.25s ease-in-out !important;
+}
+.visitor-counter-pill:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(245, 158, 11, 0.8) !important;
+}
+
+.stat-counter-card {
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+.stat-counter-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: rgba(245, 158, 11, 0.8) !important;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35) !important;
 }
 </style>
 
 <script>
-function initAutocomplete(inputId, suggestionsId) {
-    const input = document.getElementById(inputId);
-    const suggestionsContainer = document.getElementById(suggestionsId);
-    let debounceTimer;
+// ========================================================
+// Comprehensive Rovexa Local Location Dataset
+// ========================================================
+const ROVEXA_LOCATIONS = [
+    // Primary Headquarters & Hub
+    { name: "Tiruvannamalai, Tamil Nadu", type: "city", badge: "Core Hub" },
+    { name: "Arulmigu Arunachaleswarar Temple, Tiruvannamalai", type: "temple", badge: "Temple" },
+    { name: "Tiruvannamalai Central Bus Stand", type: "bus", badge: "Bus Stand" },
+    { name: "Tiruvannamalai Railway Station (TNM)", type: "station", badge: "Station" },
+    { name: "Girivalam Path, Tiruvannamalai", type: "temple", badge: "Landmark" },
 
-    input.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        const query = this.value.trim();
-        
-        if (query.length < 3) {
-            suggestionsContainer.innerHTML = '';
-            suggestionsContainer.style.display = 'none';
+    // Popular Destinations
+    { name: "Chennai, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Chennai International Airport (MAA)", type: "airport", badge: "Airport" },
+    { name: "Puratchi Thalaivar Dr. M.G.R. Central (MAS), Chennai", type: "station", badge: "Station" },
+    { name: "Tambaram, Chennai", type: "city", badge: "Hub" },
+    { name: "Koyambedu Bus Terminal (CMBT), Chennai", type: "bus", badge: "Bus Stand" },
+
+    { name: "Vellore, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "CMC Hospital (Christian Medical College), Vellore", type: "hospital", badge: "Hospital" },
+    { name: "Katpadi Junction (KPD), Vellore", type: "station", badge: "Station" },
+    { name: "VIT University, Vellore", type: "city", badge: "Campus" },
+
+    { name: "Arani, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Gingee (Senji Fort), Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Chengam, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Villupuram, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Villupuram Junction (VM), Tamil Nadu", type: "station", badge: "Station" },
+
+    { name: "Puducherry (Pondicherry)", type: "city", badge: "Popular" },
+    { name: "White Town / Promenade Beach, Pondicherry", type: "city", badge: "Tourist" },
+    { name: "Auroville, Puducherry", type: "city", badge: "Tourist" },
+
+    { name: "Tirukovilur, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Thandarampattu, Tamil Nadu", type: "city", badge: "Popular" },
+
+    // Fleets & Inter-City Routes
+    { name: "Bengaluru (Bangalore), Karnataka", type: "city", badge: "Metro" },
+    { name: "Kempegowda International Airport (BLR)", type: "airport", badge: "Airport" },
+    { name: "KSR Bengaluru City Railway Station (SBC)", type: "station", badge: "Station" },
+    { name: "Electronic City, Bengaluru", type: "city", badge: "Tech Hub" },
+    { name: "Whitefield, Bengaluru", type: "city", badge: "Tech Hub" },
+
+    { name: "Salem, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Coimbatore, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Coimbatore International Airport (CJB)", type: "airport", badge: "Airport" },
+    { name: "Madurai, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Kumbakonam, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Tirupati, Andhra Pradesh", type: "temple", badge: "Pilgrimage" },
+    { name: "Sabarimala, Kerala", type: "temple", badge: "Pilgrimage" },
+    { name: "Ooty (Udhagamandalam), Tamil Nadu", type: "city", badge: "Hill Station" },
+    { name: "Rameswaram, Tamil Nadu", type: "city", badge: "Pilgrimage" },
+    { name: "Yelagiri Hills, Tamil Nadu", type: "city", badge: "Hill Station" },
+    { name: "Yercaud Hills, Salem", type: "city", badge: "Hill Station" },
+    { name: "Ramanathapuram, Tamil Nadu", type: "city", badge: "Popular" },
+    { name: "Kodaikanal, Tamil Nadu", type: "city", badge: "Hill Station" },
+    { name: "Melmalayanur Angalamman Temple", type: "temple", badge: "Temple" },
+    { name: "Javathu Hills (Jamunamarathur)", type: "city", badge: "Tourist" },
+    { name: "Thiruvallur, Tamil Nadu", type: "city", badge: "Popular" },
+
+    // Surrounding Districts & Towns
+    { name: "Polur, Tiruvannamalai", type: "city", badge: "Town" },
+    { name: "Kalasapakkam, Tiruvannamalai", type: "city", badge: "Town" },
+    { name: "Kilpennathur, Tiruvannamalai", type: "city", badge: "Town" },
+    { name: "Chetpet, Tiruvannamalai", type: "city", badge: "Town" },
+    { name: "Vandavasi, Tiruvannamalai", type: "city", badge: "Town" },
+    { name: "Tindivanam, Tamil Nadu", type: "city", badge: "Town" },
+    { name: "Kanchipuram, Tamil Nadu", type: "city", badge: "Temple City" },
+    { name: "Hosur, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Dharmapuri, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Krishnagiri, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Cuddalore, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Chidambaram, Tamil Nadu", type: "temple", badge: "Temple City" },
+    { name: "Neyveli Township, Tamil Nadu", type: "city", badge: "Town" },
+    { name: "Trichy (Tiruchirappalli), Tamil Nadu", type: "city", badge: "City" },
+    { name: "Thanjavur, Tamil Nadu", type: "city", badge: "Temple City" },
+    { name: "Erode, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Tirupur, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Dindigul, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Tirunelveli, Tamil Nadu", type: "city", badge: "City" },
+    { name: "Kanyakumari, Tamil Nadu", type: "city", badge: "Tourist" }
+];
+
+// Helper to escape HTML characters
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Helper to highlight matching letters in string
+function highlightMatch(text, query) {
+    if (!query) return escapeHtml(text);
+    const escapedText = escapeHtml(text);
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return escapedText.replace(regex, '<span class="suggestion-highlight">$1</span>');
+}
+
+// Get icon HTML by location type
+function getLocationIcon(type) {
+    switch (type) {
+        case 'airport':
+            return '<i class="bi bi-airplane-fill text-primary me-2"></i>';
+        case 'station':
+            return '<i class="bi bi-train-front-fill text-info me-2"></i>';
+        case 'temple':
+            return '<i class="bi bi-brightness-high-fill text-warning me-2"></i>';
+        case 'bus':
+            return '<i class="bi bi-bus-front-fill text-success me-2"></i>';
+        case 'hospital':
+            return '<i class="bi bi-hospital-fill text-danger me-2"></i>';
+        default:
+            return '<i class="bi bi-geo-alt-fill text-danger me-2"></i>';
+    }
+}
+
+// Quick popular route selection
+function setPopularRoute(dropLocation) {
+    const pickupInput = document.getElementById('home_pickup');
+    const dropInput = document.getElementById('home_drop');
+    if (pickupInput) {
+        pickupInput.value = 'Tiruvannamalai';
+    }
+    if (dropInput) {
+        dropInput.value = dropLocation;
+        dropInput.focus();
+    }
+    // Dismiss suggestions
+    const pSug = document.getElementById('home_pickup_suggestions');
+    const dSug = document.getElementById('home_drop_suggestions');
+    if (pSug) { pSug.innerHTML = ''; pSug.style.display = 'none'; }
+    if (dSug) { dSug.innerHTML = ''; dSug.style.display = 'none'; }
+}
+
+// Live Autocomplete Implementation
+function initLiveLocationAutocomplete(inputId, suggestionsId) {
+    const input = document.getElementById(inputId);
+    const container = document.getElementById(suggestionsId);
+    let remoteDebounceTimer = null;
+    let selectedIndex = -1;
+    let currentMatches = [];
+
+    if (!input || !container) return;
+
+    // Filter local locations matching query ONLY when query is entered
+    function filterLocal(query) {
+        const q = query.toLowerCase().trim();
+        if (!q || q.length < 1) {
+            return []; // DO NOT show any suggestions if empty!
+        }
+        const startsWith = [];
+        const contains = [];
+        for (const loc of ROVEXA_LOCATIONS) {
+            const lower = loc.name.toLowerCase();
+            if (lower.startsWith(q)) {
+                startsWith.push(loc);
+            } else if (lower.includes(q)) {
+                contains.push(loc);
+            }
+        }
+        return [...startsWith, ...contains].slice(0, 8);
+    }
+
+    // Render list into suggestions container with solid opaque styling
+    function render(matches, query) {
+        currentMatches = matches;
+        selectedIndex = -1;
+        container.innerHTML = '';
+
+        if (!matches || matches.length === 0 || !query || query.trim().length < 1) {
+            container.style.display = 'none';
             return;
         }
 
-        debounceTimer = setTimeout(() => {
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`)
-                .then(res => res.json())
-                .then(data => {
-                    suggestionsContainer.innerHTML = '';
-                    if (data.length > 0) {
-                        suggestionsContainer.style.display = 'block';
-                        data.forEach(item => {
-                            const div = document.createElement('div');
-                            div.className = 'suggestion-item';
-                            div.innerText = item.display_name;
-                            div.addEventListener('click', () => {
-                                input.value = item.display_name;
-                                suggestionsContainer.innerHTML = '';
-                                suggestionsContainer.style.display = 'none';
+        // Apply solid container styles
+        container.style.position = 'absolute';
+        container.style.top = '100%';
+        container.style.left = '12px';
+        container.style.right = '12px';
+        container.style.background = '#ffffff';
+        container.style.backgroundColor = '#ffffff';
+        container.style.border = '1px solid #cbd5e1';
+        container.style.borderRadius = '12px';
+        container.style.maxHeight = '260px';
+        container.style.overflowY = 'auto';
+        container.style.zIndex = '99999';
+        container.style.boxShadow = '0 16px 36px rgba(15, 23, 42, 0.25)';
+        container.style.padding = '4px 0';
+        container.style.margin = '4px 0 0 0';
+
+        matches.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.dataset.index = index;
+            div.style.cssText = 'display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 10px 14px !important; background-color: #ffffff !important; color: #1e293b !important; border-bottom: 1px solid #f1f5f9 !important; cursor: pointer !important; font-size: 13.5px !important; text-align: left !important; user-select: none !important;';
+
+            div.innerHTML = `
+                <div class="d-flex align-items-center flex-grow-1 text-truncate" style="min-width: 0;">
+                    ${getLocationIcon(item.type)}
+                    <span class="text-truncate" style="color: #1e293b; font-weight: 500;">${highlightMatch(item.name, query)}</span>
+                </div>
+                ${item.badge ? `<span class="suggestion-badge" style="background: #f1f5f9; color: #475569; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap; margin-left: 8px;">${escapeHtml(item.badge)}</span>` : ''}
+            `;
+
+            div.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#fef3c7';
+                this.style.color = '#92400e';
+            });
+            div.addEventListener('mouseleave', function() {
+                if (parseInt(this.dataset.index) !== selectedIndex) {
+                    this.style.backgroundColor = '#ffffff';
+                    this.style.color = '#1e293b';
+                }
+            });
+
+            div.addEventListener('click', () => {
+                selectItem(item.name);
+            });
+
+            container.appendChild(div);
+        });
+
+        container.style.display = 'block';
+    }
+
+    function selectItem(val) {
+        input.value = val;
+        container.innerHTML = '';
+        container.style.display = 'none';
+        input.dispatchEvent(new Event('change'));
+    }
+
+    function updateHighlight() {
+        const items = container.querySelectorAll('.suggestion-item');
+        items.forEach((item, idx) => {
+            if (idx === selectedIndex) {
+                item.style.backgroundColor = '#fef3c7';
+                item.style.color = '#92400e';
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.style.backgroundColor = '#ffffff';
+                item.style.color = '#1e293b';
+            }
+        });
+    }
+
+    // LIVE INPUT: Match ONLY while user is typing!
+    input.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        // If empty, dismiss immediately
+        if (query.length < 1) {
+            container.innerHTML = '';
+            container.style.display = 'none';
+            return;
+        }
+
+        // 1. Instant local filter (0ms delay - immediate feedback as user types)
+        const localMatches = filterLocal(query);
+        render(localMatches, query);
+
+        // 2. Optional remote query for arbitrary outside addresses if query is 3+ chars
+        clearTimeout(remoteDebounceTimer);
+        if (query.length >= 3) {
+            remoteDebounceTimer = setTimeout(() => {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=4`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.length > 0 && input.value.trim() === query) {
+                            const existingNames = new Set(currentMatches.map(m => m.name.toLowerCase()));
+                            const remoteItems = [];
+                            data.forEach(d => {
+                                const dName = d.display_name;
+                                if (!existingNames.has(dName.toLowerCase())) {
+                                    remoteItems.push({ name: dName, type: 'city', badge: 'Live' });
+                                }
                             });
-                            suggestionsContainer.appendChild(div);
-                        });
-                    } else {
-                        suggestionsContainer.style.display = 'none';
-                    }
-                })
-                .catch(err => console.error(err));
-        }, 400);
+
+                            if (remoteItems.length > 0) {
+                                const combined = [...currentMatches, ...remoteItems].slice(0, 10);
+                                render(combined, query);
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }, 350);
+        }
     });
 
+    // Keyboard navigation
+    input.addEventListener('keydown', function(e) {
+        if (container.style.display === 'none') return;
+        const items = container.querySelectorAll('.suggestion-item');
+        if (!items || items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            updateHighlight();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            updateHighlight();
+        } else if (e.key === 'Enter') {
+            if (selectedIndex >= 0 && selectedIndex < currentMatches.length) {
+                e.preventDefault();
+                selectItem(currentMatches[selectedIndex].name);
+            }
+        } else if (e.key === 'Escape') {
+            container.style.display = 'none';
+        }
+    });
+
+    // On focus: ONLY render if input already has text typed in it
+    input.addEventListener('focus', function() {
+        const query = this.value.trim();
+        if (query.length >= 1) {
+            const matches = filterLocal(query);
+            render(matches, query);
+        } else {
+            container.innerHTML = '';
+            container.style.display = 'none';
+        }
+    });
+
+    // Dismiss on click outside
     document.addEventListener('click', function(e) {
-        if (e.target !== input && e.target !== suggestionsContainer) {
-            suggestionsContainer.innerHTML = '';
-            suggestionsContainer.style.display = 'none';
+        if (e.target !== input && !container.contains(e.target)) {
+            container.style.display = 'none';
         }
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    initAutocomplete('home_pickup', 'home_pickup_suggestions');
-    initAutocomplete('home_drop', 'home_drop_suggestions');
+    initLiveLocationAutocomplete('home_pickup', 'home_pickup_suggestions');
+    initLiveLocationAutocomplete('home_drop', 'home_drop_suggestions');
+
+    // Smooth Count-Up Animation for Real-Time Metrics
+    function animateValue(element, target, duration, suffix) {
+        if (!element || isNaN(target)) return;
+        suffix = suffix || '';
+        var start = 0;
+        var startTime = null;
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var progress = Math.min((timestamp - startTime) / duration, 1);
+            var ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            var current = Math.floor(start + (target - start) * ease);
+            element.innerText = current.toLocaleString() + suffix;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                element.innerText = target.toLocaleString() + suffix;
+            }
+        }
+        window.requestAnimationFrame(step);
+    }
+
+    var animatedOnce = false;
+    function triggerMetricsAnimation() {
+        if (animatedOnce) return;
+        animatedOnce = true;
+        document.querySelectorAll('.counter-animate').forEach(function(el) {
+            var target = parseInt(el.getAttribute('data-target'), 10);
+            var suffix = el.getAttribute('data-suffix') || '';
+            if (!isNaN(target)) {
+                animateValue(el, target, 1600, suffix);
+            }
+        });
+    }
+
+    var statsSection = document.querySelector('.stats-counter-section');
+    if ('IntersectionObserver' in window && statsSection) {
+        var observer = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) {
+                triggerMetricsAnimation();
+                observer.disconnect();
+            }
+        }, { threshold: 0.2 });
+        observer.observe(statsSection);
+    } else {
+        setTimeout(triggerMetricsAnimation, 300);
+    }
+
+    // Real-time visitor counter & platform metrics updater
+    function updateHomeLiveStats() {
+        fetch('/api/stats/')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.visitor_count) {
+                    var heroEl = document.getElementById('hero-visitor-count');
+                    var statsEl = document.getElementById('live-visitors-count');
+                    if (heroEl) heroEl.innerText = data.visitor_count;
+                    if (statsEl) statsEl.innerText = data.visitor_count;
+                }
+                if (data.active_visitors !== undefined) {
+                    var heroActive = document.getElementById('hero-active-count');
+                    var badgeActive = document.getElementById('live-active-badge');
+                    if (heroActive) heroActive.innerText = data.active_visitors;
+                    if (badgeActive) badgeActive.innerText = data.active_visitors;
+                }
+                if (data.customers !== undefined) {
+                    var custEl = document.getElementById('live-home-customers');
+                    if (custEl) custEl.innerText = data.customers + '+';
+                }
+                if (data.drivers !== undefined) {
+                    var drivEl = document.getElementById('live-home-drivers');
+                    if (drivEl) drivEl.innerText = data.drivers + '+';
+                }
+                if (data.vehicles !== undefined) {
+                    var vehEl = document.getElementById('live-home-vehicles');
+                    if (vehEl) vehEl.innerText = data.vehicles + '+';
+                }
+                if (data.trips !== undefined) {
+                    var tripEl = document.getElementById('live-home-trips');
+                    if (tripEl) tripEl.innerText = data.trips + '+';
+                }
+            })
+            .catch(function(err) {
+                console.log('Real-time stats polling check:', err);
+            });
+    }
+
+    // Refresh every 10 seconds in background
+    setInterval(updateHomeLiveStats, 10000);
 });
 </script>
 {% endblock %}

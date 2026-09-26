@@ -5,91 +5,163 @@
 
 <div class="container mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Booking #{{ booking.id }}</h2>
-        <a href="{% url 'booking_list' %}" class="btn btn-outline-secondary btn-sm">
-            &larr; Back to Bookings
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+            <h2 class="mb-0 fw-bold" style="color: #0f172a;">Booking #{{ booking.id }}</h2>
+            <span class="badge-status-cust {% if booking.status == 'Approved' or booking.status == 'Confirmed' %}accepted{% elif booking.status == 'Completed' %}completed{% elif booking.status == 'Cancelled' or booking.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+                {{ booking.status|default:"Pending" }}
+            </span>
+        </div>
+        <a href="{% url 'booking_list' %}" class="btn-rovexa-outline text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Back to Bookings
         </a>
     </div>
 
-    <div class="card shadow-sm">
+    <div class="card border-0 shadow-sm" style="border-radius: 18px; border: 1.5px solid #e2e8f0 !important; overflow: hidden;">
+        <div class="card-header py-3 px-4" style="background: #0f172a; border-bottom: 2px solid #f59e0b;">
+            <div class="d-flex justify-content-between align-items-center text-white">
+                <span class="fw-bold"><i class="bi bi-info-circle-fill text-warning me-2"></i>Trip Details & Itinerary</span>
+                <span class="text-white-50 small">{{ booking.created_at|date:"M d, Y - H:i" }}</span>
+            </div>
+        </div>
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
-            <div class="row mb-3">
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <strong>Customer / Passenger Name:</strong> {{ booking.safe_customer_name }}
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Passenger</span>
+                        <strong class="text-dark fs-6">{{ booking.safe_customer_name }}</strong>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <strong>Customer Contact Phone:</strong> {{ booking.safe_customer_phone }}
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Contact Phone</span>
+                        <strong class="text-dark fs-6">{{ booking.safe_customer_phone }}</strong>
+                    </div>
                 </div>
             </div>
 
-            {% if booking.driver_notes or booking.scheduled_datetime %}
-            <div class="row mb-3">
+            {% if booking.driver_notes or booking.scheduled_datetime or booking.return_datetime or booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+            <div class="row g-3 mb-3">
                 {% if booking.scheduled_datetime %}
-                <div class="col-md-6">
-                    <strong>Scheduled Pickup:</strong> {{ booking.scheduled_datetime|date:"M d, Y - H:i" }}
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3" style="background: #fffbeb; border: 1px solid #fef3c7;">
+                        <span class="text-warning small text-uppercase fw-bold d-block mb-1"><i class="bi bi-calendar-event me-1"></i>Scheduled Pickup</span>
+                        <strong class="text-dark">{{ booking.scheduled_datetime|date:"M d, Y - H:i" }}</strong>
+                    </div>
+                </div>
+                {% endif %}
+                {% if booking.return_datetime %}
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3" style="background: #eff6ff; border: 1px solid #dbeafe;">
+                        <span class="text-primary small text-uppercase fw-bold d-block mb-1"><i class="bi bi-arrow-repeat me-1"></i>Scheduled Return</span>
+                        <strong class="text-dark">{{ booking.return_datetime|date:"M d, Y - H:i" }}</strong>
+                    </div>
                 </div>
                 {% endif %}
                 {% if booking.driver_notes %}
-                <div class="col-md-6">
-                    <strong>Notes for Driver:</strong> {{ booking.driver_notes }}
+                <div class="{% if booking.scheduled_datetime and booking.return_datetime %}col-md-4{% else %}col-md-6{% endif %}">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1"><i class="bi bi-chat-left-text me-1"></i>Notes for Driver</span>
+                        <span class="text-dark">{{ booking.driver_notes }}</span>
+                    </div>
                 </div>
                 {% endif %}
             </div>
             {% endif %}
 
-            <div class="row mb-3">
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <strong>Vehicle:</strong> {{ booking.safe_vehicle_name }}
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Vehicle</span>
+                        <strong class="text-dark fs-6"><i class="bi bi-car-front-fill text-warning me-1"></i>{{ booking.safe_vehicle_name }}</strong>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <strong>Driver:</strong> {{ booking.driver|default:"Not assigned" }}
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Assigned Driver</span>
+                        <strong class="text-dark fs-6">{{ booking.driver|default:"Pending assignment" }}</strong>
+                    </div>
                 </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <strong>Pickup Location:</strong> {{ booking.pickup_location }}
+                    <div class="p-3 rounded-3" style="background: #f0fdf4; border: 1px solid #dcfce7;">
+                        <span class="text-success small text-uppercase fw-bold d-block mb-1"><i class="bi bi-geo-alt-fill me-1"></i>Pickup Location</span>
+                        <span class="fw-semibold text-dark">{{ booking.pickup_location }}</span>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <strong>Drop Location:</strong> {{ booking.drop_location }}
+                    <div class="p-3 rounded-3" style="background: #fef2f2; border: 1px solid #fee2e2;">
+                        <span class="text-danger small text-uppercase fw-bold d-block mb-1"><i class="bi bi-flag-fill me-1"></i>Drop Location</span>
+                        <span class="fw-semibold text-dark">{{ booking.drop_location }}</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <strong>Date:</strong> {{ booking.booking_date }}
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <div class="p-3 rounded-3 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Trip Type</span>
+                        {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                            <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-40 rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.8rem;">
+                                <i class="bi bi-arrow-repeat me-1"></i> Round Trip (2-Way)
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.8rem;">
+                                <i class="bi bi-arrow-right me-1"></i> One Way
+                            </span>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <strong>Time:</strong> {{ booking.booking_time }}
+                <div class="col-md-3">
+                    <div class="p-3 rounded-3 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Date</span>
+                        <strong class="text-dark">{{ booking.booking_date }}</strong>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <strong>Distance:</strong> {{ booking.distance }} km
+                <div class="col-md-3">
+                    <div class="p-3 rounded-3 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Time</span>
+                        <strong class="text-dark">{{ booking.booking_time }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 rounded-3 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Billable Distance</span>
+                        <strong class="text-dark">{{ booking.distance }} km</strong>
+                        {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                            <span class="d-block extra-small text-muted" style="font-size: 0.72rem;">(2-Way Return Trip)</span>
+                        {% else %}
+                            <span class="d-block extra-small text-muted" style="font-size: 0.72rem;">(One Way Trip)</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <strong>Total Fare:</strong> ₹{{ booking.total_fare }}
+            <div class="p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: #fefce8; border: 1.5px solid #fef08a;">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold d-block">Estimated Total Fare</span>
+                    <span class="fs-4 fw-extrabold" style="color: #b45309;">₹{{ booking.total_fare }}</span>
                 </div>
-                <div class="col-md-6">
-                    <strong>Booked On:</strong> {{ booking.created_at }}
+                <div class="text-muted small text-end">
+                    <span>* Excludes driver beta, Toll, State Tax & Parking</span>
                 </div>
             </div>
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
 
                 {% if request.user.role == "CUSTOMER" and booking.customer_id == request.user.id %}
 
-                    <a href="{% url 'booking_track' booking.id %}" class="btn btn-warning btn-sm fw-bold">
-                        <i class="bi bi-compass-fill me-1"></i>Track Ride & Live Map
+                    <a href="{% url 'booking_track' booking.id %}" class="btn-rovexa-gold text-decoration-none">
+                        <i class="bi bi-compass-fill me-1"></i> Track Ride & Live Map
                     </a>
 
                     {% if booking.status != "Completed" %}
-                        <a href="{% url 'make_payment' booking.id %}" class="btn btn-success btn-sm">
-                            Pay Now
+                        <a href="{% url 'make_payment' booking.id %}" class="btn rounded-pill px-4 py-2 fw-bold text-white shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: 1.5px solid #34d399;">
+                            <i class="bi bi-credit-card-fill me-1"></i> Pay Now
                         </a>
                     {% endif %}
 

@@ -251,12 +251,9 @@
         color: #0f172a;
     }
     
-    .btn-deactivate {
-        color: #ef4444;
-        background: #fef2f2;
-        border-color: #fecaca;
-    }
-    .btn-deactivate:hover { background: #fee2e2; }
+    .btn-block:hover { background: #fee2e2 !important; border-color: #f87171 !important; transform: translateY(-1px); }
+    .btn-unblock:hover { background: #d1fae5 !important; border-color: #6ee7b7 !important; transform: translateY(-1px); }
+    .btn-delete:hover { background: #fee2e2 !important; border-color: #ef4444 !important; color: #dc2626 !important; transform: translateY(-1px); }
 
     /* Empty State */
     .empty-state {
@@ -292,6 +289,7 @@
         <a href="?role=all{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="filter-tab {% if role_filter == 'all' or not role_filter %}active{% endif %}">All Users</a>
         <a href="?role=admin{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="filter-tab {% if role_filter == 'admin' %}active{% endif %}">Admins</a>
         <a href="?role=customer{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="filter-tab {% if role_filter == 'customer' %}active{% endif %}">Customers</a>
+        <a href="?role=blocked{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="filter-tab {% if role_filter == 'blocked' %}active{% endif %}" style="color: #dc2626;"><i class="bi bi-slash-circle me-1"></i>Blocked</a>
     </div>
 
     <div class="table-container">
@@ -300,6 +298,7 @@
             <thead>
                 <tr>
                     <th>User</th>
+                    <th>Phone</th>
                     <th>Email</th>
                     <th>Role</th>
                     <th>Join Date</th>
@@ -324,6 +323,15 @@
                             </div>
                         </div>
                     </td>
+                    <td data-label="Phone">
+                        {% if u.phone %}
+                            <a href="tel:{{ u.phone }}" style="color: #059669; text-decoration: none; font-weight: 600;">
+                                <i class="bi bi-telephone-fill me-1 small"></i>{{ u.phone }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted small">Not provided</span>
+                        {% endif %}
+                    </td>
                     <td data-label="Email">
                         <a href="mailto:{{ u.email }}" style="color: #475569; text-decoration: none;">{{ u.email }}</a>
                     </td>
@@ -337,35 +345,53 @@
                     <td data-label="Join Date" style="color: #64748b;">{{ u.date_joined|date:"M d, Y" }}</td>
                     <td data-label="Status">
                         {% if u.is_active %}
-                            <span style="font-weight: 500; color: #0f172a; font-size: 0.9rem;"><span class="status-dot dot-active"></span>Active</span>
+                            <span class="badge" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 6px 12px; border-radius: 50px; font-weight: 600; font-size: 0.82rem;">
+                                <i class="bi bi-check-circle-fill me-1"></i>Active
+                            </span>
                         {% else %}
-                            <span style="font-weight: 500; color: #64748b; font-size: 0.9rem;"><span class="status-dot dot-inactive"></span>Inactive</span>
+                            <span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 6px 12px; border-radius: 50px; font-weight: 700; font-size: 0.82rem;">
+                                <i class="bi bi-slash-circle-fill me-1"></i>Blocked
+                            </span>
                         {% endif %}
                     </td>
                     <td data-label="Actions">
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
-                            <!-- Form to change role -->
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
                             {% if u.id != request.user.id %}
-                            <form method="POST" action="{% url 'admin_user_edit' u.id %}" style="margin:0;">
-                                {% csrf_token %}
-                                <select name="new_role" class="action-btn" onchange="this.form.submit()">
-                                    <option value="" disabled selected>Edit Role</option>
-                                    <option value="CUSTOMER">Make Customer</option>
-                                    <option value="ADMIN">Make Admin</option>
-                                </select>
-                            </form>
-                            {% endif %}
-                            
-                            <!-- Toggle Active Status -->
-                            {% if u.id != request.user.id %}
-                            <form method="POST" action="{% url 'admin_user_toggle_status' u.id %}" style="margin:0;">
-                                {% csrf_token %}
-                                {% if u.is_active %}
-                                    <button type="submit" class="action-btn btn-deactivate">Deactivate</button>
-                                {% else %}
-                                    <button type="submit" class="action-btn" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;">Activate</button>
-                                {% endif %}
-                            </form>
+                                <!-- Form to change role -->
+                                <form method="POST" action="{% url 'admin_user_edit' u.id %}" style="margin:0;">
+                                    {% csrf_token %}
+                                    <select name="new_role" class="action-btn" onchange="this.form.submit()" title="Change User Role">
+                                        <option value="" disabled selected>Edit Role</option>
+                                        <option value="CUSTOMER">Make Customer</option>
+                                        <option value="ADMIN">Make Admin</option>
+                                    </select>
+                                </form>
+                                
+                                <!-- Toggle Block / Unblock Status -->
+                                <form method="POST" action="{% url 'admin_user_toggle_status' u.id %}" style="margin:0;"
+                                      onsubmit="return confirm('{% if u.is_active %}⚠️ Are you sure you want to BLOCK {{ u.username }} ({{ u.email|default:u.phone }})?\n\nOnce blocked, they will NEVER be allowed to log in with this account/email.{% else %}Unblock and reactivate {{ u.username }}? They will regain access to log in.{% endif %}');">
+                                    {% csrf_token %}
+                                    {% if u.is_active %}
+                                        <button type="submit" class="action-btn btn-block" style="color: #dc2626; background: #fff1f2; border: 1px solid #fecdd3; font-weight: 600;" title="Block this customer from logging in">
+                                            <i class="bi bi-slash-circle me-1"></i>Block
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="action-btn btn-unblock" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-weight: 600;" title="Unblock this customer">
+                                            <i class="bi bi-unlock-fill me-1"></i>Unblock
+                                        </button>
+                                    {% endif %}
+                                </form>
+
+                                <!-- Delete User -->
+                                <form method="POST" action="{% url 'admin_user_delete' u.id %}" style="margin:0;"
+                                      onsubmit="return confirm('🚨 PERMANENT DELETION WARNING:\n\nAre you sure you want to permanently DELETE user \'{{ u.username }}\' ({{ u.email|default:u.phone }})?\n\nAll customer bookings, wallet, and profile data will be permanently removed. This action CANNOT be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="action-btn btn-delete" style="color: #b91c1c; background: #fef2f2; border: 1px solid #fca5a5; font-weight: 600;" title="Permanently delete this user">
+                                        <i class="bi bi-trash3-fill me-1"></i>Delete
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 small fw-semibold">You (Current Admin)</span>
                             {% endif %}
                         </div>
                     </td>

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +74,9 @@
     <!-- Header -->
     <div class="brand-header d-flex justify-content-between align-items-start">
       <div>
-        <div class="brand-logo"><i class="bi bi-taxi-front-fill text-warning me-2"></i>ROVEXA</div>
+        <div class="brand-logo mb-1">
+          <img src="{% static 'images/logo-dark.png' %}" alt="Rovexa Cab Services" height="46" style="max-height: 46px; width: auto; object-fit: contain;">
+        </div>
         <div class="text-muted small">Official Ride Receipt</div>
       </div>
       <div class="text-end">

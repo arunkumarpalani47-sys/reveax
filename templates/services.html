@@ -5,14 +5,18 @@
 
 <!-- Hero -->
 
-<section class="service-hero">
+<section class="service-hero text-white d-flex align-items-center" style="background: linear-gradient(rgba(15,23,42,.78),rgba(15,23,42,.78)),url('{% static 'images/hero-car.jpg' %}') center/cover no-repeat; min-height: 400px; position: relative;">
 
-    <div class="container">
+    <div class="container text-center py-5 position-relative" style="z-index: 2;">
 
-        <h1>Our Services</h1>
+        <span class="badge rounded-pill bg-warning text-dark px-3 py-1.5 fw-bold text-uppercase mb-3" style="font-size: 0.8rem; letter-spacing: 1px;">
+            <i class="bi bi-car-front-fill me-1"></i> Rovexa Fleet & Services
+        </span>
 
-        <p>
-            Safe, Reliable & Affordable Taxi Solutions
+        <h1 class="display-4 fw-bold text-white mb-3">Our Cab Services</h1>
+
+        <p class="lead text-light mx-auto" style="max-width: 650px;">
+            Safe, Reliable & Affordable Cab Solutions by Rovexa Cab Services
         </p>
 
     </div>
@@ -177,5 +181,558 @@ Book Now
 
 </section>
 
+<!-- ================= OUR POPULAR FLEETS ================= -->
+<section class="fleets-section py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2 shadow-sm" style="font-size: 0.82rem; letter-spacing: 0.5px;">
+                <i class="bi bi-geo-alt-fill me-1"></i> Popular Outstation & Pilgrimage Routes
+            </span>
+            <h2 class="fw-bold text-dark display-6 mt-2 mb-3">
+                Our Popular <span class="text-warning">Fleets</span>
+            </h2>
+            <p class="text-muted mx-auto" style="max-width: 680px; font-size: 1.05rem;">
+                Dependable cab services from Tiruvannamalai to all major cities, pilgrimage hubs, and hill stations across South India.
+            </p>
+        </div>
 
+        <div class="row g-4">
+            <!-- Row 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">City & Airport Hub</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Chennai</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Chennai</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Chennai" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Metro & Airport</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Bangalore</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Bangalore</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~4.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Bangalore" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Commercial Hub</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Salem</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Salem</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Salem" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Industrial City</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Coimbatore</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Coimbatore</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~5.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Coimbatore" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Heritage & Temple</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Madurai</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Madurai</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~5.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Madurai" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Temple Town</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Kumbakonam</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Kumbakonam</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Kumbakonam" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Beach & Heritage</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Pondicherry</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Pondicherry</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~2.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Pondicherry" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">CMC & Fort City</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Vellore</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Vellore</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~2.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Vellore" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Sacred Pilgrimage</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Tirupathi</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Tirupathi</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~4.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Tirupathi" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Holy Pilgrimage</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Sabarimala</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Sabarimala</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~10 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Sabarimala" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Hill Station</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Ooty</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Ooty</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~7.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Ooty" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Holy Island</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Rameshwaram</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Rameshwaram</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~8.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Rameshwaram" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Hill Resort</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Yelagiri</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Yelagiri</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~2.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Yelagiri" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Hill Retreat</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Yarcad</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Yarcad</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Yarcad" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Coastal District</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Ramanathapuram</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Ramanathapuram</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~7.0 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Ramanathapuram" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Princess of Hills</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Kodaikanal</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Kodaikanal</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~7.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Kodaikanal" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Goddess Temple</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Malayanur</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Malayanur</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~1.0 hr</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Malayanur" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Nature & Waterfalls</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Javathu Hills</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Javathu Hills</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~1.5 hrs</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Javathu Hills" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 7 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Historic Fort</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Gingee</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Gingee</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~50 mins</span>
+                        <a href="{% url 'add_booking' %}?pickup=Tiruvannamalai&drop=Gingee" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Junction & Hub</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Villupuram</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Villupuram</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~1.2 hrs</span>
+                        <a href="{% url 'search_vehicle' %}?pickup=Tiruvannamalai&drop=Villupuram" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="fleet-route-card">
+                    <div class="fleet-route-header">
+                        <span class="badge bg-light text-dark border fw-semibold">Heritage City</span>
+                        <i class="bi bi-taxi-front-fill text-warning fs-5"></i>
+                    </div>
+                    <h5 class="fleet-route-title">Tiruvannamalai to Thiruvallur</h5>
+                    <div class="fleet-route-path">
+                        <span class="fw-semibold text-dark">Tiruvannamalai</span>
+                        <i class="bi bi-arrow-right text-warning"></i>
+                        <span class="fw-semibold text-primary">Thiruvallur</span>
+                    </div>
+                    <div class="fleet-route-footer">
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i> ~3.5 hrs</span>
+                        <a href="{% url 'search_vehicle' %}?pickup=Tiruvannamalai&drop=Thiruvallur" class="btn btn-warning btn-sm px-3 fw-bold rounded-pill">
+                            Book Cab <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.fleets-section {
+    padding: 60px 0;
+    background-color: #f8fafc;
+}
+
+.fleets-section .row > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.fleet-route-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    flex: 1 1 auto;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none !important;
+}
+
+.fleet-route-card:hover {
+    transform: translateY(-4px);
+    border-color: #f59e0b;
+    box-shadow: 0 14px 28px rgba(245, 158, 11, 0.14);
+}
+
+.fleet-route-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #f59e0b;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.fleet-route-card:hover::before {
+    opacity: 1;
+}
+
+.fleet-route-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.fleet-route-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    line-height: 1.35;
+}
+
+.fleet-route-path {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 0.86rem;
+    margin: 8px 0 16px 0;
+}
+
+.fleet-route-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px dashed #e2e8f0;
+    width: 100%;
+}
+</style>
 {% endblock %}

@@ -418,7 +418,7 @@
 <div class="container-fluid py-4">
     <div class="page-header">
         <h1 class="page-title">Bookings</h1>
-        <a href="?export=csv" class="btn-export">
+        <a href="?export=csv" class="btn btn-sm btn-rovexa-outline px-3.5 py-1.5 fw-bold">
             <i class="bi bi-download me-2"></i> Export CSV
         </a>
     </div>
@@ -498,6 +498,22 @@
                         <div class="route">
                             <div class="route-point pickup" title="{{ booking.pickup_location }}"><i class="bi bi-circle-fill me-1"></i> {{ booking.pickup_location }}</div>
                             <div class="route-point dropoff" title="{{ booking.drop_location }}"><i class="bi bi-square-fill me-1"></i> {{ booking.drop_location }}</div>
+                            <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
+                                {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                                    <span class="badge bg-warning bg-opacity-20 text-dark border border-warning border-opacity-50 rounded-pill px-2 py-0.5 fw-bold" style="font-size:0.7rem; background:#fef3c7;">
+                                        <i class="bi bi-arrow-repeat me-0.5 text-warning"></i> 2-Way ({{ booking.distance }} km)
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-2 py-0.5 fw-semibold" style="font-size:0.7rem;">
+                                        1-Way ({{ booking.distance }} km)
+                                    </span>
+                                {% endif %}
+                                {% if booking.return_datetime %}
+                                    <span class="badge bg-info bg-opacity-10 text-primary border border-info border-opacity-25 rounded-pill px-1.5 py-0.5" style="font-size:0.68rem;" title="Scheduled Return: {{ booking.return_datetime|date:'M d, Y H:i' }}">
+                                        <i class="bi bi-calendar-event me-0.5"></i>Return: {{ booking.return_datetime|date:"M d, H:i" }}
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
                     </td>
                     <td data-label="Date">

@@ -442,9 +442,20 @@
 
           <!-- Trip Specifications Card -->
           <div class="card-dark-glass mb-0">
-            <h5 class="fw-bold text-white mb-3 small text-uppercase tracking-wider">
-              <i class="bi bi-geo-alt-fill text-warning me-1"></i> Route Details
-            </h5>
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+              <h5 class="fw-bold text-white mb-0 small text-uppercase tracking-wider">
+                <i class="bi bi-geo-alt-fill text-warning me-1"></i> Route Details
+              </h5>
+              {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-40 rounded-pill px-2.5 py-1 fw-bold" style="font-size:0.75rem;">
+                  <i class="bi bi-arrow-repeat me-1"></i> Round Trip (2-Way)
+                </span>
+              {% else %}
+                <span class="badge bg-secondary bg-opacity-20 text-white-50 border border-secondary border-opacity-30 rounded-pill px-2.5 py-1 fw-bold" style="font-size:0.75rem;">
+                  <i class="bi bi-arrow-right me-1"></i> One Way
+                </span>
+              {% endif %}
+            </div>
 
             <div class="d-flex flex-column gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
               <div class="route-spec-item">
@@ -464,11 +475,23 @@
               </div>
             </div>
 
-            <div class="row g-2 text-center">
+            {% if booking.return_datetime %}
+            <div class="p-2.5 rounded-3 bg-dark bg-opacity-60 border border-warning border-opacity-30 mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <span class="text-warning extra-small fw-bold"><i class="bi bi-calendar2-check me-1.5"></i> Scheduled Return Leg:</span>
+              <strong class="text-white small">{{ booking.return_datetime|date:"M d, Y - H:i" }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="row g-2 text-center mb-2">
               <div class="col-4">
                 <div class="p-2.5 rounded-3 bg-dark bg-opacity-50">
                   <div class="text-white-50 extra-small" style="font-size:0.7rem;">Distance</div>
                   <div class="text-white fw-bold small mt-1">{{ booking.distance|floatformat:1 }} km</div>
+                  {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                    <span class="text-warning extra-small d-block" style="font-size:0.62rem;">(2-Way Total)</span>
+                  {% else %}
+                    <span class="text-white-50 extra-small d-block" style="font-size:0.62rem;">(One Way)</span>
+                  {% endif %}
                 </div>
               </div>
               <div class="col-4">
@@ -483,6 +506,10 @@
                   <div class="text-success fw-bold small mt-1">₹{{ booking.total_fare|floatformat:2 }}</div>
                 </div>
               </div>
+            </div>
+
+            <div class="p-2 rounded-2 bg-dark bg-opacity-40 border border-secondary border-opacity-20 text-center">
+              <small class="text-white-50" style="font-size:0.7rem;"><i class="bi bi-info-circle text-warning me-1"></i> Exclude driver beta, Toll, State Tax & Parking fares.</small>
             </div>
           </div>
 

@@ -328,9 +328,8 @@
 <div class="page-wrapper">
 
     <div class="brand">
-        <a href="/" class="brand-logo">
-            <div class="brand-icon"><i class="bi bi-taxi-front-fill"></i></div>
-            <span class="brand-name">Rovexa</span>
+        <a href="/" class="brand-logo mb-2">
+            <img src="{% static 'images/logo-white.png' %}" alt="Rovexa Cab Services" height="52" style="max-height: 52px; width: auto; object-fit: contain;">
         </a>
     </div>
 
@@ -361,50 +360,70 @@
         <form method="POST" id="regForm" autocomplete="off">
             {% csrf_token %}
             <input type="hidden" name="role" value="CUSTOMER">
+            {% if next or request.GET.next %}
+            <input type="hidden" name="next" value="{{ next|default:request.GET.next }}">
+            {% endif %}
 
             <div class="field-row">
                 <div class="field-group">
-                    <label class="field-label" for="first_name">First Name</label>
+                    <label class="field-label" for="first_name">First Name <span style="color:#ef4444">*</span></label>
                     <div class="field-wrap">
-                        <input class="field-input" type="text" id="first_name" name="first_name" placeholder="John" required>
+                        <input class="field-input" type="text" id="first_name" name="first_name" placeholder="John" value="{{ form_data.first_name|default:'' }}" required>
                         <i class="bi bi-person field-icon"></i>
                     </div>
                 </div>
                 <div class="field-group">
-                    <label class="field-label" for="last_name">Last Name</label>
+                    <label class="field-label" for="last_name">Last Name <span style="color:#ef4444">*</span></label>
                     <div class="field-wrap">
-                        <input class="field-input" type="text" id="last_name" name="last_name" placeholder="Doe" required>
+                        <input class="field-input" type="text" id="last_name" name="last_name" placeholder="Doe" value="{{ form_data.last_name|default:'' }}" required>
                         <i class="bi bi-person field-icon"></i>
                     </div>
                 </div>
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="username">Username</label>
+                <label class="field-label" for="username">Username <span style="color:#ef4444">*</span></label>
                 <div class="field-wrap">
-                    <input class="field-input" type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username" required>
+                    <input class="field-input" type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username" value="{{ form_data.username|default:'' }}" required>
                     <i class="bi bi-at field-icon"></i>
                 </div>
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="email">Email Address</label>
+                <label class="field-label" for="email">Email Address <span style="color:#ef4444">*</span></label>
                 <div class="field-wrap">
-                    <input class="field-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+                    <input class="field-input" type="email" id="email" name="email" placeholder="you@example.com" value="{{ form_data.email|default:'' }}" required>
                     <i class="bi bi-envelope field-icon"></i>
                 </div>
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="phone">Phone Number</label>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+                    <label class="field-label" for="phone" style="margin-bottom:0;">
+                        Mobile Number <span style="color:#ef4444">*</span>
+                    </label>
+                    <span style="font-size:10px; font-weight:700; color:#10b981; letter-spacing:0.5px; text-transform:uppercase;">
+                        <i class="bi bi-shield-lock-fill"></i> Mandatory For Customer
+                    </span>
+                </div>
                 <div class="field-wrap">
-                    <input class="field-input" type="text" id="phone" name="phone" placeholder="+91 9876543210">
-                    <i class="bi bi-telephone field-icon"></i>
+                    <input class="field-input" type="tel" id="phone" name="phone"
+                           placeholder="Enter 10-digit mobile (e.g. 9876543210)"
+                           maxlength="14"
+                           value="{{ form_data.phone|default:'' }}"
+                           autocomplete="tel"
+                           required
+                           style="padding-right: 40px;">
+                    <i class="bi bi-telephone field-icon" id="phoneIcon"></i>
+                    <span id="phoneValidationIcon" style="position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; display: none;"></span>
+                </div>
+                <div id="phoneHelp" style="font-size: 11.5px; margin-top: 6px; color: rgba(255,255,255,0.45); line-height: 1.4; transition: all 0.2s ease;">
+                    <i class="bi bi-info-circle me-1"></i> Valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.
                 </div>
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="password">Password</label>
+                <label class="field-label" for="password">Password <span style="color:#ef4444">*</span></label>
                 <div class="field-wrap">
                     <input class="field-input" type="password" id="password" name="password" placeholder="Min. 8 characters" style="padding-right: 40px;" required oninput="checkStrength(this.value)">
                     <i class="bi bi-lock field-icon"></i>
@@ -420,7 +439,7 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="confirm_password">Confirm Password</label>
+                <label class="field-label" for="confirm_password">Confirm Password <span style="color:#ef4444">*</span></label>
                 <div class="field-wrap">
                     <input class="field-input" type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" style="padding-right: 40px;" required>
                     <i class="bi bi-lock-fill field-icon"></i>
@@ -436,7 +455,7 @@
         <div class="divider">already have an account?</div>
 
         <div class="auth-footer">
-            <a href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in instead</a>
+            <a href="{% url 'customer_login' %}{% if next or request.GET.next %}?next={{ next|default:request.GET.next }}{% endif %}"><i class="bi bi-box-arrow-in-right"></i> Sign in instead</a>
         </div>
     </div>
 
@@ -479,16 +498,108 @@
         label.style.color = score > 0 ? colors[score - 1] : 'rgba(255,255,255,0.3)';
     }
 
+    // Phone Validation Engine
+    const phoneInput = document.getElementById('phone');
+    const phoneHelp = document.getElementById('phoneHelp');
+    const phoneStatus = document.getElementById('phoneValidationIcon');
+
+    function cleanIndianPhone(val) {
+        if (!val) return '';
+        let digits = val.replace(/\D/g, '');
+        if (digits.length === 12 && digits.startsWith('91')) {
+            digits = digits.slice(2);
+        } else if (digits.length === 11 && digits.startsWith('0')) {
+            digits = digits.slice(1);
+        }
+        return digits;
+    }
+
+    function validatePhone(showEmptyError) {
+        const raw = phoneInput.value.trim();
+        if (!raw) {
+            phoneStatus.style.display = 'none';
+            phoneInput.style.borderColor = showEmptyError ? 'rgba(239, 68, 68, 0.8)' : 'rgba(255,255,255,0.1)';
+            if (showEmptyError) {
+                phoneHelp.innerHTML = '<span style="color:#f87171;"><i class="bi bi-x-circle-fill me-1"></i> Mobile number is mandatory. Please enter your mobile number.</span>';
+            } else {
+                phoneHelp.innerHTML = '<i class="bi bi-info-circle me-1"></i> Valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.';
+                phoneHelp.style.color = 'rgba(255,255,255,0.45)';
+            }
+            return false;
+        }
+
+        if (/[a-zA-Z]/.test(raw)) {
+            phoneStatus.style.display = 'inline';
+            phoneStatus.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#ef4444;"></i>';
+            phoneInput.style.borderColor = 'rgba(239, 68, 68, 0.8)';
+            phoneHelp.innerHTML = '<span style="color:#f87171;"><i class="bi bi-exclamation-triangle-fill me-1"></i> Letters are not allowed. Please enter digits only.</span>';
+            return false;
+        }
+
+        const digits = cleanIndianPhone(raw);
+        if (digits.length > 0 && !/^[6-9]/.test(digits)) {
+            phoneStatus.style.display = 'inline';
+            phoneStatus.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#ef4444;"></i>';
+            phoneInput.style.borderColor = 'rgba(239, 68, 68, 0.8)';
+            phoneHelp.innerHTML = '<span style="color:#f87171;"><i class="bi bi-exclamation-triangle-fill me-1"></i> Indian mobile numbers must start with 6, 7, 8, or 9.</span>';
+            return false;
+        }
+
+        if (digits.length !== 10) {
+            phoneStatus.style.display = 'inline';
+            phoneStatus.innerHTML = '<i class="bi bi-dash-circle-fill" style="color:#f59e0b;"></i>';
+            phoneInput.style.borderColor = 'rgba(245, 158, 11, 0.8)';
+            phoneHelp.innerHTML = `<span style="color:#fbbf24;"><i class="bi bi-clock-history me-1"></i> Entered ${digits.length} of 10 digits (e.g. 9876543210).</span>`;
+            return false;
+        }
+
+        // Valid
+        phoneStatus.style.display = 'inline';
+        phoneStatus.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#10b981;"></i>';
+        phoneInput.style.borderColor = 'rgba(16, 185, 129, 0.8)';
+        phoneHelp.innerHTML = `<span style="color:#34d399;"><i class="bi bi-check-circle-fill me-1"></i> Valid Indian mobile number (${digits})</span>`;
+        return true;
+    }
+
+    phoneInput.addEventListener('input', function() {
+        validatePhone(false);
+    });
+
+    phoneInput.addEventListener('blur', function() {
+        validatePhone(true);
+    });
+
+    if (phoneInput.value) {
+        validatePhone(false);
+    }
+
     document.getElementById('regForm').addEventListener('submit', function(e) {
+        // Enforce Mandatory & Format check on Mobile Number
+        const isPhoneValid = validatePhone(true);
+        if (!isPhoneValid) {
+            e.preventDefault();
+            phoneInput.focus();
+            return;
+        }
+
         const pw = document.getElementById('password').value;
         const cpw = document.getElementById('confirm_password').value;
         if (pw !== cpw) {
             e.preventDefault();
             alert('Passwords do not match.');
+            document.getElementById('confirm_password').focus();
             return;
         }
+
+        if (pw.length < 8) {
+            e.preventDefault();
+            alert('Password must be at least 8 characters long.');
+            document.getElementById('password').focus();
+            return;
+        }
+
         const btn = document.getElementById('regBtn');
-        btn.innerHTML = '<span style="opacity:0.7">Creating account…</span>';
+        btn.innerHTML = '<span style="opacity:0.7"><i class="bi bi-arrow-repeat spin me-2"></i> Creating account…</span>';
         btn.disabled = true;
     });
 </script>

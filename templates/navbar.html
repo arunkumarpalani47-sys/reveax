@@ -5,25 +5,11 @@
     <div class="container">
 
         <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-
-            <img src="{% static 'images/Brand.jpg' %}"
-                 width="55"
-                 height="55"
-                 class="me-2 rounded-circle">
-
-            <div>
-
-                <h2 class="m-0 fw-bold">
-                    Rove<span class="text-warning">xa</span>
-                </h2>
-
-                <small class="text-muted">
-                    Safe Rides, Anytime
-                </small>
-
-            </div>
-
+        <a class="navbar-brand d-flex align-items-center py-1" href="{% url 'home' %}">
+            <img src="{% static 'images/logo-dark.png' %}"
+                 alt="Rovexa Cab Services"
+                 height="52"
+                 style="max-height: 52px; width: auto; object-fit: contain;">
         </a>
 
         <!-- Mobile Toggle -->
@@ -84,23 +70,25 @@
             <div class="d-flex align-items-center">
 
                 
-                <a href="tel:+919876543210"
-   class="btn btn-outline-dark rounded-pill me-3">
-
-    <i class="bi bi-telephone-fill me-2"></i>
-
-    +91 94873 51101
-
-</a>
+                <a href="tel:+919487351101"
+                   class="btn btn-contact-phone rounded-pill me-3 shadow-sm">
+                    <i class="bi bi-telephone-fill me-2"></i>
+                    +91 94873 51101
+                </a>
 
                 {% if request.user.is_authenticated %}
 
                     <div class="dropdown ms-2">
-                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle profile-dropdown-toggle" id="navbarProfileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle profile-dropdown-toggle py-1 px-2 rounded-pill" id="navbarProfileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="navbar-avatar d-flex align-items-center justify-content-center fw-bold shadow-sm 
                                 {% if request.user.role == 'ADMIN' %}bg-admin{% elif request.user.role == 'PARTNER' %}bg-partner{% elif request.user.role == 'DRIVER' %}bg-driver{% else %}bg-customer{% endif %}">
                                 {{ request.user.display_name|slice:":1"|upper }}
                             </div>
+                            <div class="d-none d-md-block text-start lh-1 me-1">
+                                <span class="d-block fw-bold text-dark" style="font-size: 0.88rem;">{{ request.user.display_name }}</span>
+                                <span class="text-muted text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ request.user.role|lower }}</span>
+                            </div>
+                            <i class="bi bi-chevron-down text-muted small d-none d-md-inline-block"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2 mt-2" aria-labelledby="navbarProfileDropdown" style="border-radius: 16px; min-width: 250px; background: #ffffff;">
                             <li class="px-3 py-2 border-bottom border-light">
@@ -108,7 +96,9 @@
                                 <div class="text-muted small d-flex align-items-center gap-1 mt-1">
                                     <span class="badge text-capitalize px-2 py-1 
                                         {% if request.user.role == 'ADMIN' %}bg-warning text-dark{% elif request.user.role == 'PARTNER' %}bg-primary text-white{% elif request.user.role == 'DRIVER' %}bg-secondary text-white{% else %}bg-success text-white{% endif %}" style="font-size: 10px;">{{ request.user.role|lower }}</span>
-                                    {% if request.user.email %}
+                                    {% if request.user.phone %}
+                                        <span class="text-muted" style="font-size: 11px;"><i class="bi bi-telephone-fill text-secondary me-1"></i>{{ request.user.phone }}</span>
+                                    {% elif request.user.email %}
                                         <span class="text-truncate text-muted" style="max-width: 140px; font-size: 11px;">{{ request.user.email }}</span>
                                     {% endif %}
                                 </div>
@@ -143,15 +133,12 @@
                     </div>
 
                 {% else %}
-
-                    <a href="{% url 'login' %}"
-   class="btn btn-warning rounded-pill px-4">
-
-    <i class="bi bi-person me-2"></i>
-
-    Login / Register
-
-</a>
+                    <a href="{% url 'login_portal' %}"
+                       class="btn rounded-pill px-4"
+                       style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: 1.5px solid #fbbf24; font-weight: 700; color: #0f172a; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                        <i class="bi bi-person me-2"></i>
+                        Login / Register
+                    </a>
                 {% endif %}
 
             </div>
@@ -199,5 +186,61 @@
 }
 .dropdown-menu .dropdown-item:hover i {
     color: #ffc107 !important;
+}
+
+/* Contact Number Button: Red & White default, White & Black on hover */
+.btn-contact-phone {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    border: 2px solid #dc2626 !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 18px;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    transition: all 0.25s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.btn-contact-phone i {
+    color: #ffffff !important;
+    transition: color 0.25s ease-in-out;
+}
+
+.btn-contact-phone:hover,
+.btn-contact-phone:focus,
+.btn-contact-phone:active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-contact-phone:hover i,
+.btn-contact-phone:focus i,
+.btn-contact-phone:active i {
+    color: #000000 !important;
+}
+
+/* Framed Rovexa Nav Items */
+.navbar .nav-link {
+    padding: 7px 16px !important;
+    border-radius: 50px;
+    border: 1.5px solid transparent;
+    transition: all 0.25s ease;
+    margin: 0 2px;
+}
+.navbar .nav-link:hover {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.08);
+    color: #d97706 !important;
+}
+.navbar .nav-link.active {
+    border-color: #f59e0b !important;
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #b45309 !important;
+    font-weight: 700;
 }
 </style>

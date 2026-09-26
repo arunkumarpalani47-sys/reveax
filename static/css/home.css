@@ -1,5 +1,391 @@
 /* Rovexa Home Page Styles */
+
 .hero-section {
-  position: relative;
-  overflow: hidden;
+    position: relative;
+    background-image: url('/static/images/hero-car.jpg');
+    background-position: center right;
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.85) 45%, rgba(15, 23, 42, 0.45) 80%, rgba(15, 23, 42, 0.25) 100%);
+    z-index: 1;
+}
+
+@media (max-width: 991px) {
+    .hero-overlay {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.85) 100%);
+    }
+}
+
+.min-vh-hero {
+    min-height: 520px;
+}
+
+.hero-subheading {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #f59e0b;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 50rem;
+    width: fit-content;
+}
+
+.hero-title {
+    font-size: clamp(2.3rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: #f1f5f9;
+    max-width: 620px;
+}
+
+.hero-supporting {
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px;
+}
+
+/* WhatsApp CTA Button */
+.btn-whatsapp-cta {
+    background-color: #25d366;
+    color: #ffffff;
+    border: 2px solid #25d366;
+    transition: all 0.25s ease;
+}
+
+.btn-whatsapp-cta:hover,
+.btn-whatsapp-cta:focus {
+    background-color: #1eb956;
+    border-color: #1eb956;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+}
+
+/* Search Box Container */
+.search-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    z-index: 10;
+    margin-top: -36px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Contact Number Button: Red & White default, White & Black on hover */
+.btn-contact-phone {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    border: 2px solid #dc2626 !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 18px;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    transition: all 0.25s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.btn-contact-phone i {
+    color: #ffffff !important;
+    transition: color 0.25s ease-in-out;
+}
+
+.btn-contact-phone:hover,
+.btn-contact-phone:focus,
+.btn-contact-phone:active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-contact-phone:hover i,
+.btn-contact-phone:focus i,
+.btn-contact-phone:active i {
+    color: #000000 !important;
+}
+
+/* ========================================================
+   Search Taxi Button: Center-aligned Horizontally & Vertically
+   ======================================================== */
+.search-taxi-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    height: 48px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    background-color: #ffc107 !important;
+    border: 2px solid #ffc107 !important;
+    color: #111827 !important;
+    box-shadow: 0 4px 14px rgba(255, 193, 7, 0.35);
+    transition: all 0.2s ease-in-out;
+    padding: 0 16px;
+    width: 100%;
+    line-height: 1;
+}
+
+.search-taxi-btn i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-right: 8px;
+}
+
+.search-taxi-btn span {
+    display: inline-block;
+    line-height: 1;
+}
+
+.search-taxi-btn:hover,
+.search-taxi-btn:focus {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+    color: #000000 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 193, 7, 0.45);
+}
+
+/* ========================================================
+   Live Location Filter / Autocomplete Dropdown Styles
+   ======================================================== */
+.autocomplete-suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 1060;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+    padding: 6px 0;
+    margin: 0;
+    list-style: none;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.suggestion-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    text-align: left;
+    user-select: none;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.active-item {
+    background-color: #fef3c7;
+    color: #92400e;
+    font-weight: 600;
+}
+
+.suggestion-item i {
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.suggestion-highlight {
+    background-color: #fef08a;
+    color: #000000;
+    font-weight: 700;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.suggestion-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-left: auto;
+    text-transform: uppercase;
+    font-weight: 600;
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+
+.suggestion-divider {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    padding: 6px 14px 4px 14px;
+    font-weight: 700;
+    border-bottom: 1px solid #f1f5f9;
+    background-color: #f8fafc;
+}
+
+/* ========================================================
+   Why Choose Rovexa Cabs Section
+   ======================================================== */
+.why-choose-section {
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    border-radius: 24px;
+    padding: 64px 20px;
+    margin: 40px auto;
+}
+
+.why-choose-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 18px !important;
+    padding: 28px 24px !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.why-choose-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08) !important;
+    border-color: rgba(245, 158, 11, 0.5) !important;
+}
+
+.feature-icon-wrapper {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 26px;
+}
+
+/* ========================================================
+   Our Popular Fleets Section - Equal Height & Aligned Grid
+   ======================================================== */
+.fleets-section {
+    padding: 60px 0;
+    background-color: #f8fafc;
+}
+
+.fleets-section .row > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.fleet-route-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    flex: 1 1 auto;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none !important;
+}
+
+.fleet-route-card:hover {
+    transform: translateY(-4px);
+    border-color: #f59e0b;
+    box-shadow: 0 14px 28px rgba(245, 158, 11, 0.14);
+}
+
+.fleet-route-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #f59e0b;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.fleet-route-card:hover::before {
+    opacity: 1;
+}
+
+.fleet-route-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.fleet-route-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    line-height: 1.35;
+}
+
+.fleet-route-path {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 0.86rem;
+    margin: 8px 0 16px 0;
+}
+
+.fleet-route-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px dashed #e2e8f0;
+    width: 100%;
+}
+
+

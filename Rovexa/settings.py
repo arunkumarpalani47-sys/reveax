@@ -105,6 +105,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "Rovexa.middleware.BlockedUserMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # ✅ FIXED V-07/V-11: Custom middleware adds Content-Security-Policy & Permissions-Policy headers
@@ -224,14 +225,13 @@ MIGRATION_MODULES = {
     'sessions': 'mongo_migrations.sessions',
 }
 
-LOGIN_URL = "/login/"
+LOGIN_URL = "/login/customer/"
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/login/customer/"
 
 # ─── Redis & Channel Layers ───────────────────────────────────────────────────
-REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")
+REDIS_URL = os.environ.get("REDIS_URL", None)
 
-# ✅ FIXED V-05: Use Redis cache so django-ratelimit works correctly
 # Safe Redis cache config (Upstash does not support DB 1 selection)
 if REDIS_URL and ("redis://" in REDIS_URL or "rediss://" in REDIS_URL):
     CACHES = {
@@ -281,18 +281,25 @@ LOGGING = {
 }
 
 # Suppress non-critical system check warnings
-SILENCED_SYSTEM_CHECKS = ["django_ratelimit.W001"]
+SILENCED_SYSTEM_CHECKS = ["django_ratelimit.W001", "django_ratelimit.E003"]
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [REDIS_URL],
-            "capacity": 1500,
-            "expiry": 10,
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL],
+                "capacity": 1500,
+                "expiry": 10,
+            },
         },
-    },
-}
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 
 # ─── Google Maps ──────────────────────────────────────────────────────────────
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "")

@@ -119,9 +119,28 @@
         }
         .btn-register:hover { background: var(--accent); color: #fff; box-shadow: 0 0 20px rgba(16,185,129,.4); }
 
-        .bottom-link { text-align:center; margin-top:20px; font-size:12px; color:rgba(255,255,255,.25); }
-        .bottom-link a { color:rgba(255,255,255,.4); text-decoration:none; }
-        .bottom-link a:hover { color:rgba(255,255,255,.7); }
+        .bottom-link { text-align:center; margin-top:22px; }
+        .portal-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .portal-back-btn:hover {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(255,255,255,0.28);
+            color: #ffffff;
+            transform: translateX(-3px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
 
         .mini-brand { position:absolute; top:28px; right:32px; display:flex; align-items:center; gap:8px; text-decoration:none; }
         .mini-brand-icon { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),#06b6d4); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff; }
@@ -160,9 +179,8 @@
 </div>
 
 <div class="right-panel">
-    <a href="/" class="mini-brand">
-        <div class="mini-brand-icon"><i class="bi bi-taxi-front-fill"></i></div>
-        <span class="mini-brand-name">Rovexa</span>
+    <a href="/" class="mini-brand mb-3">
+        <img src="{% static 'images/logo-white.png' %}" alt="Rovexa Cab Services" height="42" style="max-height: 42px; width: auto; object-fit: contain;">
     </a>
 
     <div class="form-wrap">
@@ -185,10 +203,13 @@
 
         <form method="POST" id="loginForm">
             {% csrf_token %}
+            {% if next or request.GET.next %}
+            <input type="hidden" name="next" value="{{ next|default:request.GET.next }}">
+            {% endif %}
             <div class="field">
-                <label for="c-username">Username</label>
+                <label for="c-username">Mobile Number or Username</label>
                 <div class="field-wrap">
-                    <input class="finput" type="text" id="c-username" name="username" placeholder="Your username" autocomplete="username" required>
+                    <input class="finput" type="text" id="c-username" name="username" placeholder="10-digit mobile or username" autocomplete="username" required>
                     <i class="bi bi-person icon"></i>
                 </div>
             </div>
@@ -209,14 +230,18 @@
 
         <div class="register-box">
             <p>Don't have an account? Create one free in 30 seconds.</p>
-            <a href="{% url 'customer_register' %}" class="btn-register">
+            <a href="{% url 'customer_register' %}{% if next or request.GET.next %}?next={{ next|default:request.GET.next }}{% endif %}" class="btn-register">
                 <i class="bi bi-person-plus-fill"></i> Create Free Account
             </a>
         </div>
 
         <div class="bottom-link">
-            <a href="{% url 'login_portal' %}"><i class="bi bi-grid-3x3-gap"></i> Back to all portals</a>
+            <a href="{% url 'login_portal' %}" class="portal-back-btn">
+                <i class="bi bi-arrow-left"></i> All Portals
+            </a>
         </div>
+
+
     </div>
 </div>
 

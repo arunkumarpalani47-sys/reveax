@@ -111,6 +111,12 @@ class Booking(models.Model):
 
     VEHICLE_TYPES = (
         ("CAR_CAB", "Rovexa Car Cab (4+ Seats)"),
+        ("AUTO", "Auto Rickshaw"),
+        ("MINI", "Mini / Hatchback"),
+        ("SEDAN", "Prime Sedan"),
+        ("SUV", "Suv / Innova"),
+        ("LUXURY", "Luxury"),
+        ("PREMIUM", "Premium"),
     )
 
     PAYMENT_METHODS = (
@@ -160,7 +166,16 @@ class Booking(models.Model):
     passenger_phone    = models.CharField(max_length=20, blank=True, default="")
     driver_notes       = models.TextField(blank=True, default="")
     rental_package     = models.CharField(max_length=50, blank=True, default="")
-    outstation_type    = models.CharField(max_length=20, blank=True, default="")
+    outstation_type    = models.CharField(max_length=20, blank=True, default="ONE_WAY")
+    TRIP_TYPE_CHOICES = (
+        ("ONE_WAY", "One Way"),
+        ("ROUND_TRIP", "Round Trip"),
+    )
+    trip_type = models.CharField(
+        max_length=20,
+        choices=TRIP_TYPE_CHOICES,
+        default="ONE_WAY"
+    )
     return_datetime    = models.DateTimeField(null=True, blank=True)
 
     waypoints_json = models.TextField(blank=True, default="[]")

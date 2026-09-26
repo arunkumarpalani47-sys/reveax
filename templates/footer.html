@@ -11,13 +11,17 @@
 
             <div class="col-lg-4 col-md-6">
 
-                <h3 class="footer-logo">
-                    <i class="bi bi-taxi-front-fill text-warning"></i>
-                    Rovexa Taxi Booking
-                </h3>
+                <div class="footer-logo mb-3">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'images/logo-white.png' %}"
+                             alt="Rovexa Cab Services"
+                             height="52"
+                             style="max-height: 52px; width: auto; object-fit: contain;">
+                    </a>
+                </div>
 
                 <p class="footer-text">
-                    Rovexa is a reliable taxi booking platform providing
+                    Rovexa Cab Services is a reliable cab service platform providing
                     safe, affordable and comfortable rides anytime,
                     anywhere.
                 </p>
@@ -114,11 +118,8 @@
 
         <div class="text-center">
 
-            <p class="copyright">
-
-                © 2026 Rovexa. All Rights Reserved.
-                | ❤️ Rovexa
-
+            <p class="copyright mb-0">
+                © 2026 Rovexa Cab Services. All Rights Reserved.
             </p>
 
         </div>

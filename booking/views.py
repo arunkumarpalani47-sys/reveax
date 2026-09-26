@@ -227,13 +227,39 @@ def add_booking(request):
     vehicles_type_data = {v.vehicle_type: float(v.price_per_km) for v in available_vehicles}
 
     if request.method == "POST":
-        form = BookingForm(request.POST)
+        post_data = request.POST.copy()
+
+        # Handle Trip Type
+        trip_type = post_data.get("trip_type", "ONE_WAY").upper()
+        if trip_type not in ["ONE_WAY", "ROUND_TRIP"]:
+            trip_type = "ONE_WAY"
+        post_data["trip_type"] = trip_type
+
+        # Ensure vehicle_type fallback
+        v_id = post_data.get("vehicle_id")
+        if not post_data.get("vehicle_type"):
+            if v_id:
+                try:
+                    v = Vehicle.objects.get(id=v_id)
+                    post_data["vehicle_type"] = v.vehicle_type
+                except Vehicle.DoesNotExist:
+                    post_data["vehicle_type"] = "CAR_CAB"
+            else:
+                post_data["vehicle_type"] = "CAR_CAB"
+
+        if not post_data.get("booking_category"):
+            post_data["booking_category"] = "DAILY_RIDE"
+        if not post_data.get("payment_method"):
+            post_data["payment_method"] = "CASH"
+
+        form = BookingForm(post_data)
         if form.is_valid():
             booking = form.save(commit=False)
             booking.customer = request.user
+            booking.trip_type = trip_type
+            booking.outstation_type = trip_type
 
             # Bind selected Vehicle if passed
-            v_id = request.POST.get("vehicle_id")
             if v_id:
                 try:
                     booking.vehicle = Vehicle.objects.get(id=v_id)
@@ -253,11 +279,27 @@ def add_booking(request):
             booking.passenger_phone = request.POST.get("passenger_phone") or getattr(request.user, "phone", "") or ""
             booking.driver_notes = request.POST.get("driver_notes", "")
 
+            # If user does not have a phone number on profile, save it
+            if booking.passenger_phone and not getattr(request.user, "phone", ""):
+                try:
+                    request.user.phone = booking.passenger_phone
+                    request.user.save(update_fields=["phone"])
+                except Exception:
+                    pass
+
             sched_dt = request.POST.get("scheduled_datetime")
             if sched_dt:
                 try:
                     from django.utils.dateparse import parse_datetime
                     booking.scheduled_datetime = parse_datetime(sched_dt)
+                except Exception:
+                    pass
+
+            return_dt = request.POST.get("return_datetime")
+            if return_dt:
+                try:
+                    from django.utils.dateparse import parse_datetime
+                    booking.return_datetime = parse_datetime(return_dt)
                 except Exception:
                     pass
 
@@ -280,12 +322,14 @@ def add_booking(request):
                 booking.distance = Decimal(str(road_dist))
 
             fare_details = calculate_trip_fare(
-                vehicle_type=booking.vehicle_type or "MINI",
+                vehicle_type=booking.vehicle_type or "CAR_CAB",
                 distance_km=float(booking.distance),
                 duration_mins=int(float(booking.distance) * 1.5),
                 pickup_address=booking.pickup_location,
                 drop_address=booking.drop_location,
-                booking_category=booking.booking_category
+                booking_category=booking.booking_category,
+                outstation_type=booking.trip_type,
+                trip_type=booking.trip_type,
             )
             booking.total_fare = Decimal(str(fare_details["total_fare"]))
             booking.fare = booking.total_fare
@@ -296,7 +340,8 @@ def add_booking(request):
             messages.success(request, f"🎉 Booking #{booking.id} submitted! Sent to Admin for review & approval.")
             return redirect(f"/booking/track/{booking.id}/")
 
-
+        pickup = request.POST.get("pickup_location", "")
+        drop = request.POST.get("drop_location", "")
     else:
         pickup = request.GET.get("pickup", "")
         drop = request.GET.get("drop", "")
@@ -322,8 +367,8 @@ def add_booking(request):
         "booking/booking_form.html",
         {
             "form": form,
-            "pickup": pickup if request.method == "GET" else "",
-            "drop": drop if request.method == "GET" else "",
+            "pickup": pickup,
+            "drop": drop,
             "available_vehicles": available_vehicles,
             "vehicles_data": json.dumps(vehicles_data),
             "vehicles_type_data": json.dumps(vehicles_type_data),
@@ -445,99 +490,13 @@ def seed_default_vehicles_if_empty():
 
 
 def search_vehicle(request):
-    pickup = request.GET.get("pickup", "").strip()
-    drop   = request.GET.get("drop", "").strip()
-    date   = request.GET.get("date", "").strip()
-    time   = request.GET.get("time", "").strip()
-    selected_type = request.GET.get("type", "ALL").upper().strip()
-    sort_by = request.GET.get("sort", "price_asc").strip()
-
-    from .pricing import get_real_road_distance, seed_default_pricing_rules
-    seed_default_pricing_rules()
-
-    distance_km = 0.0
-    if pickup and drop:
-        try:
-            distance_km = get_real_road_distance(0, 0, 0, 0, pickup, drop)
-        except Exception:
-            distance_km = 12.5
-    
-    if not distance_km or distance_km <= 0.1:
-        distance_km = 12.5
-
-    estimated_duration = max(10, int(distance_km * 1.5))
-
-    queryset = Vehicle.objects.filter(is_available=True)
-
-    if selected_type and selected_type != "ALL":
-        if selected_type == "ELECTRIC":
-            queryset = queryset.filter(fuel_type="ELECTRIC")
-        elif selected_type == "OUTSTATION":
-            queryset = queryset.filter(vehicle_type__in=["SEDAN", "SUV", "PREMIUM", "LUXURY"])
-        else:
-            queryset = queryset.filter(vehicle_type=selected_type)
-
-    vehicle_list = []
-    base_fare = 40.0
-
-    for v in queryset:
-        rate = float(v.price_per_km or 15.0)
-        calc_fare = int(round(base_fare + (distance_km * rate)))
-
-        v_name = (v.vehicle_name or "").strip()
-        v_brand = (v.brand or "").strip()
-
-        if not v_brand:
-            v_brand = "Rovexa"
-        if not v_name:
-            v_name = f"{v.get_vehicle_type_display()} Taxi"
-
-        d_name = (v.driver_name or "").strip()
-        if not d_name:
-            d_name = "Assigned Driver"
-
-        vehicle_list.append({
-            "obj": v,
-            "id": str(v.id),
-            "vehicle_name": v_name,
-            "brand": v_brand,
-            "model": v.model or "",
-            "vehicle_number": v.vehicle_number or "",
-            "vehicle_type": v.vehicle_type,
-            "fuel_type": v.fuel_type,
-            "seats": v.seats or 4,
-            "price_per_km": rate,
-            "calculated_fare": calc_fare,
-            "image_url": v.get_image_url(),
-            "driver_name": d_name,
-            "driver_phone": v.driver_phone or "",
-            "driver_rating": float(v.driver_rating or 4.9),
-            "driver_image_url": v.get_driver_image_url(),
-        })
-
-    if sort_by == "price_asc":
-        vehicle_list.sort(key=lambda x: x["calculated_fare"])
-    elif sort_by == "price_desc":
-        vehicle_list.sort(key=lambda x: x["calculated_fare"], reverse=True)
-    elif sort_by == "rating_desc":
-        vehicle_list.sort(key=lambda x: x["driver_rating"], reverse=True)
-
-    from django.conf import settings
-    context = {
-        "pickup": pickup,
-        "drop": drop,
-        "date": date,
-        "time": time,
-        "selected_type": selected_type,
-        "sort_by": sort_by,
-        "distance_km": round(distance_km, 1),
-        "estimated_duration": estimated_duration,
-        "vehicles": vehicle_list,
-        "total_vehicles_count": len(vehicle_list),
-        "GOOGLE_MAPS_API_KEY": getattr(settings, "GOOGLE_MAPS_API_KEY", ""),
-    }
-
-    return render(request, "booking/search_vehicle.html", context)
+    """Directly opens the Taxi Search / Booking screen with all query parameters."""
+    from django.urls import reverse
+    params = request.GET.urlencode()
+    target_url = reverse("add_booking")
+    if params:
+        target_url = f"{target_url}?{params}"
+    return redirect(target_url)
 
 
 
@@ -909,18 +868,17 @@ def cancel_booking(request, id):
         return JsonResponse({"success": False, "error": str(e)}, status=400)
 
 
-@login_required
 @require_http_methods(["POST"])
 @csrf_exempt
 def api_calculate_fare(request):
     """
     POST /booking/api/calculate-fare/
-    Body: {"vehicle_type": "MINI", "distance": 10.5, "duration": 25, "pickup": "...", "drop": "...", "coupon": "..."}
-    Returns detailed dynamic fare breakdown.
+    Body: {"vehicle_type": "CAR_CAB", "distance": 10.5, "duration": 25, "pickup": "...", "drop": "...", "trip_type": "ONE_WAY"|"ROUND_TRIP"}
+    Returns detailed dynamic fare breakdown including One Way and Round Trip pricing.
     """
     try:
         data   = json.loads(request.body)
-        v_type = data.get("vehicle_type", "MINI")
+        v_type = data.get("vehicle_type", "CAR_CAB")
         dist   = float(data.get("distance") or 0)
         dur    = int(data.get("duration") or 0)
         pickup = data.get("pickup", "")
@@ -932,7 +890,8 @@ def api_calculate_fare(request):
         coupon     = data.get("coupon", "")
         b_category = data.get("booking_category", "DAILY_RIDE")
         rental_pkg = data.get("rental_package", "")
-        out_type   = data.get("outstation_type", "ONE_WAY")
+        trip_type  = data.get("trip_type", "ONE_WAY")
+        out_type   = data.get("outstation_type", trip_type)
 
         if dist < 0.1:
             from .pricing import get_real_road_distance
@@ -950,6 +909,7 @@ def api_calculate_fare(request):
             booking_category=b_category,
             rental_package=rental_pkg,
             outstation_type=out_type,
+            trip_type=trip_type,
         )
 
         return JsonResponse({"success": True, "fare_details": breakdown})

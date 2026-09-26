@@ -7,7 +7,7 @@
             <h3 class="fw-bold text-dark mb-1"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>My Bookings</h3>
             <p class="text-muted small mb-0">Track and manage all your cab rides</p>
         </div>
-        <a href="{% url 'add_booking' %}" class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm">
+        <a href="{% url 'add_booking' %}" class="btn btn-rovexa-gold px-4 py-2">
             <i class="bi bi-plus-circle me-1"></i> Book New Ride
         </a>
     </div>
@@ -17,19 +17,19 @@
         <div class="card-body p-2 overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
             <ul class="nav nav-pills gap-2 flex-nowrap">
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill {% if status_filter == 'ALL' %}active bg-primary{% else %}text-secondary{% endif %}" href="?status=ALL">All Rides</a>
+                    <a class="nav-link rounded-pill px-3 py-1.5 fw-semibold {% if status_filter == 'ALL' %}active bg-dark text-warning border border-warning{% else %}text-secondary border border-light{% endif %}" href="?status=ALL">All Rides</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill {% if status_filter == 'PENDING' %}active bg-warning text-dark{% else %}text-secondary{% endif %}" href="?status=PENDING">Pending <span class="badge bg-light text-dark ms-1">{{ pending_c }}</span></a>
+                    <a class="nav-link rounded-pill px-3 py-1.5 fw-semibold {% if status_filter == 'PENDING' %}active bg-warning text-dark border border-warning{% else %}text-secondary border border-light{% endif %}" href="?status=PENDING">Pending <span class="badge bg-light text-dark ms-1">{{ pending_c }}</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill {% if status_filter == 'CONFIRMED' %}active bg-info text-white{% else %}text-secondary{% endif %}" href="?status=CONFIRMED">Confirmed <span class="badge bg-light text-dark ms-1">{{ confirmed_c }}</span></a>
+                    <a class="nav-link rounded-pill px-3 py-1.5 fw-semibold {% if status_filter == 'CONFIRMED' %}active bg-info text-white border border-info{% else %}text-secondary border border-light{% endif %}" href="?status=CONFIRMED">Confirmed <span class="badge bg-light text-dark ms-1">{{ confirmed_c }}</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill {% if status_filter == 'COMPLETED' %}active bg-success{% else %}text-secondary{% endif %}" href="?status=COMPLETED">Completed <span class="badge bg-light text-dark ms-1">{{ completed_c }}</span></a>
+                    <a class="nav-link rounded-pill px-3 py-1.5 fw-semibold {% if status_filter == 'COMPLETED' %}active bg-success text-white border border-success{% else %}text-secondary border border-light{% endif %}" href="?status=COMPLETED">Completed <span class="badge bg-light text-dark ms-1">{{ completed_c }}</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill {% if status_filter == 'CANCELLED' %}active bg-danger{% else %}text-secondary{% endif %}" href="?status=CANCELLED">Cancelled <span class="badge bg-light text-dark ms-1">{{ cancelled_c }}</span></a>
+                    <a class="nav-link rounded-pill px-3 py-1.5 fw-semibold {% if status_filter == 'CANCELLED' %}active bg-danger text-white border border-danger{% else %}text-secondary border border-light{% endif %}" href="?status=CANCELLED">Cancelled <span class="badge bg-light text-dark ms-1">{{ cancelled_c }}</span></a>
                 </li>
             </ul>
         </div>
@@ -40,16 +40,16 @@
         <div class="row g-3">
             {% for booking in bookings %}
             <div class="col-md-6 col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
+                <div class="card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden" style="border: 1px solid #e2e8f0 !important;">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="badge 
-                                    {% if booking.status == 'COMPLETED' or booking.status == 'Completed' %}bg-success
-                                    {% elif booking.status == 'ACCEPTED' or booking.status == 'Accepted' or booking.status == 'CONFIRMED' %}bg-success text-white
-                                    {% elif booking.status == 'REJECTED' or booking.status == 'Rejected' %}bg-danger text-white
-                                    {% elif booking.status == 'PENDING' or booking.status == 'Pending' or booking.status == 'SEARCHING_DRIVER' %}bg-warning text-dark
-                                    {% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
+                                <span class="badge-status-cust 
+                                    {% if booking.status == 'COMPLETED' or booking.status == 'Completed' %}badge-status-completed
+                                    {% elif booking.status == 'ACCEPTED' or booking.status == 'Accepted' or booking.status == 'CONFIRMED' %}badge-status-accepted
+                                    {% elif booking.status == 'REJECTED' or booking.status == 'Rejected' %}badge-status-rejected
+                                    {% elif booking.status == 'PENDING' or booking.status == 'Pending' or booking.status == 'SEARCHING_DRIVER' %}badge-status-pending
+                                    {% else %}badge-status-completed{% endif %}">
                                     {% if booking.status == 'ACCEPTED' or booking.status == 'Accepted' %}ACCEPTED BY ADMIN
                                     {% elif booking.status == 'REJECTED' or booking.status == 'Rejected' %}REJECTED BY ADMIN
                                     {% elif booking.status == 'PENDING' or booking.status == 'Pending' %}PENDING REVIEW
@@ -58,7 +58,18 @@
                                 <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ booking.created_at|date:"M d, Y" }}</small>
                             </div>
                             
-                            <h5 class="fw-bold mb-2">{{ booking.safe_vehicle_name }}</h5>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h5 class="fw-bold mb-0 text-dark">{{ booking.safe_vehicle_name }}</h5>
+                                {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                                    <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-40 rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Round Trip (2-Way)
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                                        <i class="bi bi-arrow-right me-1"></i> One Way
+                                    </span>
+                                {% endif %}
+                            </div>
                             
                             <div class="mb-3">
                                 <div class="d-flex align-items-center mb-1 text-secondary small">
@@ -69,19 +80,27 @@
                                     <i class="bi bi-flag-fill text-success me-2"></i>
                                     <span class="text-truncate">{{ booking.drop_location|default:"Destination" }}</span>
                                 </div>
+                                {% if booking.return_datetime %}
+                                <div class="d-flex align-items-center text-primary extra-small mt-1 ps-4" style="font-size: 0.75rem;">
+                                    <i class="bi bi-calendar2-event me-1 text-warning"></i> Return: {{ booking.return_datetime|date:"M d, Y - H:i" }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="border-top pt-3 d-flex justify-content-between align-items-center">
                             <div>
-                                <small class="text-muted d-block">Total Fare</small>
-                                <span class="fw-bold fs-5 text-success">₹{{ booking.total_fare }}</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-bold fs-5 text-success">₹{{ booking.total_fare }}</span>
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">{{ booking.distance }} km</span>
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.68rem;">Excl. Toll, State Tax & Beta</small>
                             </div>
                             <div class="d-flex gap-2">
-                                <a href="{% url 'booking_track' booking.id %}" class="btn btn-sm btn-warning rounded-pill px-3 fw-bold">
+                                <a href="{% url 'booking_track' booking.id %}" class="btn btn-sm btn-rovexa-track">
                                     <i class="bi bi-compass-fill me-1"></i>Track
                                 </a>
-                                <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-rovexa-details">
                                     Details <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -92,11 +111,11 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+        <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
             <i class="bi bi-journal-x text-muted display-1"></i>
             <h5 class="mt-3 text-muted">No rides found</h5>
             <p class="text-muted small">You haven't booked any rides yet.</p>
-            <a href="{% url 'add_booking' %}" class="btn btn-primary rounded-pill px-4 mt-2">Book Your First Ride</a>
+            <a href="{% url 'add_booking' %}" class="btn btn-rovexa-gold px-4 py-2 mt-2">Book Your First Ride</a>
         </div>
     {% endif %}
 </div>

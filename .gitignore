@@ -31,3 +31,6 @@ media/
 # Logs & temp
 *.log
 scratch/
+
+# GitHub workflows (requires workflow PAT scope)
+.github/

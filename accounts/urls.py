@@ -3,15 +3,15 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    # Role-picker portal (main /login/ entry)
-    path("login/", views.login_portal, name="login_portal"),
-
-    # Individual role login pages
-    path("login/admin/", views.admin_login, name="admin_login"),
+    # Main customer login (Direct access - no entry/portal screen)
+    path("login/", views.customer_login, name="login"),
     path("login/customer/", views.customer_login, name="customer_login"),
 
-    # Kept for backward compat (LOGIN_URL setting points here)
-    path("login-redirect/", views.user_login, name="login"),
+    # Admin Login (Dedicated URL)
+    path("login/admin/", views.admin_login, name="admin_login"),
+
+    # Role portal (kept at /portal/ if needed, but not in customer flow)
+    path("portal/", views.login_portal, name="login_portal"),
 
     # Registration (Customer only; Partners created by Admin)
     path("register/", views.register, name="register"),

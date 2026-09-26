@@ -5,28 +5,38 @@
 <div class="container-fluid p-0">
 
     <!-- Mobile Dashboard Top Navigation Pill Bar -->
-    <div class="d-md-none bg-dark p-2 text-white border-bottom border-secondary">
+    <div class="d-md-none p-2 text-white border-bottom border-dark" style="background: #0f172a;">
         <div class="d-flex align-items-center justify-content-between overflow-x-auto gap-2 px-2 py-1" style="-webkit-overflow-scrolling: touch;">
-            <a href="{% if request.user.role == 'ADMIN' %}{% url 'admin_dashboard' %}{% elif request.user.role == 'DRIVER' or request.user.role == 'PARTNER' %}{% url 'booking_list' %}{% else %}{% url 'customer_dashboard' %}{% endif %}" class="btn btn-sm btn-outline-warning text-nowrap rounded-pill px-3 py-1">
-                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            <a href="{% if request.user.role == 'ADMIN' %}{% url 'admin_dashboard' %}{% elif request.user.role == 'DRIVER' or request.user.role == 'PARTNER' %}{% url 'booking_list' %}{% else %}{% url 'customer_dashboard' %}{% endif %}" 
+               class="btn btn-sm text-nowrap rounded-pill px-3 py-1.5 fw-semibold {% if '/dashboard/' in request.path %}btn-warning text-dark{% else %}btn-outline-secondary text-white border-secondary{% endif %}"
+               style="font-size: 0.82rem; border-width: 1.5px;">
+                <i class="bi bi-speedometer2 me-1 text-warning"></i> Dashboard
             </a>
-            <a href="{% url 'add_booking' %}" class="btn btn-sm btn-warning text-nowrap rounded-pill px-3 py-1 text-dark fw-bold">
+            <a href="{% url 'add_booking' %}" 
+               class="btn btn-sm text-nowrap rounded-pill px-3 py-1.5 fw-bold"
+               style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #0f172a; border: 1.5px solid #fbbf24; font-size: 0.82rem; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">
                 <i class="bi bi-taxi-front-fill me-1"></i> Book Taxi
             </a>
-            <a href="{% url 'booking_list' %}" class="btn btn-sm btn-outline-light text-nowrap rounded-pill px-3 py-1">
-                <i class="bi bi-calendar-event me-1"></i> My Bookings
+            <a href="{% url 'booking_list' %}" 
+               class="btn btn-sm text-nowrap rounded-pill px-3 py-1.5 fw-semibold {% if '/booking/list/' in request.path %}btn-warning text-dark{% else %}btn-outline-secondary text-white border-secondary{% endif %}"
+               style="font-size: 0.82rem; border-width: 1.5px;">
+                <i class="bi bi-calendar-event me-1 text-warning"></i> My Bookings
             </a>
-            <a href="{% url 'profile' %}" class="btn btn-sm btn-outline-light text-nowrap rounded-pill px-3 py-1">
-                <i class="bi bi-person-fill me-1"></i> Profile
+            <a href="{% url 'profile' %}" 
+               class="btn btn-sm text-nowrap rounded-pill px-3 py-1.5 fw-semibold {% if '/profile/' in request.path %}btn-warning text-dark{% else %}btn-outline-secondary text-white border-secondary{% endif %}"
+               style="font-size: 0.82rem; border-width: 1.5px;">
+                <i class="bi bi-person-fill me-1 text-warning"></i> Profile
             </a>
         </div>
     </div>
 
     <div class="row g-0">
 
-        <!-- Desktop Sidebar -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-0 d-none d-md-block">
-            {% include 'sidebar.html' %}
+        <!-- Desktop Sidebar (Sticky, Full Viewport, Seamless Rovexa Dark Navy) -->
+        <div class="col-md-3 col-lg-2 p-0 d-none d-md-block" style="background: #0f172a; border-right: 1px solid rgba(255, 255, 255, 0.08);">
+            <div class="sidebar-sticky-viewport" style="position: sticky; top: 0; height: 100vh; max-height: 100vh; overflow-y: auto; overflow-x: hidden;">
+                {% include 'sidebar.html' %}
+            </div>
         </div>
 
         <!-- Main Content Area -->

@@ -20,10 +20,51 @@ from .models import PricingRule, Coupon
 
 import urllib.parse
 
+KNOWN_LOCATIONS = {
+    "tiruvannamalai": (12.2253, 79.0747),
+    "chennai": (13.0827, 80.2707),
+    "vellore": (12.9165, 79.1325),
+    "arani": (12.6703, 79.2844),
+    "gingee": (12.2530, 79.4190),
+    "chengam": (12.3082, 78.7997),
+    "villupuram": (11.9398, 79.4946),
+    "pandy": (11.9416, 79.8083),
+    "pondicherry": (11.9416, 79.8083),
+    "puducherry": (11.9416, 79.8083),
+    "tirukovilur": (11.9567, 79.2023),
+    "thandarampattu": (12.0163, 78.9329),
+    "bangalore": (12.9716, 77.5946),
+    "bengaluru": (12.9716, 77.5946),
+    "salem": (11.6643, 78.1460),
+    "coimbatore": (11.0168, 76.9558),
+    "madurai": (9.9252, 78.1198),
+    "kumbakonam": (10.9602, 79.3845),
+    "tirupathi": (13.6288, 79.4192),
+    "tirupati": (13.6288, 79.4192),
+    "sabarimala": (9.4404, 77.0818),
+    "ooty": (11.4102, 76.6950),
+    "rameshwaram": (9.2876, 79.3129),
+    "rameswaram": (9.2876, 79.3129),
+    "yelagiri": (12.5790, 78.6385),
+    "yarcad": (11.7753, 78.2093),
+    "yercaud": (11.7753, 78.2093),
+    "ramanathapuram": (9.3639, 78.8395),
+    "kodaikanal": (10.2381, 77.4892),
+    "malayanur": (12.3995, 79.3907),
+    "melmalayanur": (12.3995, 79.3907),
+    "javathu hills": (12.6000, 78.9000),
+    "thiruvallur": (13.1432, 79.9079),
+}
+
 def geocode_address_to_lat_lon(address: str):
-    """Geocodes a text address to (lat, lon) tuple using Nominatim API with query fallback."""
+    """Geocodes a text address to (lat, lon) tuple with known location lookup and Nominatim fallback."""
     if not address or len(address.strip()) < 3:
         return None
+
+    clean_addr = address.lower().strip()
+    for key, coords in KNOWN_LOCATIONS.items():
+        if key in clean_addr:
+            return coords
 
     def _try_geocode(q_str):
         try:
@@ -202,23 +243,33 @@ def calculate_trip_fare(
     booking_category: str = "DAILY_RIDE",
     rental_package: str = "",
     outstation_type: str = "ONE_WAY",
+    trip_type: str = "ONE_WAY",
 ) -> dict:
     """
     Calculates detailed fare breakdown according to Rovexa dynamic pricing formula.
-    Supports DAILY_RIDE, SCHEDULED, RENTAL, and OUTSTATION categories.
+    Supports One Way and Round Trip trips, as well as DAILY_RIDE, RENTAL, and OUTSTATION.
     """
-    dist_val = max(0.0, float(distance_km or 0))
+    is_round_trip = (trip_type.upper() in ["ROUND_TRIP", "ROUNDTRIP"] or outstation_type.upper() in ["ROUND_TRIP", "ROUNDTRIP"])
+    normalized_trip_type = "ROUND_TRIP" if is_round_trip else "ONE_WAY"
+
+    raw_dist = max(0.0, float(distance_km or 0))
+    # Round trip travels both ways: 2x distance and duration
+    dist_val = (raw_dist * 2.0) if is_round_trip else raw_dist
     dist = Decimal(str(dist_val))
 
     # Calculate realistic duration based on distance if default duration is too low
-    est_dur = max(int(duration_mins or 0), max(5, int(dist_val * 1.5)))
+    raw_dur = max(int(duration_mins or 0), max(5, int(raw_dist * 1.5)))
+    est_dur = (raw_dur * 2) if is_round_trip else raw_dur
     dur  = Decimal(str(est_dur))
 
     rule = get_pricing_rule(vehicle_type)
     rule_base     = Decimal(str(rule.base_fare if rule else DEFAULT_RULES.get(vehicle_type.upper(), {}).get("base_fare", 40)))
-    rate_per_km   = Decimal(str(rule.rate_per_km if rule else DEFAULT_RULES.get(vehicle_type.upper(), {}).get("rate_per_km", 15)))
+    base_rate_per_km = Decimal(str(rule.rate_per_km if rule else DEFAULT_RULES.get(vehicle_type.upper(), {}).get("rate_per_km", 15)))
     rate_per_min  = Decimal(str(rule.rate_per_min if rule else DEFAULT_RULES.get(vehicle_type.upper(), {}).get("rate_per_min", 2)))
     rule_surge    = Decimal(str(rule.surge_multiplier if rule else 1.0))
+
+    # Applied rate per km: Round trip gets configured round-trip rate structure (10% discount on per-km rate)
+    rate_per_km = (base_rate_per_km * Decimal("0.90")) if is_round_trip else base_rate_per_km
 
     if booking_category == "RENTAL":
         # Rental packages: 2_HRS_20_KM (₹499), 4_HRS_40_KM (₹899), 8_HRS_80_KM (₹1799)
@@ -232,22 +283,22 @@ def calculate_trip_fare(
             base_fare = Decimal("1799.00")
             included_km = 80.0
 
-        extra_km = max(0.0, distance_km - included_km)
+        extra_km = max(0.0, dist_val - included_km)
         distance_fare = Decimal(str(extra_km)) * Decimal("18.00")
         time_fare = Decimal("0.00")
         subtotal = base_fare + distance_fare
 
     elif booking_category == "OUTSTATION":
         # Outstation: Min 250 km / day + ₹300 Driver Allowance / Day
-        billable_km = max(250.0, distance_km)
-        rate_outstation = Decimal("16.00") if outstation_type == "ONE_WAY" else Decimal("14.00")
+        billable_km = max(250.0, dist_val)
+        rate_outstation = Decimal("14.00") if is_round_trip else Decimal("16.00")
         distance_fare = Decimal(str(billable_km)) * rate_outstation
         base_fare = Decimal("300.00")  # Driver Allowance
         time_fare = Decimal("0.00")
         subtotal = base_fare + distance_fare
 
     else:
-        # Standard Daily Ride or Scheduled Ride
+        # Standard Daily / Intercity Ride
         base_fare     = rule_base
         distance_fare = dist * rate_per_km
         time_fare     = dur * rate_per_min
@@ -300,6 +351,11 @@ def calculate_trip_fare(
 
     return {
         "vehicle_type":           vehicle_type.upper(),
+        "trip_type":              normalized_trip_type,
+        "is_round_trip":          is_round_trip,
+        "total_distance":         round(float(dist_val), 2),
+        "one_way_distance":       round(float(raw_dist), 2),
+        "rate_per_km":            round(float(rate_per_km), 2),
         "base_fare":              round(float(base_fare), 2),
         "distance_fare":          round(float(distance_fare), 2),
         "time_fare":              round(float(time_fare), 2),
@@ -315,4 +371,5 @@ def calculate_trip_fare(
         "coupon_code":            applied_coupon or "",
         "coupon_error":           coupon_error,
         "total_fare":             round(float(final_total), 2),
+        "additional_charges_note": "Exclude driver beta, Toll, State Tax & Parking fares.",
     }

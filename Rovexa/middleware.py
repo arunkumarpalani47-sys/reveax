@@ -58,3 +58,27 @@ class SecurityHeadersMiddleware:
             response["X-Permitted-Cross-Domain-Policies"] = "none"
 
         return response
+
+
+class BlockedUserMiddleware:
+    """
+    Instantly terminates the session of any currently active user if an Admin blocks or deactivates them.
+    Prevents blocked customers from performing any action or remaining logged in.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if getattr(request, "user", None) and request.user.is_authenticated:
+            if not request.user.is_active:
+                from django.contrib.auth import logout
+                from django.contrib import messages
+                from django.shortcuts import redirect
+                logout(request)
+                messages.error(
+                    request,
+                    "🚫 Your account has been BLOCKED by the administrator. Access is disabled."
+                )
+                return redirect("customer_login")
+
+        return self.get_response(request)

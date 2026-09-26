@@ -510,6 +510,83 @@
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
+
+/* Trip Type Selector Card Styles */
+.trip-type-card {
+  display: block;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  user-select: none;
+  height: 100%;
+}
+
+.trip-type-card:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.btn-check:checked + .trip-type-card {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(255, 255, 255, 0.98) 100%);
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.16);
+}
+
+.trip-type-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.oneway-icon {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.round-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.trip-type-title {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.trip-type-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.trip-type-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.btn-check:checked + .trip-type-card .trip-type-indicator {
+  border-color: #f59e0b;
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
 </style>
 
 <div class="booking-page-wrapper">
@@ -539,6 +616,51 @@
         <div class="row g-4">
           <!-- LEFT COLUMN: Form Inputs & Ride Selection -->
           <div class="col-lg-6">
+
+            <!-- TRIP TYPE SELECTION -->
+            <div class="mb-4">
+              <label class="fw-bold text-dark mb-2 d-flex align-items-center justify-content-between">
+                <span class="d-flex align-items-center gap-2">
+                  <i class="bi bi-signpost-split text-warning fs-5"></i>
+                  <span>Trip Type</span>
+                </span>
+                <span class="badge bg-light text-secondary border fw-normal" style="font-size: 0.75rem;">Select Journey Mode</span>
+              </label>
+
+              <div class="row g-3">
+                <div class="col-6">
+                  <input type="radio" class="btn-check" name="trip_type" id="trip_type_oneway" value="ONE_WAY" checked onchange="onTripTypeChange()">
+                  <label class="trip-type-card" for="trip_type_oneway">
+                    <span class="trip-type-indicator"></span>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="trip-type-icon-box oneway-icon">
+                        <i class="bi bi-arrow-right"></i>
+                      </div>
+                      <div>
+                        <div class="trip-type-title">One Way</div>
+                        <div class="trip-type-desc">Point to point drop</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="col-6">
+                  <input type="radio" class="btn-check" name="trip_type" id="trip_type_roundtrip" value="ROUND_TRIP" onchange="onTripTypeChange()">
+                  <label class="trip-type-card" for="trip_type_roundtrip">
+                    <span class="trip-type-indicator"></span>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="trip-type-icon-box round-icon">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </div>
+                      <div>
+                        <div class="trip-type-title">Round Trip</div>
+                        <div class="trip-type-desc">Return journey included</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
 
             <!-- STEP 1: Pickup & Drop Location -->
             <div class="mb-4">
@@ -697,10 +819,17 @@
 
             <!-- STEP 3: Customer & Passenger Details -->
             <div class="mb-4">
-              <label class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
-                <span class="badge bg-primary rounded-circle" style="width:24px; height:24px; font-size:11px; display:inline-flex; align-items:center; justify-content:center;">3</span>
-                Customer & Passenger Contact Information
-              </label>
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <label class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                  <span class="badge bg-primary rounded-circle" style="width:24px; height:24px; font-size:11px; display:inline-flex; align-items:center; justify-content:center;">3</span>
+                  Customer & Passenger Contact Information
+                </label>
+                {% if request.user.is_authenticated %}
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.78rem;">
+                  <i class="bi bi-shield-check me-1"></i> Logged in as: {{ request.user.display_name }}
+                </span>
+                {% endif %}
+              </div>
               
               <div class="card card-body bg-light border-0 rounded-4 p-3">
                 <div class="row g-3">
@@ -708,7 +837,7 @@
                     <label class="form-label small fw-bold text-dark">Customer / Passenger Name</label>
                     <div class="input-group">
                       <span class="input-group-text bg-white border-end-0 text-primary" style="border-radius: 14px 0 0 14px;"><i class="bi bi-person-fill"></i></span>
-                      <input type="text" name="passenger_name" class="form-control form-control-custom border-start-0" placeholder="e.g. Anish Kumar" value="{{ request.user.get_full_name|default:request.user.username }}" required>
+                      <input type="text" name="passenger_name" class="form-control form-control-custom border-start-0" placeholder="e.g. Anish Kumar" value="{{ request.user.display_name|default:request.user.username }}" required>
                     </div>
                   </div>
 
@@ -725,6 +854,11 @@
                     <input type="datetime-local" id="scheduled_datetime" name="scheduled_datetime" class="form-control form-control-custom">
                   </div>
 
+                  <div class="col-md-6" id="return_datetime_group" style="display: none;">
+                    <label class="form-label small fw-semibold text-secondary">Return Date & Time (Round Trip)</label>
+                    <input type="datetime-local" id="return_datetime" name="return_datetime" class="form-control form-control-custom">
+                  </div>
+
                   <div class="col-md-6">
                     <label class="form-label small fw-semibold text-secondary">Driver Notes / Special Requests</label>
                     <input type="text" name="driver_notes" class="form-control form-control-custom" placeholder="e.g. AC cab, carrying 2 suitcases">
@@ -739,18 +873,26 @@
                 <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-20 px-3 py-1.5 rounded-pill fw-bold" style="font-size: 0.78rem;">
                   <i class="bi bi-lightning-charge-fill me-1"></i> Live Fare Estimate
                 </span>
-                <span class="text-white-50 small" id="rate_per_km_display">Base Rate Applicable</span>
+                <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 px-2.5 py-1 rounded-pill fw-bold" id="trip_type_badge" style="font-size: 0.72rem;">
+                  One Way
+                </span>
               </div>
 
               <div class="d-flex align-items-baseline justify-content-between mt-2">
                 <div>
                   <div class="fare-price-tag" id="fare_amount_display">₹0.00</div>
-                  <div class="text-white-50 small mt-1">Includes distance fare & taxes</div>
+                  <div class="text-white-50 small mt-1" id="rate_per_km_display">Includes distance fare & taxes</div>
                 </div>
                 <div class="text-end">
                   <div class="fw-bold text-white fs-5" id="trip_dist_display">0 km</div>
                   <div class="text-white-50 small" id="trip_time_display">Est. 0 mins</div>
                 </div>
+              </div>
+
+              <!-- Mandatory Exclude Notice -->
+              <div class="mt-3 pt-2.5 border-top border-white border-opacity-10 d-flex align-items-center gap-2 text-warning small" style="font-size: 0.8rem;">
+                <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+                <span class="fw-semibold">Exclude driver beta, Toll, State Tax & Parking fares.</span>
               </div>
             </div>
 
@@ -762,10 +904,16 @@
             <input type="hidden" id="distance" name="distance" value="0">
 
             <!-- Submit Buttons -->
-            <div class="d-flex gap-3">
+            <div>
               <button type="submit" class="btn-book-submit">
                 <i class="bi bi-send-check-fill me-2"></i> Confirm & Book Luxury Ride Now
               </button>
+              <div class="text-center mt-2.5">
+                <span class="text-muted small fw-medium" style="font-size: 0.8rem;">
+                  <i class="bi bi-shield-exclamation text-warning me-1"></i>
+                  Exclude driver beta, Toll, State Tax & Parking fares.
+                </span>
+              </div>
             </div>
 
           </div>
@@ -922,7 +1070,30 @@ function updateRoute() {
     }
 }
 
-// DYNAMIC FARE ESTIMATE BASED ON ACTIVE ADMIN VEHICLE CARD
+// TRIP TYPE TOGGLE & CALCULATION
+function getSelectedTripType() {
+    const radio = document.querySelector('input[name="trip_type"]:checked');
+    return radio ? radio.value : 'ONE_WAY';
+}
+
+function onTripTypeChange() {
+    const tripType = getSelectedTripType();
+    const returnGroup = document.getElementById("return_datetime_group");
+    const returnInput = document.getElementById("return_datetime");
+    const badge = document.getElementById("trip_type_badge");
+
+    if (tripType === 'ROUND_TRIP') {
+        if (returnGroup) returnGroup.style.display = 'block';
+        if (badge) badge.innerText = 'Round Trip (2-Way)';
+    } else {
+        if (returnGroup) returnGroup.style.display = 'none';
+        if (returnInput) returnInput.value = '';
+        if (badge) badge.innerText = 'One Way';
+    }
+    updateRoute();
+}
+
+// DYNAMIC FARE ESTIMATE BASED ON ACTIVE ADMIN VEHICLE CARD & TRIP TYPE
 function updateFareEstimate(distanceKm, durationMins) {
     if (!distanceKm) {
         distanceKm = document.getElementById("distance").value;
@@ -948,6 +1119,8 @@ function updateFareEstimate(distanceKm, durationMins) {
     const dLng = document.getElementById("drop_lng").value;
     const pickup = document.getElementById("pickup").value;
     const drop = document.getElementById("drop").value;
+    const tripType = getSelectedTripType();
+    const isRound = (tripType === 'ROUND_TRIP');
 
     fetch("/booking/api/calculate-fare/", {
         method: "POST",
@@ -962,7 +1135,8 @@ function updateFareEstimate(distanceKm, durationMins) {
             pickup_lng: pLng,
             drop_lat: dLat,
             drop_lng: dLng,
-            booking_category: "DAILY_RIDE"
+            booking_category: "DAILY_RIDE",
+            trip_type: tripType
         })
     })
     .then(r => r.json())
@@ -971,9 +1145,17 @@ function updateFareEstimate(distanceKm, durationMins) {
             const details = data.fare_details;
             summaryCard.style.display = 'block';
             document.getElementById("fare_amount_display").innerText = `₹${details.total_fare.toFixed(2)}`;
-            document.getElementById("rate_per_km_display").innerText = `Rate: ₹${rate}/km (Base ₹${details.base_fare})`;
-            document.getElementById("trip_dist_display").innerText = `${distanceKm} km`;
-            document.getElementById("trip_time_display").innerText = `Est. ${durationMins || Math.round(distanceKm * 1.5)} mins`;
+            const badge = document.getElementById("trip_type_badge");
+            if (badge) {
+                badge.innerText = details.is_round_trip ? 'Round Trip (2-Way)' : 'One Way';
+            }
+            const dispDist = details.total_distance || (isRound ? (parseFloat(distanceKm) * 2).toFixed(2) : distanceKm);
+            const dispDur = isRound ? Math.round((durationMins || Math.round(distanceKm * 1.5)) * 2) : (durationMins || Math.round(distanceKm * 1.5));
+            document.getElementById("rate_per_km_display").innerText = isRound 
+                ? `Round Trip Rate: ₹${rate}/km (Total ~${dispDist} km)`
+                : `One Way Rate: ₹${rate}/km (Base ₹${details.base_fare})`;
+            document.getElementById("trip_dist_display").innerText = `${dispDist} km`;
+            document.getElementById("trip_time_display").innerText = `Est. ${dispDur} mins`;
         } else {
             fallbackEstimate();
         }
@@ -984,12 +1166,19 @@ function updateFareEstimate(distanceKm, durationMins) {
 
     function fallbackEstimate() {
         const baseFare = 40.0;
-        const dur = durationMins || Math.round(distanceKm * 1.5);
-        const fare = (baseFare + (parseFloat(distanceKm) * rate) + (dur * 2)).toFixed(2);
+        const oneWayDist = parseFloat(distanceKm);
+        const totalDist = isRound ? (oneWayDist * 2) : oneWayDist;
+        const dur = (durationMins || Math.round(oneWayDist * 1.5)) * (isRound ? 2 : 1);
+        const effectiveRate = isRound ? Math.max(12, rate * 0.95) : rate;
+        const fare = (baseFare + (totalDist * effectiveRate) + (dur * 1.5)).toFixed(2);
         summaryCard.style.display = 'block';
         document.getElementById("fare_amount_display").innerText = `₹${fare}`;
-        document.getElementById("rate_per_km_display").innerText = `Rate: ₹${rate}/km (Base ₹${baseFare})`;
-        document.getElementById("trip_dist_display").innerText = `${distanceKm} km`;
+        const badge = document.getElementById("trip_type_badge");
+        if (badge) badge.innerText = isRound ? 'Round Trip (2-Way)' : 'One Way';
+        document.getElementById("rate_per_km_display").innerText = isRound 
+            ? `Round Trip Rate: ₹${effectiveRate.toFixed(2)}/km` 
+            : `One Way Rate: ₹${rate}/km`;
+        document.getElementById("trip_dist_display").innerText = `${totalDist.toFixed(1)} km`;
         document.getElementById("trip_time_display").innerText = `Est. ${dur} mins`;
     }
 }
@@ -1112,35 +1301,51 @@ function initVehicleCardSelection() {
     const hiddenVidInput = document.getElementById('selected_vehicle_id');
     const cards = document.querySelectorAll('.premium-car-card');
 
-    cards.forEach(card => {
-        card.addEventListener('click', function() {
-            cards.forEach(c => {
-                c.classList.remove('active');
-                const checkTxt = c.querySelector('.check-txt');
-                if (checkTxt) checkTxt.innerText = 'Select';
-            });
-            this.classList.add('active');
-            const activeCheckTxt = this.querySelector('.check-txt');
-            if (activeCheckTxt) activeCheckTxt.innerText = 'Selected';
+    function syncCard(card) {
+        if (!card) return;
+        cards.forEach(c => {
+            c.classList.remove('active');
+            const checkTxt = c.querySelector('.check-txt');
+            if (checkTxt) checkTxt.innerText = 'Select';
+        });
+        card.classList.add('active');
+        const activeCheckTxt = card.querySelector('.check-txt');
+        if (activeCheckTxt) activeCheckTxt.innerText = 'Selected';
 
-            const vid = this.getAttribute('data-vid');
-            const vtype = this.getAttribute('data-vtype');
+        const vid = card.getAttribute('data-vid');
+        const vtype = card.getAttribute('data-vtype');
 
-            if (hiddenVidInput && vid) {
-                hiddenVidInput.value = vid;
-            }
+        if (hiddenVidInput && vid) {
+            hiddenVidInput.value = vid;
+        }
 
-            if (vehicleSelect && vtype) {
-                for (let option of vehicleSelect.options) {
-                    if (option.value.toUpperCase() === vtype.toUpperCase()) {
-                        vehicleSelect.value = option.value;
-                        break;
-                    }
+        if (vehicleSelect && vtype) {
+            let matched = false;
+            for (let option of vehicleSelect.options) {
+                if (option.value.toUpperCase() === vtype.toUpperCase()) {
+                    vehicleSelect.value = option.value;
+                    matched = true;
+                    break;
                 }
             }
+            if (!matched && vehicleSelect.options.length > 0) {
+                vehicleSelect.selectedIndex = 0;
+            }
+        }
+    }
+
+    cards.forEach(card => {
+        card.addEventListener('click', function() {
+            syncCard(this);
             updateRoute();
         });
     });
+
+    // Auto sync on load with the first active vehicle card
+    const initialActive = document.querySelector('.premium-car-card.active') || cards[0];
+    if (initialActive) {
+        syncCard(initialActive);
+    }
 }
 
 // LISTENERS & INITIALIZATION

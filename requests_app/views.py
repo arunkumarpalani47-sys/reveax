@@ -20,11 +20,19 @@ def admin_users(request):
     role_filter = request.GET.get("role", "all").upper()
     search = request.GET.get("q", "") or request.GET.get("search", "")
     qs = CustomUser.objects.all().order_by("-date_joined")
-    if role_filter and role_filter != "ALL":
+    if role_filter == "BLOCKED":
+        qs = qs.filter(is_active=False)
+    elif role_filter and role_filter != "ALL":
         qs = qs.filter(role__iexact=role_filter)
     if search:
-        search_lower = search.lower()
-        qs = [u for u in qs if search_lower in (u.username or "").lower() or search_lower in (u.email or "").lower()]
+        search_lower = search.lower().strip()
+        qs = [
+            u for u in qs
+            if search_lower in (u.username or "").lower()
+            or search_lower in (u.email or "").lower()
+            or search_lower in (u.phone or "").lower()
+            or search_lower in (u.get_full_name() or "").lower()
+        ]
     return render(request, "requests_app/admin_users.html", {
         "users": qs,
         "role_filter": role_filter.lower(),
@@ -53,11 +61,38 @@ def admin_user_edit(request, user_id):
 @role_required("ADMIN")
 def admin_user_toggle_status(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
+    if request.user.id == user.id:
+        messages.error(request, "You cannot block your own admin account while logged in.")
+        return redirect("admin_users")
+
     if request.method == "POST":
         user.is_active = not user.is_active
         user.save()
-        status_str = "activated" if user.is_active else "deactivated"
-        messages.success(request, f"User {user.display_name} has been {status_str}.")
+        if not user.is_active:
+            messages.warning(
+                request,
+                f"🚫 User '{user.display_name}' ({user.email or user.username}) has been BLOCKED. They will never be allowed to log in."
+            )
+        else:
+            messages.success(
+                request,
+                f"✅ User '{user.display_name}' ({user.email or user.username}) has been UNBLOCKED and activated."
+            )
+    return redirect("admin_users")
+
+
+@role_required("ADMIN")
+def admin_user_delete(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    if request.user.id == user.id:
+        messages.error(request, "You cannot delete your own admin account while logged in.")
+        return redirect("admin_users")
+
+    if request.method == "POST":
+        uname = user.username
+        uemail = user.email or user.phone or "account"
+        user.delete()
+        messages.success(request, f"🗑️ User '{uname}' ({uemail}) has been permanently deleted.")
     return redirect("admin_users")
 
 
