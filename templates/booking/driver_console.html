@@ -347,8 +347,9 @@
           </h1>
         </div>
         <div class="text-white-50 small mt-1 ps-1">
-          Booking ID: <code class="text-warning fw-bold">#{{ booking.id }}</code>
+          Booking ID: <code class="text-warning fw-bold">{{ booking.booking_number|default:booking.id }}</code>
         </div>
+
       </div>
 
       <div>

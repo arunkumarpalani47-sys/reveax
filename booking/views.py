@@ -361,7 +361,8 @@ def add_booking(request):
             booking.save()
             repair_booking_coordinates_and_distance(booking)
 
-            messages.success(request, f"🎉 Booking #{booking.id} submitted! Sent to Admin for review & approval.")
+            bno = booking.booking_number or f"#{booking.id}"
+            messages.success(request, f"🎉 Booking {bno} submitted! Sent to Admin for review & approval.")
             return redirect(f"/booking/track/{booking.id}/")
 
         pickup = request.POST.get("pickup_location", "")

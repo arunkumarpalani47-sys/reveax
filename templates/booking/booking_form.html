@@ -559,14 +559,14 @@
 
 /* Trip Type Selector Card Styles */
 .trip-type-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
   border: 2px solid #e2e8f0;
   border-radius: 16px;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 0.95rem;
   cursor: pointer;
   transition: all 0.25s ease;
-  position: relative;
   user-select: none;
   height: 100%;
 }
@@ -580,6 +580,13 @@
   border-color: #f59e0b;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(255, 255, 255, 0.98) 100%);
   box-shadow: 0 4px 18px rgba(245, 158, 11, 0.16);
+}
+
+.trip-type-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
 }
 
 .trip-type-icon-box {
@@ -607,25 +614,23 @@
   font-weight: 800;
   font-size: 0.95rem;
   color: #0f172a;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .trip-type-desc {
   font-size: 0.72rem;
   color: #64748b;
-  line-height: 1.2;
-  margin-top: 2px;
+  line-height: 1.25;
+  margin-top: 3px;
 }
 
 .trip-type-indicator {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 2px solid #cbd5e1;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .btn-check:checked + .trip-type-card .trip-type-indicator {
@@ -677,15 +682,15 @@
                 <div class="col-6">
                   <input type="radio" class="btn-check" name="trip_type" id="trip_type_oneway" value="ONE_WAY" checked onchange="onTripTypeChange()">
                   <label class="trip-type-card" for="trip_type_oneway">
-                    <span class="trip-type-indicator"></span>
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="trip-type-top-row">
                       <div class="trip-type-icon-box oneway-icon">
                         <i class="bi bi-arrow-right"></i>
                       </div>
-                      <div>
-                        <div class="trip-type-title">One Way</div>
-                        <div class="trip-type-desc">Point to point drop</div>
-                      </div>
+                      <span class="trip-type-indicator"></span>
+                    </div>
+                    <div>
+                      <div class="trip-type-title">One Way</div>
+                      <div class="trip-type-desc">Point to point drop</div>
                     </div>
                   </label>
                 </div>
@@ -693,15 +698,15 @@
                 <div class="col-6">
                   <input type="radio" class="btn-check" name="trip_type" id="trip_type_roundtrip" value="ROUND_TRIP" onchange="onTripTypeChange()">
                   <label class="trip-type-card" for="trip_type_roundtrip">
-                    <span class="trip-type-indicator"></span>
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="trip-type-top-row">
                       <div class="trip-type-icon-box round-icon">
                         <i class="bi bi-arrow-left-right"></i>
                       </div>
-                      <div>
-                        <div class="trip-type-title">Round Trip</div>
-                        <div class="trip-type-desc">Return journey included</div>
-                      </div>
+                      <span class="trip-type-indicator"></span>
+                    </div>
+                    <div>
+                      <div class="trip-type-title">Round Trip</div>
+                      <div class="trip-type-desc">Return journey included</div>
                     </div>
                   </label>
                 </div>

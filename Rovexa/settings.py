@@ -309,17 +309,18 @@ RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_test_rovexaKey123")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 
 # ─── Email Configuration ──────────────────────────────────────────────────────
-EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rovexa Cab Services <noreply@rovexa.com>")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "rovexacabs@gmail.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "rbcmbmvtnYzcguuf")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rovexa Cab Services <rovexacabs@gmail.com>")
 
 # ─── Admin Alert Notifications ───────────────────────────────────────────────
 # Email to receive alerts (customer login, new booking, status changes)
-ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL", EMAIL_HOST_USER)
+ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL", "rovexacabs@gmail.com")
+
 
 # WhatsApp via Twilio (optional — leave blank to disable WhatsApp alerts)
 TWILIO_ACCOUNT_SID   = os.environ.get("TWILIO_ACCOUNT_SID", "")
