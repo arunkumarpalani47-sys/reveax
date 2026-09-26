@@ -317,6 +317,16 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rovexa Cabs <noreply@rovexa.com>")
 
+# ─── Admin Alert Notifications ───────────────────────────────────────────────
+# Email to receive alerts (customer login, new booking, status changes)
+ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL", EMAIL_HOST_USER)
+
+# WhatsApp via Twilio (optional — leave blank to disable WhatsApp alerts)
+TWILIO_ACCOUNT_SID   = os.environ.get("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN    = os.environ.get("TWILIO_AUTH_TOKEN", "")
+TWILIO_WHATSAPP_FROM = os.environ.get("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
+ADMIN_WHATSAPP_NUMBER = os.environ.get("ADMIN_WHATSAPP_NUMBER", "")  # e.g. +919487351101
+
 REALTIME_CUSTOMER_UPDATE_INTERVAL = 2  # seconds
 DRIVER_SEARCH_RADII_KM = [2, 5, 8, 10]  # expanding search
 DRIVER_REQUEST_TIMEOUT = 15  # seconds each driver has to accept
