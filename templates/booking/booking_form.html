@@ -1170,24 +1170,26 @@ function updateFareEstimate(distanceKm, durationMins) {
             drop_lat: dLat,
             drop_lng: dLng,
             booking_category: "DAILY_RIDE",
-            trip_type: tripType
+            trip_type: tripType,
+            rate: rate                       // vehicle's admin-set per-km rate
         })
     })
     .then(r => r.json())
     .then(data => {
         if (data.success && data.fare_details) {
             const details = data.fare_details;
+            const usedRate = details.rate_per_km || rate;
             summaryCard.style.display = 'block';
-            document.getElementById("fare_amount_display").innerText = `₹${details.total_fare.toFixed(2)}`;
+            document.getElementById("fare_amount_display").innerText = `₹${details.total_fare.toFixed(0)}`;
             const badge = document.getElementById("trip_type_badge");
             if (badge) {
                 badge.innerText = details.is_round_trip ? 'Round Trip (2-Way)' : 'One Way';
             }
             const dispDist = details.total_distance || (isRound ? (parseFloat(distanceKm) * 2).toFixed(2) : distanceKm);
-            const dispDur = isRound ? Math.round((durationMins || Math.round(distanceKm * 1.5)) * 2) : (durationMins || Math.round(distanceKm * 1.5));
-            document.getElementById("rate_per_km_display").innerText = isRound 
-                ? `Round Trip Rate: ₹${rate}/km (Total ~${dispDist} km)`
-                : `One Way Rate: ₹${rate}/km (Base ₹${details.base_fare})`;
+            const dispDur  = details.estimated_duration || (isRound ? Math.round((durationMins || Math.round(distanceKm * 1.5)) * 2) : (durationMins || Math.round(distanceKm * 1.5)));
+            document.getElementById("rate_per_km_display").innerText = isRound
+                ? `Round Trip: ${dispDist} km × ₹${usedRate}/km`
+                : `One Way: ${dispDist} km × ₹${usedRate}/km`;
             document.getElementById("trip_dist_display").innerText = `${dispDist} km`;
             document.getElementById("trip_time_display").innerText = `Est. ${dispDur} mins`;
         } else {
@@ -1199,23 +1201,23 @@ function updateFareEstimate(distanceKm, durationMins) {
     });
 
     function fallbackEstimate() {
-        const baseFare = 40.0;
+        // Simple formula: distance × rate (no base fare, no surge)
         const oneWayDist = parseFloat(distanceKm);
-        const totalDist = isRound ? (oneWayDist * 2) : oneWayDist;
-        const dur = (durationMins || Math.round(oneWayDist * 1.5)) * (isRound ? 2 : 1);
-        const effectiveRate = isRound ? Math.max(12, rate * 0.95) : rate;
-        const fare = (baseFare + (totalDist * effectiveRate) + (dur * 1.5)).toFixed(2);
+        const totalDist  = isRound ? (oneWayDist * 2) : oneWayDist;
+        const dur        = (durationMins || Math.round(oneWayDist * 1.5)) * (isRound ? 2 : 1);
+        const fare       = Math.ceil(totalDist * rate);
         summaryCard.style.display = 'block';
         document.getElementById("fare_amount_display").innerText = `₹${fare}`;
         const badge = document.getElementById("trip_type_badge");
         if (badge) badge.innerText = isRound ? 'Round Trip (2-Way)' : 'One Way';
-        document.getElementById("rate_per_km_display").innerText = isRound 
-            ? `Round Trip Rate: ₹${effectiveRate.toFixed(2)}/km` 
-            : `One Way Rate: ₹${rate}/km`;
+        document.getElementById("rate_per_km_display").innerText = isRound
+            ? `Round Trip: ${totalDist.toFixed(1)} km × ₹${rate}/km`
+            : `One Way: ${totalDist.toFixed(1)} km × ₹${rate}/km`;
         document.getElementById("trip_dist_display").innerText = `${totalDist.toFixed(1)} km`;
         document.getElementById("trip_time_display").innerText = `Est. ${dur} mins`;
     }
 }
+
 
 // ADDRESS GEOCODING
 function geocodeAddress(address, isPickup) {

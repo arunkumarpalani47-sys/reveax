@@ -472,10 +472,23 @@
               <div class="col-4">
                 <div class="p-2.5 rounded-3 bg-dark bg-opacity-40">
                   <div class="text-white-50 extra-small" style="font-size:0.7rem;">Trip Fare</div>
-                  <div class="text-success fw-bold small mt-1">₹{{ booking.total_fare|floatformat:2 }}</div>
+                  <div class="text-success fw-bold small mt-1">₹{{ booking.total_fare|floatformat:0 }}</div>
                 </div>
               </div>
             </div>
+            <!-- Fare Breakdown Formula -->
+            <div class="mt-2 p-2 rounded-2 bg-dark bg-opacity-40 text-center border border-success border-opacity-20">
+              <small class="text-white-50" style="font-size:0.7rem;">
+                <i class="bi bi-calculator text-success me-1"></i>
+                {% if booking.trip_type == 'ROUND_TRIP' or booking.outstation_type == 'ROUND_TRIP' %}
+                  {{ booking.distance|floatformat:1 }} km × 2 × ₹{{ booking.vehicle.price_per_km|floatformat:0|default:"—" }}/km
+                {% else %}
+                  {{ booking.distance|floatformat:1 }} km × ₹{{ booking.vehicle.price_per_km|floatformat:0|default:"—" }}/km
+                {% endif %}
+                = <strong class="text-success">₹{{ booking.total_fare|floatformat:0 }}</strong>
+              </small>
+            </div>
+
 
             <div class="mt-3 p-2.5 rounded-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 text-warning small text-center fw-semibold">
               <i class="bi bi-exclamation-circle-fill me-1"></i> Exclude driver beta, Toll, State Tax & Parking fares.

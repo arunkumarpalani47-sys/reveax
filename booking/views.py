@@ -72,6 +72,11 @@ def repair_booking_coordinates_and_distance(booking):
 
     # Recalculate total_fare if missing, 0, or parameters changed
     if not booking.total_fare or float(booking.total_fare) <= 0 or needs_save:
+        # Use vehicle's own price_per_km if available
+        vehicle_price_per_km = None
+        if booking.vehicle and getattr(booking.vehicle, 'price_per_km', None):
+            vehicle_price_per_km = float(booking.vehicle.price_per_km)
+
         fare_details = calculate_trip_fare(
             vehicle_type=booking.vehicle_type or "MINI",
             distance_km=float(booking.distance),
@@ -81,7 +86,8 @@ def repair_booking_coordinates_and_distance(booking):
             coupon_code=booking.coupon_code,
             booking_category=booking.booking_category,
             rental_package=booking.rental_package,
-            outstation_type=booking.outstation_type
+            outstation_type=booking.outstation_type,
+            vehicle_price_per_km=vehicle_price_per_km,
         )
         booking.total_fare = Decimal(str(fare_details["total_fare"]))
         booking.fare = booking.total_fare
@@ -303,12 +309,24 @@ def add_booking(request):
                 except Exception:
                     pass
 
-            booking.pickup_lat = safe_float(request.POST.get("pickup_lat"), 12.9716)
-            booking.pickup_lng = safe_float(request.POST.get("pickup_lng"), 77.5946)
-            booking.drop_lat = safe_float(request.POST.get("drop_lat"), 12.9352)
-            booking.drop_lng = safe_float(request.POST.get("drop_lng"), 77.6245)
+            # Use 0.0 as default (not Bengaluru) so is_default_bengaluru() triggers re-geocoding
+            booking.pickup_lat = safe_float(request.POST.get("pickup_lat"), 0.0)
+            booking.pickup_lng = safe_float(request.POST.get("pickup_lng"), 0.0)
+            booking.drop_lat   = safe_float(request.POST.get("drop_lat"),   0.0)
+            booking.drop_lng   = safe_float(request.POST.get("drop_lng"),   0.0)
 
-            from .pricing import get_real_road_distance, calculate_trip_fare
+            from .pricing import get_real_road_distance, calculate_trip_fare, geocode_address_to_lat_lon
+
+            # If coordinates are missing/zero, geocode from address text immediately
+            if not booking.pickup_lat or not booking.pickup_lng or booking.pickup_lat == 0.0:
+                g1 = geocode_address_to_lat_lon(booking.pickup_location)
+                if g1:
+                    booking.pickup_lat, booking.pickup_lng = g1
+
+            if not booking.drop_lat or not booking.drop_lng or booking.drop_lat == 0.0:
+                g2 = geocode_address_to_lat_lon(booking.drop_location)
+                if g2:
+                    booking.drop_lat, booking.drop_lng = g2
 
             raw_dist = safe_float(request.POST.get("distance"), 0)
             if raw_dist > 0.1:
@@ -321,6 +339,11 @@ def add_booking(request):
                 )
                 booking.distance = Decimal(str(road_dist))
 
+            # Get the vehicle's own price_per_km if a vehicle is linked
+            vehicle_price_per_km = None
+            if booking.vehicle and getattr(booking.vehicle, 'price_per_km', None):
+                vehicle_price_per_km = float(booking.vehicle.price_per_km)
+
             fare_details = calculate_trip_fare(
                 vehicle_type=booking.vehicle_type or "CAR_CAB",
                 distance_km=float(booking.distance),
@@ -330,6 +353,7 @@ def add_booking(request):
                 booking_category=booking.booking_category,
                 outstation_type=booking.trip_type,
                 trip_type=booking.trip_type,
+                vehicle_price_per_km=vehicle_price_per_km,
             )
             booking.total_fare = Decimal(str(fare_details["total_fare"]))
             booking.fare = booking.total_fare
@@ -892,6 +916,8 @@ def api_calculate_fare(request):
         rental_pkg = data.get("rental_package", "")
         trip_type  = data.get("trip_type", "ONE_WAY")
         out_type   = data.get("outstation_type", trip_type)
+        # Vehicle's admin-set per-km rate (sent from frontend data-price attribute)
+        vehicle_price_per_km = float(data.get("rate", 0) or data.get("vehicle_price_per_km", 0) or 0)
 
         if dist < 0.1:
             from .pricing import get_real_road_distance
@@ -910,6 +936,7 @@ def api_calculate_fare(request):
             rental_package=rental_pkg,
             outstation_type=out_type,
             trip_type=trip_type,
+            vehicle_price_per_km=vehicle_price_per_km if vehicle_price_per_km > 0 else None,
         )
 
         return JsonResponse({"success": True, "fare_details": breakdown})
