@@ -285,22 +285,22 @@ Friendly customer support.
 <div class="row text-center text-dark g-4">
 
 <div class="col-6 col-md-3">
-<h1 id="live-customers" class="fw-bold display-4">{{ customers|default:10 }}+</h1>
+<h1 id="live-customers" class="fw-bold display-4">{% if customers and customers > 0 %}{{ customers }}+{% else %}0{% endif %}</h1>
 <h5 class="fw-bold">Happy Customers</h5>
 </div>
 
 <div class="col-6 col-md-3">
-<h1 id="live-drivers" class="fw-bold display-4">{{ drivers|default:5 }}+</h1>
+<h1 id="live-drivers" class="fw-bold display-4">{% if drivers and drivers > 0 %}{{ drivers }}+{% else %}0{% endif %}</h1>
 <h5 class="fw-bold">Professional Drivers</h5>
 </div>
 
 <div class="col-6 col-md-3">
-<h1 id="live-vehicles" class="fw-bold display-4">{{ vehicles|default:3 }}+</h1>
+<h1 id="live-vehicles" class="fw-bold display-4">{% if vehicles and vehicles > 0 %}{{ vehicles }}+{% else %}0{% endif %}</h1>
 <h5 class="fw-bold">Vehicles</h5>
 </div>
 
 <div class="col-6 col-md-3">
-<h1 id="live-trips" class="fw-bold display-4">{{ trips|default:15 }}+</h1>
+<h1 id="live-trips" class="fw-bold display-4">{% if trips and trips > 0 %}{{ trips }}+{% else %}0{% endif %}</h1>
 <h5 class="fw-bold">Completed Trips</h5>
 </div>
 
@@ -314,10 +314,10 @@ function updateRealtimeStats() {
     fetch('/api/stats/')
         .then(response => response.json())
         .then(data => {
-            if (data.customers !== undefined) document.getElementById('live-customers').innerText = data.customers + '+';
-            if (data.drivers !== undefined) document.getElementById('live-drivers').innerText = data.drivers + '+';
-            if (data.vehicles !== undefined) document.getElementById('live-vehicles').innerText = data.vehicles + '+';
-            if (data.trips !== undefined) document.getElementById('live-trips').innerText = data.trips + '+';
+            if (data.customers !== undefined) document.getElementById('live-customers').innerText = data.customers + (data.customers > 0 ? '+' : '');
+            if (data.drivers !== undefined) document.getElementById('live-drivers').innerText = data.drivers + (data.drivers > 0 ? '+' : '');
+            if (data.vehicles !== undefined) document.getElementById('live-vehicles').innerText = data.vehicles + (data.vehicles > 0 ? '+' : '');
+            if (data.trips !== undefined) document.getElementById('live-trips').innerText = data.trips + (data.trips > 0 ? '+' : '');
         })
         .catch(err => console.log('Realtime stats fetch error:', err));
 }

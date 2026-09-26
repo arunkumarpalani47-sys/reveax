@@ -68,23 +68,23 @@ def get_live_stats():
         from vehicle.models import Vehicle
         from booking.models import Booking
 
-        customers = CustomUser.objects.filter(role="CUSTOMER").count() or CustomUser.objects.count()
-        drivers = Vehicle.objects.filter(driver_name__isnull=False).exclude(driver_name="").count() or 5
+        customers = CustomUser.objects.filter(role="CUSTOMER").count()
+        drivers = Vehicle.objects.filter(driver_name__isnull=False).exclude(driver_name="").count()
         vehicles = Vehicle.objects.count()
         trips = Booking.objects.count()
 
         return {
-            "customers": max(customers, 1),
-            "drivers": max(drivers, 1),
-            "vehicles": max(vehicles, 1),
-            "trips": max(trips, 1)
+            "customers": customers,
+            "drivers": drivers,
+            "vehicles": vehicles,
+            "trips": trips
         }
     except Exception:
         return {
-            "customers": 10,
-            "drivers": 5,
-            "vehicles": 3,
-            "trips": 15
+            "customers": 0,
+            "drivers": 0,
+            "vehicles": 0,
+            "trips": 0
         }
 
 def home(request):

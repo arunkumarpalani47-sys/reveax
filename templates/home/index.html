@@ -461,7 +461,7 @@ required>
                     <div class="stat-icon-wrap mb-2 text-info fs-2">
                         <i class="bi bi-people-fill"></i>
                     </div>
-                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-customers" data-target="{{ customers|default:11 }}" data-suffix="+">{{ customers|default:10 }}+</h3>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-customers" data-target="{{ customers|default_if_none:0 }}" data-suffix="+">{% if customers and customers > 0 %}{{ customers }}+{% else %}0{% endif %}</h3>
                     <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Happy Customers</div>
                 </div>
             </div>
@@ -472,7 +472,7 @@ required>
                     <div class="stat-icon-wrap mb-2 text-success fs-2">
                         <i class="bi bi-person-badge-fill"></i>
                     </div>
-                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-drivers" data-target="{{ drivers|default:5 }}" data-suffix="+">{{ drivers|default:5 }}+</h3>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-drivers" data-target="{{ drivers|default_if_none:0 }}" data-suffix="+">{% if drivers and drivers > 0 %}{{ drivers }}+{% else %}0{% endif %}</h3>
                     <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Expert Drivers</div>
                 </div>
             </div>
@@ -483,7 +483,7 @@ required>
                     <div class="stat-icon-wrap mb-2 text-warning fs-2">
                         <i class="bi bi-car-front-fill"></i>
                     </div>
-                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-vehicles" data-target="{{ vehicles|default:3 }}" data-suffix="+">{{ vehicles|default:3 }}+</h3>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-vehicles" data-target="{{ vehicles|default_if_none:0 }}" data-suffix="+">{% if vehicles and vehicles > 0 %}{{ vehicles }}+{% else %}0{% endif %}</h3>
                     <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Verified Cabs</div>
                 </div>
             </div>
@@ -494,7 +494,7 @@ required>
                     <div class="stat-icon-wrap mb-2 text-danger fs-2">
                         <i class="bi bi-geo-alt-fill"></i>
                     </div>
-                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-trips" data-target="{{ trips|default:15 }}" data-suffix="+">{{ trips|default:15 }}+</h3>
+                    <h3 class="fw-bold text-white display-6 mb-1 counter-animate" id="live-home-trips" data-target="{{ trips|default_if_none:0 }}" data-suffix="+">{% if trips and trips > 0 %}{{ trips }}+{% else %}0{% endif %}</h3>
                     <div class="text-white-50 small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Completed Trips</div>
                 </div>
             </div>
@@ -1477,11 +1477,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var progress = Math.min((timestamp - startTime) / duration, 1);
             var ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
             var current = Math.floor(start + (target - start) * ease);
-            element.innerText = current.toLocaleString() + suffix;
+            element.innerText = current.toLocaleString() + (current > 0 ? suffix : '');
             if (progress < 1) {
                 window.requestAnimationFrame(step);
             } else {
-                element.innerText = target.toLocaleString() + suffix;
+                element.innerText = target.toLocaleString() + (target > 0 ? suffix : '');
             }
         }
         window.requestAnimationFrame(step);
@@ -1532,19 +1532,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (data.customers !== undefined) {
                     var custEl = document.getElementById('live-home-customers');
-                    if (custEl) custEl.innerText = data.customers + '+';
+                    if (custEl) custEl.innerText = data.customers + (data.customers > 0 ? '+' : '');
                 }
                 if (data.drivers !== undefined) {
                     var drivEl = document.getElementById('live-home-drivers');
-                    if (drivEl) drivEl.innerText = data.drivers + '+';
+                    if (drivEl) drivEl.innerText = data.drivers + (data.drivers > 0 ? '+' : '');
                 }
                 if (data.vehicles !== undefined) {
                     var vehEl = document.getElementById('live-home-vehicles');
-                    if (vehEl) vehEl.innerText = data.vehicles + '+';
+                    if (vehEl) vehEl.innerText = data.vehicles + (data.vehicles > 0 ? '+' : '');
                 }
                 if (data.trips !== undefined) {
                     var tripEl = document.getElementById('live-home-trips');
-                    if (tripEl) tripEl.innerText = data.trips + '+';
+                    if (tripEl) tripEl.innerText = data.trips + (data.trips > 0 ? '+' : '');
                 }
             })
             .catch(function(err) {
