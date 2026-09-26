@@ -315,7 +315,7 @@ EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rovexa Cabs <noreply@rovexa.com>")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rovexa Cab Services <noreply@rovexa.com>")
 
 # ─── Admin Alert Notifications ───────────────────────────────────────────────
 # Email to receive alerts (customer login, new booking, status changes)

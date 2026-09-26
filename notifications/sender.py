@@ -43,7 +43,7 @@ def _send_email_notification(subject: str, html_body: str):
         logger.warning("[Rovexa Notifications] ADMIN_NOTIFICATION_EMAIL not set — skipping email.")
         return
 
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", f"Rovexa Cabs <{admin_email}>")
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", f"Rovexa Cab Services <{admin_email}>")
 
     try:
         msg = EmailMultiAlternatives(
@@ -143,7 +143,7 @@ def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> s
         <tr>
           <td>
             <span style="color:#ffffff;font-size:20px;font-weight:900;
-                         letter-spacing:2px;text-transform:uppercase;">ROVEAX</span>
+                         letter-spacing:2px;text-transform:uppercase;">ROVEXA</span>
             <span style="color:#94a3b8;font-size:11px;margin-left:8px;
                          font-weight:400;letter-spacing:1px;">CAB SERVICES</span>
           </td>
@@ -178,7 +178,7 @@ def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> s
               {title}
             </div>
             <div style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:6px;">
-              🕐 {now_str} &nbsp;|&nbsp; 📍 Roveax Admin Panel
+              🕐 {now_str} &nbsp;|&nbsp; 📍 Rovexa Cab Services Admin Panel
             </div>
           </td>
         </tr>
@@ -232,7 +232,7 @@ def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> s
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="color:#94a3b8;font-size:12px;line-height:1.8;">
-            <strong style="color:#e2e8f0;">Roveax Cab Services</strong><br>
+            <strong style="color:#e2e8f0;">Rovexa Cab Services</strong><br>
             📞 +91 94873 51101 &nbsp;|&nbsp;
             🌐 reveax.onrender.com<br>
             <span style="color:#64748b;font-size:11px;">
@@ -243,8 +243,9 @@ def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> s
             <span style="color:#1e40af;font-size:22px;font-weight:900;
                          letter-spacing:2px;">R</span>
             <span style="color:#64748b;font-size:10px;display:block;
-                         text-align:right;letter-spacing:1px;">ROVEAX</span>
+                         text-align:right;letter-spacing:1px;">ROVEXA</span>
           </td>
+
         </tr>
       </table>
     </td>
@@ -274,25 +275,25 @@ def notify_customer_login(user):
     now   = datetime.now().strftime("%d %b %Y  %I:%M %p")
 
     # Email
-    subject   = f"🔔 Customer Login: {name}"
+    subject   = f"🔔 Customer Login: {name} — Rovexa Cab Services"
     html_body = _build_email_html(
         title=f"Customer Logged In — {name}",
         color="#2563eb",
         icon="🔔",
         rows=[
-            ("Name",        name),
-            ("Email",       email),
-            ("Phone",       phone),
-            ("Username",    user.username),
-            ("Login Time",  now),
-            ("Status",      "✅ Active Session"),
+            ("Customer Name",  name),
+            ("Email",          email),
+            ("Phone",          phone),
+            ("Username",       user.username),
+            ("Login Time",     now),
+            ("Account Status", "✅ Active Session"),
         ],
     )
     _run_in_thread(_send_email_notification, subject, html_body)
 
     # WhatsApp
     wa_msg = (
-        f"🔔 *Rovexa – Customer Login Alert*\n\n"
+        f"🔔 *Rovexa Cab Services – Customer Login Alert*\n\n"
         f"👤 *Name:* {name}\n"
         f"📧 *Email:* {email}\n"
         f"📞 *Phone:* {phone}\n"
@@ -313,16 +314,16 @@ def notify_new_booking(booking):
         name = email = phone = "Unknown"
 
     now = datetime.now().strftime("%d %b %Y  %I:%M %p")
-    bid = str(booking.id)[:8].upper()
+    bid = getattr(booking, "booking_number", None) or f"#{str(booking.id)[:8].upper()}"
 
     # Email
-    subject   = f"🚖 New Booking #{bid} — {name}"
+    subject   = f"🚖 New Booking {bid} — Rovexa Cab Services"
     html_body = _build_email_html(
-        title=f"New Booking Received  #{bid}",
+        title=f"New Booking Received  {bid}",
         color="#059669",
         icon="🚖",
         rows=[
-            ("Booking ID",      bid),
+            ("Booking Number",  bid),
             ("Customer Name",   name),
             ("Email",           email),
             ("Phone",           phone),
@@ -340,7 +341,7 @@ def notify_new_booking(booking):
 
     # WhatsApp
     wa_msg = (
-        f"🚖 *Rovexa – New Booking #{bid}*\n\n"
+        f"🚖 *Rovexa Cab Services – New Booking {bid}*\n\n"
         f"👤 *Customer:* {name}\n"
         f"📞 *Phone:* {phone}\n"
         f"📧 *Email:* {email}\n"
@@ -377,35 +378,36 @@ def notify_booking_status_change(booking, old_status: str, new_status: str):
         name = phone = "Unknown"
 
     now = datetime.now().strftime("%d %b %Y  %I:%M %p")
-    bid = str(booking.id)[:8].upper()
+    bid = getattr(booking, "booking_number", None) or f"#{str(booking.id)[:8].upper()}"
 
     # Email
-    subject   = f"{icon} Booking #{bid} → {new_status}"
+    subject   = f"{icon} Booking {bid} → {new_status} — Rovexa Cab Services"
     html_body = _build_email_html(
-        title=f"Booking Status Changed  #{bid}",
+        title=f"Booking Status Changed  {bid}",
         color="#7c3aed",
         icon=icon,
         rows=[
-            ("Booking ID",    bid),
-            ("Customer",      name),
-            ("Phone",         phone),
+            ("Booking Number",  bid),
+            ("Customer",        name),
+            ("Phone",           phone),
             ("Previous Status", old_status),
-            ("New Status",    f"{icon} {new_status}"),
-            ("Pickup",        getattr(booking, "pickup_location", "—")),
-            ("Drop",          getattr(booking, "drop_location", "—")),
-            ("Total Fare",    f"₹{booking.total_fare}" if getattr(booking, "total_fare", None) else "—"),
-            ("Changed At",    now),
+            ("New Status",      f"{icon} {new_status}"),
+            ("Pickup",          getattr(booking, "pickup_location", "—")),
+            ("Drop",            getattr(booking, "drop_location", "—")),
+            ("Total Fare",      f"₹{booking.total_fare}" if getattr(booking, "total_fare", None) else "—"),
+            ("Changed At",      now),
         ],
     )
     _run_in_thread(_send_email_notification, subject, html_body)
 
     # WhatsApp
     wa_msg = (
-        f"{icon} *Rovexa – Booking Status Update*\n\n"
-        f"📋 *Booking ID:* #{bid}\n"
+        f"{icon} *Rovexa Cab Services – Booking Status Update*\n\n"
+        f"📋 *Booking Number:* {bid}\n"
         f"👤 *Customer:* {name}  |  📞 {phone}\n"
         f"🔄 *Status:* {old_status} → *{new_status}*\n"
         f"💰 *Fare:* ₹{getattr(booking, 'total_fare', '—')}\n"
         f"🕐 *At:* {now}"
     )
     _run_in_thread(_send_whatsapp_notification, wa_msg)
+
