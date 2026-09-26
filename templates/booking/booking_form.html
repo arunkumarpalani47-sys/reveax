@@ -70,7 +70,19 @@
 
 .location-input-group {
   position: relative;
-  z-index: 2;
+  transition: z-index 0.15s ease;
+}
+
+.location-input-group.pickup-group {
+  z-index: 30;
+}
+
+.location-input-group.drop-group {
+  z-index: 20;
+}
+
+.location-input-group:focus-within {
+  z-index: 100 !important;
 }
 
 .location-icon {
@@ -115,38 +127,58 @@
 
 .autocomplete-suggestions {
   position: absolute;
-  top: calc(100% + 4px);
-  left: 45px;
+  top: calc(100% + 6px);
+  left: 0;
   right: 0;
+  width: 100%;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #cbd5e1;
   border-radius: 14px;
-  max-height: 220px;
+  max-height: 250px;
   overflow-y: auto;
-  z-index: 1050;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+  z-index: 9999;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 6px 0;
+  margin: 0;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
 }
 
 .suggestion-item {
-  padding: 11px 16px;
+  padding: 10px 14px;
   cursor: pointer;
   font-size: 0.88rem;
   color: #334155;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.15s ease;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
 }
 
 .suggestion-item:last-child {
   border-bottom: none;
 }
 
+.suggestion-item i {
+  margin-top: 3px;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
 .suggestion-item:hover {
   background-color: #eff6ff;
   color: #2563eb;
-  padding-left: 20px;
+  padding-left: 18px;
 }
 
 /* ==========================================
@@ -683,7 +715,7 @@
                 <div class="route-connector"></div>
 
                 <!-- Pickup Input -->
-                <div class="location-input-group mb-3 d-flex align-items-center gap-3 position-relative">
+                <div class="location-input-group pickup-group mb-3 d-flex align-items-center gap-3 position-relative">
                   <div class="location-icon pickup-icon">
                     <i class="bi bi-geo-alt-fill"></i>
                   </div>
@@ -696,13 +728,14 @@
                       placeholder="Enter pickup address or click map..." 
                       required 
                       autocomplete="off" 
+                      spellcheck="false"
                       value="{{ pickup }}">
-                    <div class="autocomplete-suggestions" id="pickup_suggestions" style="display: none;"></div>
+                    <div class="autocomplete-suggestions shadow-lg" id="pickup_suggestions" style="display: none;"></div>
                   </div>
                 </div>
 
                 <!-- Drop Input -->
-                <div class="location-input-group d-flex align-items-center gap-3 position-relative">
+                <div class="location-input-group drop-group d-flex align-items-center gap-3 position-relative">
                   <div class="location-icon drop-icon">
                     <i class="bi bi-flag-fill"></i>
                   </div>
@@ -715,8 +748,9 @@
                       placeholder="Enter drop address or click map..." 
                       required 
                       autocomplete="off" 
+                      spellcheck="false"
                       value="{{ drop }}">
-                    <div class="autocomplete-suggestions" id="drop_suggestions" style="display: none;"></div>
+                    <div class="autocomplete-suggestions shadow-lg" id="drop_suggestions" style="display: none;"></div>
                   </div>
                 </div>
               </div>
@@ -1225,15 +1259,38 @@ function setCoordinates(lat, lng, isPickup, addressName) {
 function initFormAutocomplete(inputId, suggestionsId, isPickup) {
     const input = document.getElementById(inputId);
     const suggestionsContainer = document.getElementById(suggestionsId);
+    const groupContainer = input.closest('.location-input-group');
     let debounceTimer;
+
+    function openSuggestions() {
+        suggestionsContainer.style.display = 'block';
+        if (groupContainer) groupContainer.style.zIndex = '1000';
+    }
+
+    function closeSuggestions() {
+        suggestionsContainer.innerHTML = '';
+        suggestionsContainer.style.display = 'none';
+        if (groupContainer) groupContainer.style.zIndex = isPickup ? '30' : '20';
+    }
+
+    input.addEventListener('focus', function() {
+        if (groupContainer) groupContainer.style.zIndex = '1000';
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (suggestionsContainer.style.display === 'none' && groupContainer) {
+                groupContainer.style.zIndex = isPickup ? '30' : '20';
+            }
+        }, 200);
+    });
 
     input.addEventListener('input', function() {
         clearTimeout(debounceTimer);
         const query = this.value.trim();
 
         if (query.length < 3) {
-            suggestionsContainer.innerHTML = '';
-            suggestionsContainer.style.display = 'none';
+            closeSuggestions();
             return;
         }
 
@@ -1242,33 +1299,35 @@ function initFormAutocomplete(inputId, suggestionsId, isPickup) {
                 .then(res => res.json())
                 .then(data => {
                     suggestionsContainer.innerHTML = '';
-                    if (data.length > 0) {
-                        suggestionsContainer.style.display = 'block';
+                    if (data && data.length > 0) {
+                        openSuggestions();
                         data.forEach(item => {
                             const div = document.createElement('div');
                             div.className = 'suggestion-item';
-                            div.innerHTML = `<i class="bi bi-geo-alt text-primary"></i> <span>${item.display_name}</span>`;
-                            div.addEventListener('click', () => {
+                            div.innerHTML = `<i class="bi bi-geo-alt-fill text-primary"></i> <span>${item.display_name}</span>`;
+                            div.addEventListener('click', (e) => {
+                                e.stopPropagation();
                                 const lat = parseFloat(item.lat);
                                 const lng = parseFloat(item.lon);
                                 setCoordinates(lat, lng, isPickup, item.display_name);
-                                suggestionsContainer.innerHTML = '';
-                                suggestionsContainer.style.display = 'none';
+                                closeSuggestions();
                             });
                             suggestionsContainer.appendChild(div);
                         });
                     } else {
-                        suggestionsContainer.style.display = 'none';
+                        closeSuggestions();
                     }
                 })
-                .catch(err => console.error(err));
-        }, 400);
+                .catch(err => {
+                    console.error(err);
+                    closeSuggestions();
+                });
+        }, 300);
     });
 
     document.addEventListener('click', function(e) {
-        if (e.target !== input && e.target !== suggestionsContainer) {
-            suggestionsContainer.innerHTML = '';
-            suggestionsContainer.style.display = 'none';
+        if (e.target !== input && e.target !== suggestionsContainer && !suggestionsContainer.contains(e.target)) {
+            closeSuggestions();
         }
     });
 }
