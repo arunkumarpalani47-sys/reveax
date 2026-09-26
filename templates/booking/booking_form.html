@@ -532,6 +532,20 @@
   color: #ffffff;
 }
 
+.btn-book-submit:disabled {
+  transform: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.45;
+}
+
+.no-cab-alert {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe0e0 100%);
+  border: 2px dashed #ef4444;
+  padding: 24px 16px;
+}
+
+
 .pulse-icon {
   display: inline-block;
   animation: pulse 1.5s infinite;
@@ -846,9 +860,19 @@
                     </div>
                   </div>
                 {% empty %}
-                  <div class="alert alert-warning py-3 small mb-0 w-100 rounded-4 border-0">No active vehicles configured by Admin right now.</div>
+                  <div class="no-cab-alert text-center py-4 w-100 rounded-4" id="noCabBanner">
+                    <div style="font-size:2.5rem; margin-bottom:8px;">🚫</div>
+                    <div class="fw-bold text-danger mb-1" style="font-size:1rem;">No Cabs Available Right Now</div>
+                    <div class="text-muted small">The admin hasn't added any active vehicles yet. Please try again later or call our helpline.</div>
+                    <a href="tel:+919487351101" class="btn btn-sm btn-outline-danger rounded-pill mt-2 px-3">
+                      <i class="bi bi-telephone-fill me-1"></i> Call Helpline
+                    </a>
+                  </div>
                 {% endfor %}
               </div>
+
+              {% comment %}Track cab availability for JS validation{% endcomment %}
+              <input type="hidden" id="available_vehicle_count" value="{{ available_vehicles|length }}">
             </div>
 
             <!-- STEP 3: Customer & Passenger Details -->
@@ -939,16 +963,34 @@
 
             <!-- Submit Buttons -->
             <div>
-              <button type="submit" class="btn-book-submit">
-                <i class="bi bi-send-check-fill me-2"></i> Confirm & Book Luxury Ride Now
-              </button>
-              <div class="text-center mt-2.5">
+              {% if available_vehicles %}
+                <button type="submit" class="btn-book-submit" id="bookSubmitBtn">
+                  <i class="bi bi-send-check-fill me-2"></i> Confirm & Book Luxury Ride Now
+                </button>
+                <div id="noCabSelectedWarning" class="text-center mt-2 d-none">
+                  <span class="badge bg-danger px-3 py-2 rounded-pill" style="font-size:0.82rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Please select a cab above to continue booking
+                  </span>
+                </div>
+              {% else %}
+                <button type="button" class="btn-book-submit" disabled
+                  style="opacity:0.45; cursor:not-allowed; background:linear-gradient(135deg,#6c757d,#495057);">
+                  <i class="bi bi-slash-circle me-2"></i> No Cabs Available — Cannot Book
+                </button>
+                <div class="text-center mt-2">
+                  <span class="badge bg-danger px-3 py-2 rounded-pill" style="font-size:0.82rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> No cabs configured yet. Please call helpline or try later.
+                  </span>
+                </div>
+              {% endif %}
+              <div class="text-center mt-2">
                 <span class="text-muted small fw-medium" style="font-size: 0.8rem;">
                   <i class="bi bi-shield-exclamation text-warning me-1"></i>
                   Exclude driver beta, Toll, State Tax & Parking fares.
                 </span>
               </div>
             </div>
+
 
           </div>
 
@@ -1420,6 +1462,59 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     if (initialDropAddress) {
         geocodeAddress(initialDropAddress, false);
+    }
+
+    // ── CAB SELECTION VALIDATION ─────────────────────────────────────
+    const submitBtn = document.getElementById('bookSubmitBtn');
+    const noCabWarning = document.getElementById('noCabSelectedWarning');
+    const vehicleCount = parseInt(document.getElementById('available_vehicle_count')?.value || '0');
+
+    function updateSubmitState() {
+        if (!submitBtn || vehicleCount === 0) return; // No vehicles — button stays blocked
+        const selectedCard = document.querySelector('.premium-car-card.active');
+        const hasSelection = !!selectedCard;
+
+        if (hasSelection) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '';
+            submitBtn.style.cursor = '';
+            if (noCabWarning) noCabWarning.classList.add('d-none');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.45';
+            submitBtn.style.cursor = 'not-allowed';
+            if (noCabWarning) noCabWarning.classList.remove('d-none');
+        }
+    }
+
+    // Call once on load to set correct initial state
+    updateSubmitState();
+
+    // Update on every vehicle card click
+    document.querySelectorAll('.premium-car-card').forEach(card => {
+        card.addEventListener('click', function() {
+            setTimeout(updateSubmitState, 50); // small delay lets syncCard run first
+        });
+    });
+
+    // Final form submit guard
+    const bookingForm = document.querySelector('form');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', function(e) {
+            if (vehicleCount === 0) {
+                e.preventDefault();
+                alert('No cabs are available right now. Please call our helpline or try again later.');
+                return false;
+            }
+            const selectedCard = document.querySelector('.premium-car-card.active');
+            if (!selectedCard) {
+                e.preventDefault();
+                if (noCabWarning) noCabWarning.classList.remove('d-none');
+                // Scroll to vehicle section
+                document.getElementById('vehicleCardGrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        });
     }
 });
 </script>
