@@ -278,7 +278,7 @@ def _build_email_html(title: str, color: str, icon: str, rows: list[tuple]) -> s
         <tr>
           <td style="color:#94a3b8;font-size:12px;line-height:1.8;">
             <strong style="color:#e2e8f0;">Rovexa Cab Services</strong><br>
-            📞 +91 94873 51101 &nbsp;|&nbsp;
+            📞 +91 93452 98351 &nbsp;|&nbsp;
             🌐 reveax.onrender.com<br>
             <span style="color:#64748b;font-size:11px;">
               This is an automated notification — do not reply to this email.

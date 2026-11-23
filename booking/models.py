@@ -205,7 +205,7 @@ class Booking(models.Model):
                 return self.customer.phone
         except Exception:
             pass
-        return "+91 9876543210"
+        return "+91 93452 98351"
 
     @property
     def safe_vehicle_name(self):

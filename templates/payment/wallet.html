@@ -253,14 +253,14 @@
           <div class="row align-items-center">
             <div class="col-md-5 text-center border-end border-secondary py-2">
               <img id="dynamic_upi_qr_img"
-                   src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=9487351101@paytm&pn=Rovexa%20Cabs&am=500&cu=INR"
+                   src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=9345298351@paytm&pn=Rovexa%20Cabs&am=500&cu=INR"
                    alt="UPI QR Code" class="img-fluid rounded-3 p-2 bg-white mb-2 shadow" style="max-width:180px;">
               <div class="text-muted x-small" id="qr_vpa_subtitle">Scan QR with Google Pay / PhonePe / Paytm</div>
             </div>
             <div class="col-md-7 ps-md-4 mt-3 mt-md-0">
               <label class="form-label small fw-bold text-muted">YOUR MERCHANT / BUSINESS UPI ID</label>
               <div class="input-group mb-2">
-                <input type="text" id="upi_vpa_input" oninput="updateDynamicUpiQr()" class="form-control bg-dark text-warning fw-bold border-secondary" value="9487351101@paytm" placeholder="e.g. 9487351101@paytm">
+                <input type="text" id="upi_vpa_input" oninput="updateDynamicUpiQr()" class="form-control bg-dark text-warning fw-bold border-secondary" value="9345298351@paytm" placeholder="e.g. 9345298351@paytm">
                 <button type="button" onclick="copyUpiVpa()" class="btn btn-outline-warning btn-sm">
                   <i class="bi bi-copy me-1"></i> Copy
                 </button>
@@ -461,7 +461,7 @@
   }
 
   function updateDynamicUpiQr() {
-    const vpa = document.getElementById("upi_vpa_input") ? document.getElementById("upi_vpa_input").value.trim() : "9487351101@paytm";
+    const vpa = document.getElementById("upi_vpa_input") ? document.getElementById("upi_vpa_input").value.trim() : "9345298351@paytm";
     const amt = currentPayAmount || 500;
     const qrImg = document.getElementById("dynamic_upi_qr_img");
     const sub = document.getElementById("qr_vpa_subtitle");
