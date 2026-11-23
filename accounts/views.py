@@ -182,7 +182,8 @@ def admin_login(request):
             )
             return render(request, "accounts/admin_login.html")
 
-        user = authenticate(request, username=username, password=password)
+        auth_username = matched_admin.username if matched_admin else username
+        user = authenticate(request, username=auth_username, password=password)
 
         if user is not None:
             if not user.is_active:

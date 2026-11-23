@@ -7,8 +7,7 @@ django.setup()
 from accounts.models import CustomUser
 
 admins = [
-    ('Admin176', 'admin176@rovexa.com', 'S5#(@56JlK'),
-    ('adminbala', 'admin@rovexa.com', 'bala@2003'),
+    ('arunkumarpalani428@gmail.com', 'arunkumarpalani428@gmail.com', 'Arunkumar@2006'),
 ]
 
 for username, email, password in admins:
